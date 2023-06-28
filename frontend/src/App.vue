@@ -59,7 +59,7 @@ export default {
 
 <style>
 .v-application {
-  font-family: 'Chosunilbo_myungjo', sans-serif !important;
+  font-family: 'GmarketSansMediumE', sans-serif !important;
 }
 
 @font-face {
