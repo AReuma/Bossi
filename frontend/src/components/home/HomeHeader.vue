@@ -89,7 +89,8 @@ export default {
   },
   methods: {
     login(){
-      alert('로그인 클릭')
+      //alert('로그인 클릭')
+      this.$router.push({name: 'LoginPage'})
     },
     cart(){
       alert('장바구니 클릭')
