@@ -1,5 +1,17 @@
 <template>
     <div id='nav'>
+      <div id="before_login">
+        <div class="before_login_button" style="margin-right: 160px">
+          고객센터
+        </div>
+        <div class="before_login_button" @click="register()">
+          회원가입
+        </div>
+        <div class="before_login_button" @click="login()">
+          로그인
+        </div>
+      </div>
+
       <div id="header">
         <div id="title">
           <div id="bColor">B</div>
@@ -38,8 +50,8 @@
               <div>
                 <v-icon large style="height: 30px">mdi-account-circle-outline</v-icon>
               </div>
-              <div style="font-size: 12px; display: flex; justify-content: center; padding-top: 3px">
-                로그인
+              <div style="font-size: 11px; display: flex; justify-content: center; padding-top: 3px">
+                내 정보
               </div>
             </div>
 
@@ -49,7 +61,7 @@
                   <v-icon large style="height: 30px">mdi-cart-outline</v-icon>
                 </v-badge>
               </div>
-              <div style="font-size: 12px; display: flex; justify-content: center; padding-top: 3px">
+              <div style="font-size: 11px; display: flex; justify-content: center; padding-top: 3px">
                 장바구니
               </div>
             </div>
@@ -94,139 +106,154 @@ export default {
     },
     cart(){
       alert('장바구니 클릭')
+    },
+    register(){
+      this.$router.push({name: 'JoinPage'})
     }
   }
 };
 </script>
 
 <style scoped>
-  #nav{
-    background-color: white;
-    color: #212124;
-    top: 0;
-    left: 0;
-    width: 100%;
-    max-width: 100vw;
-    padding-top: 10px;
-    /* position: fixed;
-    z-index: 999; */
-  }
-  #header {
-    background-color: white;
-    max-width: 1200px;
-    height: 64px;
-    padding: 12px 16px;
-    box-sizing: border-box;
-    justify-content: space-between;
-    width: 100%;
-    margin: 0 auto;
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  #category{
-    max-width: 1200px;
-    height: 44px;
-    padding: 19px 50px;
-    box-sizing: border-box;
-    justify-content: space-between;
-    width: 100%;
-    margin: 0 auto;
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-  .category_list{
-    font-family: 'GmarketSansMedium', sans-serif;
-    font-size: 12px;
-    height: 42px;
-  }
-  .category_item{
-    height: 42px;
-    text-align : center;
-    padding : 13px 0;
-  }
-  #title {
-    text-decoration: none;
-    width: 160px;
-  }
-  #bColor{
-    color: #fc9899;
-    font-family: ONE-Mobile-POP, serif;
-    font-size: 42px;
-    float: left;
-  }
-  #ossiColor{
-    color: #3d4148;
-    font-family: GangwonEduSaeeum_OTFMediumA, serif;
-    font-size: 42px;
-    float: left;
-  }
-  #nav_list{
-    width: 180px;
-    font-size: 22px;
-    font-family: GmarketSansMedium,serif;
-  }
-  #nav_list .router-link-active,
-  #nav_list .router-link-exact-active {
-    text-decoration: none;
-    line-height: 1.32;
-    font-size: 18px;
-    font-style: normal;
-    margin-right: 30px;
-    color: green;
-  }
-  #nav_item{
-    text-decoration: none;
-    line-height: 1.32;
-    font-size: 18px;
-    font-weight: 700;
-    font-style: normal;
-    margin-right: 30px;
-    color: #4d5159;
-  }
-  #nav_right{
-    max-height: 54px;
-    margin-left: 20px;
-    display: flex;
-    position: relative;
-  }
-  #searchBar {
-    display: block;
-    position: relative;
-    margin-right: 12px;
-  }
-  input {
-    width: 350px;
-    line-height: 1.36;
-    font-size: 16px;
-    /*background-color: #f2f3f6;*/
-    box-sizing: border-box;
-    height: 40px;
-    /*padding: 9px 12px;*/
-    border: #fc9899 2px solid;
-    border-radius: 6px;
-    color: #212124;
-  }
-  #my_button{
-    line-height: 1.3;
-    font-size: 16px;
-    /*letter-spacing: -2%;*/
-    display: block;
-    white-space: nowrap;
-    background-color: white;
-    color: #212124;
-    height: 54px;
-    font-weight: 700;
-    width: fit-content;
-    min-height: 28px;
-    padding: 2px 10px;
-    border-radius: 3px;
-    //border: 1px solid #d1d3d8;
-    background: none;
-    appearance: none;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
+#before_login
+{
+  background-color: rgba(153,155,159,0.1);
+  //background-color: red;
+  height: 30px;
+}
+.before_login_button{
+  float: right;
+  width: 70px;
+  box-sizing: border-box;
+  text-align: center;
+  margin-top: 8px;
+  font-size: 11px;
+}
+#nav{
+  background-color: white;
+  color: #212124;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  /* position: fixed;
+  z-index: 999; */
+}
+#header {
+  background-color: white;
+  max-width: 1200px;
+  height: 64px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+#category{
+  max-width: 1200px;
+  height: 44px;
+  padding: 19px 50px;
+  box-sizing: border-box;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.category_list{
+  font-size: 14px;
+  height: 42px;
+}
+.category_item{
+  height: 42px;
+  text-align : center;
+  padding : 13px 0;
+}
+#title {
+  text-decoration: none;
+  width: 160px;
+}
+#bColor{
+  color: #fc9899;
+  font-family: ONE-Mobile-POP, serif;
+  font-size: 42px;
+  float: left;
+}
+#ossiColor{
+  color: #3d4148;
+  font-family: GangwonEduSaeeum_OTFMediumA, serif;
+  font-size: 42px;
+  float: left;
+}
+#nav_list{
+  width: 180px;
+  font-size: 22px;
+  font-family: GmarketSansMedium,serif;
+}
+#nav_list .router-link-active,
+#nav_list .router-link-exact-active {
+  text-decoration: none;
+  line-height: 1.32;
+  font-size: 18px;
+  font-style: normal;
+  margin-right: 30px;
+  color: green;
+}
+#nav_item{
+  text-decoration: none;
+  line-height: 1.32;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: normal;
+  margin-right: 30px;
+  color: #4d5159;
+}
+#nav_right{
+  max-height: 54px;
+  margin-left: 20px;
+  display: flex;
+  position: relative;
+}
+#searchBar {
+  display: block;
+  position: relative;
+  margin-right: 12px;
+}
+input {
+  width: 350px;
+  line-height: 1.36;
+  font-size: 16px;
+  /*background-color: #f2f3f6;*/
+  box-sizing: border-box;
+  height: 40px;
+  /*padding: 9px 12px;*/
+  border: #fc9899 2px solid;
+  border-radius: 6px;
+  color: #212124;
+}
+#my_button{
+  line-height: 1.3;
+  font-size: 16px;
+  /*letter-spacing: -2%;*/
+  display: block;
+  white-space: nowrap;
+  background-color: white;
+  color: #212124;
+  height: 54px;
+  font-weight: 700;
+  width: fit-content;
+  min-height: 28px;
+  padding: 2px 10px;
+  border-radius: 3px;
+//border: 1px solid #d1d3d8;
+  background: none;
+  appearance: none;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
 </style>

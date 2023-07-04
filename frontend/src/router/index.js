@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomePage from '../views/home/HomePage.vue'
 import LoginPage from "@/views/user/LoginPage.vue";
+import JoinPage from "@/views/user/JoinPage.vue";
+import EmailJoinPage from "@/views/user/EmailJoinPage.vue";
 
 Vue.use(VueRouter)
 
@@ -16,6 +18,15 @@ const routes = [
     name: 'LoginPage',
     component: LoginPage
   },
+  {
+    path: '/registerPage',
+    name: 'JoinPage',
+    component: JoinPage
+  },{
+    path: '/user/emailRegister',
+    name: 'EmailJoinPage',
+    component: EmailJoinPage
+  }
 ]
 
 const router = new VueRouter({
