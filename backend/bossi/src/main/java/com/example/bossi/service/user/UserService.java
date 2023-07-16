@@ -1,14 +1,12 @@
-package com.example.bossi.service;
+package com.example.bossi.service.user;
 
 import com.example.bossi.entity.User;
 import com.example.bossi.entity.dto.UserJoinRequest;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.UserRepository;
-import com.example.bossi.utils.JwtTokenUtil;
+import com.example.bossi.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +18,7 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${jwt.token.secret}")
-    private String key;
-
-    private Long expireTimeMs = 1000 * 60 * 60L;
+    private final JwtTokenService jwtTokenService;
 
     public String join(UserJoinRequest userJoinRequest){
 
@@ -57,9 +52,7 @@ public class UserService {
             throw new AppException(ErrorCode.INVALID_PASSWORD, "잘못된 비밀번호입니다.");
         }
 
-        //Exception이 없을 경우 토큰 발행
-
-        //return JwtTokenUtil.createToken(selectedUser.getEmail(), key, expireTimeMs);
-        return "null";
+        //return jwt.createToken(selectedUser.getEmail(), key, expireTimeMs);
+        return null;
     }
 }

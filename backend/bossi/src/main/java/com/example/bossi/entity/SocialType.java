@@ -1,5 +1,5 @@
 package com.example.bossi.entity;
 
 public enum SocialType {
-    KAKAO, NAVER, GOOGLE
+    KAKAO, NAVER, GOOGLE, GITHUB
 }
