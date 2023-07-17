@@ -4,6 +4,8 @@ import HomePage from '../views/home/HomePage.vue'
 import LoginPage from "@/views/user/LoginPage.vue";
 import JoinPage from "@/views/user/JoinPage.vue";
 import EmailJoinPage from "@/views/user/EmailJoinPage.vue";
+import OauthPage from "@/views/home/OauthPage.vue";
+import SnsRegisterPage from "@/views/user/SnsRegisterPage.vue";
 
 Vue.use(VueRouter)
 
@@ -22,10 +24,21 @@ const routes = [
     path: '/registerPage',
     name: 'JoinPage',
     component: JoinPage
-  },{
+  },
+  {
     path: '/user/emailRegister',
     name: 'EmailJoinPage',
     component: EmailJoinPage
+  },
+  {
+    path: '/oauth2/redirect',
+    name: 'OathPage',
+    component: OauthPage
+  },
+  {
+    path: '/snsRegister',
+    name: 'SnsRegisterPage',
+    component: SnsRegisterPage
   }
 ]
 

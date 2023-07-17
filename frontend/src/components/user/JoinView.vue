@@ -32,21 +32,25 @@
     </div>
 
     <div>
-      <v-btn class="my_btn" style="color: #3A1D1D; height: 54px" color="#F7E600" depressed>
+      <v-btn class="my_btn" style="color: #3A1D1D; height: 54px" color="#F7E600" depressed @click="kakaoJoin()">
         <img src="../../assets/logo/kakao_logo.png" height="20" width="20" style="margin-right: 7px" alt="kakaoLogin"/>카카오톡으로 가입하기
       </v-btn>
 
-      <v-btn v-if="bthShow !== false" class="my_btn" style="height: 54px; margin-top: 15px" outlined depressed @click="showBtn()">
+      <v-btn v-if="bthShow" class="my_btn" style="height: 54px; margin-top: 15px" outlined depressed @click="showBtn()">
         다른 방법으로 가입하기
       </v-btn>
 
       <div v-else>
-        <v-btn class="my_btn" style="height: 54px; margin-top: 15px; background-color: #33BC03" text >
+        <v-btn @click="naverJoin()" class="my_btn" style="height: 54px; margin-top: 15px; background-color: #33BC03" text >
           <img src="../../assets/logo/Naver_logo.png" height="36" width="36" />&nbsp;&nbsp;네이버로 가입하기
         </v-btn>
 
-        <v-btn class="my_btn" style="height: 54px; margin-top: 15px; background-color: #EFEFEF" text>
+        <v-btn @click="googleJoin()" class="my_btn" style="height: 54px; margin-top: 15px; background-color: #EFEFEF" text>
           <img src="../../assets/logo/Google_logo.png" style="outline-style: none;" height="40" width="40"/>&nbsp;&nbsp;구글로 가입하기
+        </v-btn>
+
+        <v-btn @click="githubJoin()" class="my_btn" style="height: 54px; margin-top: 15px; background-color: #000000" color="white" text>
+          <img src="../../assets/logo/Github_logo.png" style="outline-style: none;" height="32" width="32"/>&nbsp;&nbsp;깃허브로 가입하기
         </v-btn>
 
         <v-btn class="my_btn" style="height: 54px; margin-top: 15px; color: #fc9899" outlined depressed @click="goJoinP()">
@@ -64,23 +68,43 @@
 
 <script>
 import {defineComponent} from 'vue'
+import {GITHUB_AUTH_URL, GOOGLE_AUTH_URL, KAKAO_AUTH_URL, NAVER_AUTH_URL} from "@/constant/login";
 
 export default defineComponent({
   name: "JoinView",
   data(){
     return{
-      bthShow: false
+      bthShow: true
     }
   },
   methods: {
     showBtn(){
-      this.bthShow = true;
+      this.bthShow = false;
     },
     goJoinP(){
       this.$router.push({name: 'EmailJoinPage'})
     },
     goLongP(){
       this.$router.push({name: 'LoginPage'})
+    },
+    kakaoJoin(){
+      window.open(KAKAO_AUTH_URL,
+          "_blank", "width=480, height=720");
+    },
+    naverJoin(){
+     window.open(NAVER_AUTH_URL,
+      "_blank", "width=480, height=720");
+    },
+    googleJoin(){
+      window.open(GOOGLE_AUTH_URL,
+          "_blank", "width=480, height=720");
+    },
+    githubJoin(){
+      window.open(GITHUB_AUTH_URL,
+      "_blank", "width=480, height=720");
+    },
+    test1(){
+      alert('test1');
     }
   }
 })
@@ -88,7 +112,7 @@ export default defineComponent({
 
 <style scoped>
 #basic{
-  margin: 10px 20% 0 20%;
+  margin: 10px 25% 0 25%;
   /*border: 1px solid pink;*/
   height: 100%;
 }

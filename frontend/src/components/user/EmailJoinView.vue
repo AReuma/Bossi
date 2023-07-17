@@ -161,8 +161,8 @@ export default defineComponent({
     },
     register(){
       const {email, password, nickName, phoneNum, recommender} = this;
-      let select = this.select.includes('c4');
-      this.$emit('register', {email, password, nickName, phoneNum, recommender, select})
+      let checkSMS = this.select.includes('c4');
+      this.$emit('register', {email, password, nickName, phoneNum, recommender, checkSMS})
     }
   },
   watch: {

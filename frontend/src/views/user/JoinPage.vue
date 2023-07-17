@@ -10,7 +10,12 @@ import JoinView from "@/components/user/JoinView.vue";
 
 export default defineComponent({
   name: "JoinPage",
-  components: {JoinView}
+  components: {JoinView},
+  methods: {
+    test2(){
+    alert('test2');
+  }
+  }
 })
 </script>
 

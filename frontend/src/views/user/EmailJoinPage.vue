@@ -10,6 +10,7 @@
 import {defineComponent} from 'vue'
 import EmailJoinView from "@/components/user/EmailJoinView.vue";
 import axios from "axios";
+import {useCookies} from "vue3-cookies";
 
 
 export default defineComponent({
@@ -18,18 +19,26 @@ export default defineComponent({
     EmailJoinView
 
   },
+  data(){
+    return {
+      cookieName: useCookies().cookies.get('name'),
+    }
+  },
   methods: {
     register(payload){
-      const {email, password, nickName, phoneNum, recommender, select} = payload;
-
-      axios.post('http://localhost:7777/user/register', {email, password, nickName, phoneNum, recommender, select})
+      const {email, password, nickName, phoneNum, recommender, checkSMS} = payload;
+      const registerStatus = true;
+      axios.post('http://localhost:7777/api/v1/users/join', {email, password, nickName, phoneNum, recommender, checkSMS, registerStatus})
           .then((res) => {
             alert(res)
+          })
+          .catch((res) => {
+            console.log(res)
           })
       console.log(payload);
 
     }
-  }
+  },
 })
 </script>
 
