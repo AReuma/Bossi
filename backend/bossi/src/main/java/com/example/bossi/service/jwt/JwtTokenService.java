@@ -46,12 +46,13 @@ public class JwtTokenService {
     /**
      * AccessToken 생성 메소드
      */
-    public String createAccessToken(String email, String role) {
+    public String createAccessToken(String name, String role, Boolean registerStatus) {
         Date now = new Date();
 
         return JWT.create()
-                .withClaim("email", email)
+                .withClaim("name", name)
                 .withClaim("role", role)
+                .withClaim("registerStatus", registerStatus)
                 .withSubject(ACCESS_HEADER)
                 .withExpiresAt(new Date(now.getTime() + EXPIRATION_TIME_ACCESS))
                 .sign(Algorithm.HMAC512(SECRET));

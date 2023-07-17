@@ -79,7 +79,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter { // 요청 
         userRepository.findByRefreshToken(refreshToken)
                 .ifPresent(user -> {
                     String reIssuedRefreshToken = reIssueRefreshToken(user);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail(), user.getRole().getKey()),
+                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail(), user.getRole().getKey(), user.getRegisterStatus()),
                             reIssuedRefreshToken);
                 });
     }

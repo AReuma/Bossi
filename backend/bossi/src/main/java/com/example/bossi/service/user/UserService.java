@@ -7,6 +7,7 @@ import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.UserRepository;
 import com.example.bossi.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,8 @@ public class UserService {
                     throw new AppException(ErrorCode.USERNAME_DUPLICATED, userJoinRequest.getEmail()+"은 이미 존재함.");
                 });
 
+        String referralCode = RandomStringUtils.randomAlphanumeric(10);
+
         // 저장
         User user = User.builder()
                 .email(userJoinRequest.getEmail())
@@ -34,6 +37,8 @@ public class UserService {
                 .phoneNum(userJoinRequest.getPhoneNum())
                 .nickName(userJoinRequest.getNickName())
                 .recommender(userJoinRequest.getRecommender())
+                .referralCode(referralCode)
+                .registerStatus(Boolean.TRUE)
                 .checkSMS(userJoinRequest.getCheckSMS())
                 .build();
 

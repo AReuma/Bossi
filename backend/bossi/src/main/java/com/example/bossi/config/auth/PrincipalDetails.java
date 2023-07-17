@@ -14,10 +14,12 @@ import com.example.bossi.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Random;
 
 public class PrincipalDetails implements UserDetails, OAuth2User {
 
@@ -66,6 +68,10 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
     public String getRole(){
         return user.getRole().getKey();
+    }
+
+    public boolean getRegisterStatus() {
+        return user.getRegisterStatus();
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.example.bossi.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -68,6 +69,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private User createUser(OAuth2UserInfo userInfo, SocialType socialType) {
         UUID tempPassword = UUID.randomUUID();
+        String referralCode = RandomStringUtils.randomAlphanumeric(10);
+
         User member = User.builder()
                 .nickName(userInfo.getName())
                 .email(userInfo.getEmail())
@@ -75,7 +78,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .role(Role.USER)
                 .phoneNum(socialType.name())
                 .imageUrl("bossi_basic_profile_img.png")
-                .socialId(userInfo.getId())
+                .registerStatus(Boolean.FALSE)
+                .referralCode(referralCode)
                 .socialType(socialType).build();
 
         return userRepository.save(member);

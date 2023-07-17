@@ -39,7 +39,19 @@ public class User {
 
     private String refreshToken;
 
-    private String socialId;
+    private Integer point;
+
+    private Integer couponCount;
+
+    private String referralCode; // 추천인 발급.
+
+    @Column(nullable = false)
+    private Boolean registerStatus;
+
+    public void addCoupon(){
+
+    }
+
     public void updateRefreshToken(String updateRefreshToken) {
         this.refreshToken = updateRefreshToken;
     }

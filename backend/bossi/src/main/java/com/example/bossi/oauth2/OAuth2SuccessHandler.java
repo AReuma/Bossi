@@ -51,7 +51,7 @@ public class OAuth2SuccessHandler extends SavedRequestAwareAuthenticationSuccess
 
         User userEntity = userRepository.findUserByEmail(user.getUsername());
 
-        String access_token = jwtService.createAccessToken(userEntity.getNickName(), userEntity.getRole().getKey());
+        String access_token = jwtService.createAccessToken(userEntity.getNickName(), userEntity.getRole().getKey(), user.getRegisterStatus());
 
         String refresh_token = jwtService.createRefreshToken();
 
