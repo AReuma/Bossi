@@ -26,15 +26,15 @@ spring:
       max-request-size: 20MB
 
   profiles:
-    include: API-KEY
+    include: oauth
   security:
     oauth2:
       client:
         registration:
           kakao:
-            client-id: "${KAKAO-CLIENT-ID}"
-            client-secret: "${KAKAO-CLIENT-SECRET}"
-            redirect-uri: "${KAKAO-REDIRECT-URI}"
+            client-id: b9c2e3676f2b38d4b2f5575e61982b97
+            client-secret: Sj9kkm66JAew72RI2Cjgqs7jV6uLPFGj
+            redirect-uri: http://localhost:7777/login/oauth2/code/kakao
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             scope:
@@ -43,20 +43,20 @@ spring:
             client-name: Kakao
 
           google:
-            client-id: "${GOOGLE-CLIENT-ID}"
-            client-secret: "${GOOGLE-CLIENT-SECRET}"
+            client-id: 869037245265-951o838u6qe2o7krrhaeunhac3ej8du7.apps.googleusercontent.com
+            client-secret: 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
             scope:
               - profile
               - email
 
           github:
-            client-id: "${GITHUB-CLIENT-ID}"
-            client-secret: "${GITHUB-CLIENT-SECRET}"
+            client-id: Iv1.310effb41d8ed795
+            client-secret: d36a9d73444adfabb30678f6f2c0647df6bb526d
 
           naver:
-            client-id: "${NAVER-CLIENT-ID}"
-            client-secret: "${NAVER-CLIENT-SECRET}"
-            redirect-uri: "${NAVER-REDIRECT-URI}"
+            client-id: 2cspIEB2B0KLJ8s7MXJI
+            client-secret: hHecX3FmNp
+            redirect-uri: http://localhost:7777/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope:
               - email
