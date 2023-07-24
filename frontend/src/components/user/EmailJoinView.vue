@@ -34,12 +34,20 @@
     <div> <!--회원가입 폼 -->
       <div style="height: 100px">
         <p>이메일 <span style="color: red; font-weight: lighter">*</span></p>
+        <div style="display: flex">
         <v-text-field
-            label="이메일을 입력해주세요."
-            outlined
-            color="#434f58"
-            v-model="email"
-        ></v-text-field>
+              style="height: 60px"
+              label="이메일을 입력해주세요."
+              outlined
+              color="#434f58"
+              v-model="email"
+          ></v-text-field>
+          <v-btn color="DEEP_PINK"
+                 @click="idDubCheck()"
+                 :disabled="idCheckSuccess && !idCheck"
+                 id="phone_check">중복 확인</v-btn>
+        </div>
+        <p v-if="emailCheck" style="color: red;">이메일을 제대로 작성해주세요</p>
       </div>
 
       <div style="height: 200px; margin-top: 25px;">
@@ -50,19 +58,22 @@
             @click:append="show = !show"
             label="비밀번호 (영문+숫자+특수문자 8자 이상)"
             outlined
-            style="height: 80px"
+            style="height: 80px;"
             color="#434f58"
             v-model="password"
         ></v-text-field>
+        <p v-if="passwordCheck" style="color: red">영문, 특수문자, 숫자를 포함해서 8자 이상 작성해주세요.</p>
         <v-text-field
             :append-icon="showRe ? 'mdi-eye' : 'mdi-eye-off'"
             :type="showRe ? 'text' : 'password'"
             @click:append="showRe = !showRe"
             label="비밀번호 확인"
             outlined
-            style="height: 82px"
+            style="height: 82px;"
             color="#434f58"
+            v-model="password2"
         ></v-text-field>
+        <p v-if="passwordCheck2" style="color: red">비밀번호가 서로 다릅니다.</p>
       </div>
 
       <div style="height: 100px; margin-top: 25px;">
@@ -71,8 +82,10 @@
             label="닉네임을 입력해주세요."
             outlined
             color="#434f58"
+            style="height:60px; border: 1px solid red"
             v-model="nickName"
         ></v-text-field>
+        <p v-if="nickNameCheck" style="color: red">필수항목입니다. 닉네임을 작성해주세요.</p>
       </div>
 
       <div style="height: 100px; margin-top: 25px;">
@@ -84,15 +97,61 @@
               color="#434f58"
               style="max-width: 80%"
               v-model="phoneNum"
+              :disabled="successCheck"
           ></v-text-field>
 
           <v-btn color="DEEP_PINK"
                  depressed
-                 :disabled = this.phoneCheck
+                 :disabled = phoneCheck
                  @click="clickPhoneCheck()"
                  id="phone_check">인증요청</v-btn>
         </div>
       </div>
+
+      <div style="height: 100px; margin-top: 10px">
+        <div style="display: flex;">
+          <v-text-field
+              label="인증코드를 입력해주세요"
+              outlined
+              color="#434f58"
+              style="max-width: 80%"
+              v-model="phoneDubCode"
+              :disabled="successCheck"
+          ></v-text-field>
+
+          <v-btn color="DEEP_PINK"
+                 @click="phoneDubCheck()"
+                 :disabled="successCheck"
+                 id="phone_check">확인</v-btn>
+        </div>
+      </div>
+
+      <v-dialog v-model="phoneCheckDialog" persistent width="auto">
+        <v-card style="padding: 30px 20px 10px 20px">
+          <v-card-text style="font-size: 15px">
+            {{ phoneCheckData }}
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="DEEP_PINK" style="color: white" @click="phoneCheckDialog = false">확인</v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <v-dialog v-model="existsPhoneDialog" persistent width="auto">
+        <v-card style="padding: 30px 20px 10px 20px">
+          <v-card-text>
+            {{ phoneCheckData }}
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn @click="gLogin()" color="BACK_GROUND_COLOR" style="font-size: small">로그인</v-btn>
+            <v-btn color="DEEP_PINK" style="color: white" @click="existsPhoneDialog = false">확인</v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
       <div style="height: 100px; margin-top: 25px;">
         <p>추천인코드</p>
@@ -131,21 +190,36 @@
 
 <script>
 import {defineComponent} from 'vue'
+import axios from "axios";
+import {API_BASE_URL} from "@/constant/basic";
 
 export default defineComponent({
   name: "EmailJoinView",
+  props: ['checkCode', 'socialType', 'checkIdDub'],
   data(){
     return{
       show: false,
       showRe: false,
       selectAll: false,
       phoneCheck: true,
+      emailCheck: false,
+      idCheckSuccess: true,
+      idCheck: false,
+      passwordCheck: false,
+      passwordCheck2: false,
+      nickNameCheck: false,
       email: '',
       password: '',
+      password2: '',
       nickName: '',
       phoneNum: '',
+      phoneDubCode: '',
       recommender: '',
       select: [],
+      phoneCheckDialog: false,
+      existsPhoneDialog: false,
+      phoneCheckData: '',
+      successCheck: false,
     }
   },
   methods: {
@@ -157,17 +231,84 @@ export default defineComponent({
       }
     },
     clickPhoneCheck(){
-
+      const {phoneNum} = this
+      this.$emit('checkNum', {phoneNum})
     },
     register(){
       const {email, password, nickName, phoneNum, recommender} = this;
       let checkSMS = this.select.includes('c4');
       this.$emit('register', {email, password, nickName, phoneNum, recommender, checkSMS})
+    },
+    phoneDubCheck(){
+      if(this.socialType === "General"){
+        if(this.phoneDubCode === this.checkCode){
+          this.phoneCheckData = "인증 완료 되었습니다."
+          this.phoneCheckDialog = true;
+
+          this.successCheck = true;
+          this.phoneCheck = true;
+          this.existsPhoneDialog = false;
+        }else {
+          this.phoneCheckData = "인증번호가 일치하지 않습니다.\n확인 후 다시 입력해주세요."
+          this.phoneDubCode = "";
+          this.phoneCheckDialog = true
+        }
+      }else {
+        this.phoneCheckData = "이미 "+ this.socialType +"으로 가입된 회원의 전화번호 입니다.\n"
+        this.existsPhoneDialog = true;
+      }
+    },
+    gLogin(){
+      this.$router.push({name: 'LoginPage'})
+    },
+    idDubCheck(){
+      const {email} = this;
+
+      axios.get(API_BASE_URL + `/api/v1/users/checkId/${email}`)
+          .then((res) => {
+            this.idCheck = res.data;
+            alert(this.idCheck)
+            if(!this.idCheck){
+              alert('사용가능한 아이디 입니다.')
+            }else {
+              alert('사용중인 아이디 입니다. ')
+            }
+            console.log(res)
+          })
+          .catch((res) => {
+            console.log(res)
+          })
     }
+
   },
   watch: {
+    email: function (val) {
+      const email = /\w+@\w+.(com|net)/
+
+      this.emailCheck = !val.match(email);
+      this.idCheckSuccess = !val.match(email);
+    },
+    password: function (val){
+      const password =/^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/gm
+
+      this.passwordCheck = !val.match(password);
+    },
+    password2: function (val){
+      this.passwordCheck2 = val !== this.password;
+    },
+    nickName: function (val){
+      this.nickNameCheck = val.length <= 0;
+    },
     phoneNum: function (val){
-      this.phoneCheck = val === '';
+      const phone = /\d{3}\d{4}\d{4}/g;
+
+      this.phoneCheck = !(val.match(phone) && val.length === 11);
+    },
+    idCheck: function (){
+      if (this.idCheck === true){
+        this.email = '';
+        this.idCheck = false;
+      }
     }
   }
 })

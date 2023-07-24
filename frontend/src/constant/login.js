@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:7777'
+import {API_BASE_URL} from "@/constant/basic";
 
 export const SAVE_COOKIE_ACCESS = 60 * 60 * 3 // 3시
 
