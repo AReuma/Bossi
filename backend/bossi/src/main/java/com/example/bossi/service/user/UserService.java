@@ -1,17 +1,27 @@
 package com.example.bossi.service.user;
 
+import com.example.bossi.entity.Role;
+import com.example.bossi.entity.SocialType;
 import com.example.bossi.entity.User;
 import com.example.bossi.entity.dto.UserJoinRequest;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.UserRepository;
+import com.example.bossi.response.user.CheckPhoneResponse;
 import com.example.bossi.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.nurigo.sdk.message.model.Message;
+import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
 
@@ -38,9 +48,13 @@ public class UserService {
                 .nickName(userJoinRequest.getNickName())
                 .recommender(userJoinRequest.getRecommender())
                 .referralCode(referralCode)
+                .role(Role.USER)
                 .registerStatus(Boolean.TRUE)
+                .socialType(SocialType.GENERAL)
                 .checkSMS(userJoinRequest.getCheckSMS())
                 .build();
+
+        log.info("join()");
 
         userRepository.save(user);
 
@@ -59,5 +73,15 @@ public class UserService {
 
         //return jwt.createToken(selectedUser.getEmail(), key, expireTimeMs);
         return null;
+    }
+
+
+    public Boolean checkId(String email) {
+        log.info("===== {} ======", email);
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if(user.isPresent()){
+            return Boolean.TRUE;
+        }else return Boolean.FALSE;
     }
 }
