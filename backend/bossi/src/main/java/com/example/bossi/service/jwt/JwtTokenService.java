@@ -30,23 +30,26 @@ public class JwtTokenService {
     public static boolean isExpired(String token, String secretKey){
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJwt(token).getBody().getExpiration().before(new Date()); // 토큰 만료가 지금보다 전이면
     }
-    public static String createToken(String email){
-        Claims claims = Jwts.claims();
-        claims.put("email", email);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_ACCESS))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
-                .compact()
-                ;
-    }
 
     /**
      * AccessToken 생성 메소드
      */
-    public String createAccessToken(String name, String role, Boolean registerStatus) {
+    public static String createAccessToken(String email, String nickName, String role, Boolean registerStatus){
+        Date now = new Date();
+
+        return JWT.create()
+                .withClaim("email", email)
+                .withClaim("nickName", nickName)
+                .withClaim("registerStatus", registerStatus)
+                .withClaim("role", role)
+                .withSubject(ACCESS_HEADER)
+                .withSubject(ACCESS_HEADER)
+                .withExpiresAt(new Date(now.getTime() + EXPIRATION_TIME_ACCESS))
+                .sign(Algorithm.HMAC512(SECRET))
+                ;
+    }
+
+/*    public String createAccessToken(String name, String role, Boolean registerStatus) {
         Date now = new Date();
 
         return JWT.create()
@@ -56,9 +59,9 @@ public class JwtTokenService {
                 .withSubject(ACCESS_HEADER)
                 .withExpiresAt(new Date(now.getTime() + EXPIRATION_TIME_ACCESS))
                 .sign(Algorithm.HMAC512(SECRET));
-    }
+    }*/
 
-    public String createRefreshToken() {
+    public static String createRefreshToken() {
         Date now = new Date();
         return JWT.create()
                 .withSubject(REFRESH_HEADER)
