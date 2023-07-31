@@ -6,6 +6,7 @@ import JoinPage from "@/views/user/JoinPage.vue";
 import EmailJoinPage from "@/views/user/EmailJoinPage.vue";
 import OauthPage from "@/views/home/OauthPage.vue";
 import SnsRegisterPage from "@/views/user/SnsRegisterPage.vue";
+import SearchIdPwPage from "@/views/user/search/SearchIdPwPage.vue";
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,11 @@ const routes = [
     path: '/snsRegister',
     name: 'SnsRegisterPage',
     component: SnsRegisterPage
+  },
+  {
+    path: '/searchIdPw',
+    name: 'SearchIdPwPage',
+    component: SearchIdPwPage
   }
 ]
 

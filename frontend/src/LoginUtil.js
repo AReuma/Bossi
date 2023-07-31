@@ -7,10 +7,14 @@ function ParsingInfo(token){
 
     let result = JSON.parse(base64Encoded.toString())
 
-    let name = result.name;
+    console.log(result)
+
+    let email = result.email;
+    let nickName = result.nickName;
     let registerStatus = result.registerStatus;
 
-    useCookies().cookies.set('name', name)
+    useCookies().cookies.set('email', email)
+    useCookies().cookies.set('nickName', nickName)
     useCookies().cookies.set('registerStatus', registerStatus)
 }
 

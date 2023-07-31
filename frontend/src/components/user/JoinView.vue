@@ -102,9 +102,6 @@ export default defineComponent({
     githubJoin(){
       window.open(GITHUB_AUTH_URL,
       "_blank", "width=480, height=720");
-    },
-    test1(){
-      alert('test1');
     }
   }
 })

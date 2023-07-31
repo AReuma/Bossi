@@ -44,7 +44,7 @@
           ></v-text-field>
           <v-btn color="DEEP_PINK"
                  @click="idDubCheck()"
-                 :disabled="idCheckSuccess && !idCheck"
+                 :disabled="idCheckSuccess && idCheck"
                  id="phone_check">중복 확인</v-btn>
         </div>
         <p v-if="emailCheck" style="color: red;">이메일을 제대로 작성해주세요</p>
@@ -82,7 +82,7 @@
             label="닉네임을 입력해주세요."
             outlined
             color="#434f58"
-            style="height:60px; border: 1px solid red"
+            style="height:60px;"
             v-model="nickName"
         ></v-text-field>
         <p v-if="nickNameCheck" style="color: red">필수항목입니다. 닉네임을 작성해주세요.</p>
@@ -97,18 +97,19 @@
               color="#434f58"
               style="max-width: 80%"
               v-model="phoneNum"
-              :disabled="successCheck"
+              :disabled="sendPhoneNum"
           ></v-text-field>
 
           <v-btn color="DEEP_PINK"
                  depressed
-                 :disabled = phoneCheck
+                 :disabled = sendPhoneBtn
                  @click="clickPhoneCheck()"
                  id="phone_check">인증요청</v-btn>
         </div>
       </div>
+      <p v-if="!phoneCheck" style="color: red">필수항목입니다. 전화번호를 작성해주세요.</p>
 
-      <div style="height: 100px; margin-top: 10px">
+      <div v-if="this.checkCode !== ''" style="height: 75px; margin-top: 10px;">
         <div style="display: flex;">
           <v-text-field
               label="인증코드를 입력해주세요"
@@ -204,10 +205,13 @@ export default defineComponent({
       phoneCheck: true,
       emailCheck: false,
       idCheckSuccess: true,
-      idCheck: false,
+      idCheck: true,
       passwordCheck: false,
       passwordCheck2: false,
       nickNameCheck: false,
+      selectCheck: false,
+      sendPhoneNum: false,
+      sendPhoneBtn: true,
       email: '',
       password: '',
       password2: '',
@@ -231,16 +235,24 @@ export default defineComponent({
       }
     },
     clickPhoneCheck(){
+      this.sendPhoneBtn = true;
+      this.sendPhoneNum = true;
+
       const {phoneNum} = this
       this.$emit('checkNum', {phoneNum})
     },
     register(){
-      const {email, password, nickName, phoneNum, recommender} = this;
-      let checkSMS = this.select.includes('c4');
-      this.$emit('register', {email, password, nickName, phoneNum, recommender, checkSMS})
+      if(this.checkJoin()){
+        alert('회원가입 성공')
+       const {email, password, nickName, phoneNum, recommender} = this;
+        let checkSMS = this.select.includes('c4');
+        this.$emit('register', {email, password, nickName, phoneNum, recommender, checkSMS})
+      }else {
+        alert('회원가입 실패')
+      }
     },
     phoneDubCheck(){
-      if(this.socialType === "General"){
+      if(this.socialType === "NEW_MEM"){
         if(this.phoneDubCode === this.checkCode){
           this.phoneCheckData = "인증 완료 되었습니다."
           this.phoneCheckDialog = true;
@@ -254,7 +266,11 @@ export default defineComponent({
           this.phoneCheckDialog = true
         }
       }else {
-        this.phoneCheckData = "이미 "+ this.socialType +"으로 가입된 회원의 전화번호 입니다.\n"
+        if(this.socialType === "GENERAL") {
+          this.phoneCheckData = '회원가입이 된 전화번호 입니다.';
+        }else {
+          this.phoneCheckData = "이미 " + this.socialType + "으로 가입된 회원의 전화번호 입니다.\n"
+        }
         this.existsPhoneDialog = true;
       }
     },
@@ -267,8 +283,8 @@ export default defineComponent({
       axios.get(API_BASE_URL + `/api/v1/users/checkId/${email}`)
           .then((res) => {
             this.idCheck = res.data;
-            alert(this.idCheck)
-            if(!this.idCheck){
+            //alert(this.idCheck)
+            if(this.idCheck){
               alert('사용가능한 아이디 입니다.')
             }else {
               alert('사용중인 아이디 입니다. ')
@@ -278,15 +294,64 @@ export default defineComponent({
           .catch((res) => {
             console.log(res)
           })
-    }
+    },
+    checkSelect(select){
+      select.sort();
 
+      const arr1 = ['c1', 'c2', 'c3'];
+      const arr2 = ['c1', 'c2', 'c3', 'c4'];
+
+      let selectChecks;
+
+      if(this.select.length === 3) {
+        selectChecks = this.selectEquals(this.select, arr1)
+      }else if(this.select.length === 4){
+        selectChecks = this.selectEquals(this.select, arr2)
+      }else return false;
+
+      return selectChecks;
+    },
+    checkJoin(){
+      this.textLengthCheck(this.email.length, this.password.length, this.password2.length, this.nickName.length, this.phoneNum.length)
+
+      console.log('idCheck: '+ this.idCheck);
+      console.log('passwordCheck: '+ this.passwordCheck);
+      console.log('passwordCheck2: '+ this.passwordCheck2);
+      console.log('nickNameCheck: '+ this.nickNameCheck);
+      console.log('phoneCheck: '+ this.phoneCheck);
+      console.log('idCheckSuccess: '+ this.select);
+
+      //this.select.sort();
+      let selectChecks = this.checkSelect(this.select);
+
+      return !this.idCheckSuccess && !this.passwordCheck && !this.passwordCheck2 && !this.nickNameCheck && this.successCheck && selectChecks;
+    },
+    textLengthCheck(email, pw, pw2, nick, phone){
+      if(email === 0) this.emailCheck = true;
+
+      if(pw === 0) this.passwordCheck = true;
+
+      if(pw2 === 0) this.passwordCheck2 = true;
+
+      if(phone === 0) this.phoneCheck = false;
+
+      if(nick === 0) this.nickNameCheck = true;
+    },
+    selectEquals(a, b){
+      return a.length === b.length && a.every((v, i) => v === b[i]);
+    }
   },
   watch: {
     email: function (val) {
       const email = /\w+@\w+.(com|net)/
 
+      if(!val.match(email)){
+        this.emailCheck = true;
+      }else this.emailCheck = false;
+
       this.emailCheck = !val.match(email);
       this.idCheckSuccess = !val.match(email);
+      this.idCheck = false;
     },
     password: function (val){
       const password =/^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/gm
@@ -301,13 +366,17 @@ export default defineComponent({
     },
     phoneNum: function (val){
       const phone = /\d{3}\d{4}\d{4}/g;
+      //console.log(val)
+      if(val.length === 0) this.phoneCheck = true;
+      else if(!val.match(phone)) this.phoneCheck = false;
+      else if(val.match(phone)) this.phoneCheck = true;
 
-      this.phoneCheck = !(val.match(phone) && val.length === 11);
+      this.sendPhoneBtn = !(val.match(phone))
     },
     idCheck: function (){
-      if (this.idCheck === true){
+      if (this.idCheck === false){
         this.email = '';
-        this.idCheck = false;
+        this.idCheck = true;
       }
     }
   }
