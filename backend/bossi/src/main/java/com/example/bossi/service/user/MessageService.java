@@ -53,7 +53,7 @@ public class  MessageService {
         log.info(tmpStr);
         //messageService.sendOne(new SingleMessageSendingRequest(message));
 
-        return findUser.map(user -> new CheckPhoneResponse(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponse(tmpStr, "General"));
+        return findUser.map(user -> new CheckPhoneResponse(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponse(tmpStr, "NEW_MEM"));
 
     }
 }
