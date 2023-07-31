@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,12 @@ public class WebSecurityConfig {
     private final UserRepository userRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    private static final String[] DOC_URLS = {
+            /* swagger v3 */
+            "/v3/api-docs/**",
+            "/swagger-ui/**"
+    };
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -65,6 +72,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/v1/users/join").permitAll()
                 .requestMatchers("/api/v1/oauth2/**").permitAll()
                 .requestMatchers("/seller/**").hasRole("ROLE_SELLER")
+                .requestMatchers(DOC_URLS).permitAll()
                 .anyRequest().permitAll();
 
         http
