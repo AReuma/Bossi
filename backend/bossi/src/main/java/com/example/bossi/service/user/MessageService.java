@@ -15,9 +15,15 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
+
+import static com.example.bossi.exception.ErrorCode.BAD_REQUEST;
+import static com.example.bossi.exception.ErrorCode.NULL_REQUEST;
 
 @Service
 @Slf4j
@@ -26,6 +32,8 @@ import java.util.Optional;
 public class  MessageService {
 
     private final UserRepository userRepository;
+
+    private final ValidService validService;
 
     //@Value("${COOLSMS-API-KEY}")
     private String apiKey  = "NCSS8BOBGTWBOPBY";
@@ -36,9 +44,29 @@ public class  MessageService {
     @Value("${COOLSMS-OUTGOING_NUM}")
     private String outgoingPhoneNum;
 
-    public CheckPhoneResponse checkPhoneNum(String phoneNum) {
+    //public CheckPhoneResponse checkPhoneNum(String phoneNum) {
+    public ResponseEntity<?> checkPhoneNum(String phoneNum) {
         DefaultMessageService messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
+        // 전화번호 null 체크
+        if(phoneNum.isEmpty())
+            throw new AppException(ErrorCode.NULL_REQUEST, "전화번호가 NULL");
 
+        // 전화번호 형식인지 체크
+        phoneNum = validService.validPhoneCheck(phoneNum).toString();
+        /*String pattern = "^\\d{3}\\d{3,4}\\d{4}";
+        //010 12341234
+        if(!Pattern.matches(pattern, phoneNum)) throw new AppException(ErrorCode.BAD_REQUEST, "전화번호 형식이 잘못됨");
+        else {
+            StringBuffer sb = new StringBuffer(phoneNum);
+            sb.insert(3, "-");
+            if(sb.length() == 11) sb.insert(7, "-");
+            else sb.insert(8, "-");
+
+            System.out.println(sb.toString());
+            phoneNum = sb.toString();
+        }*/
+
+        // 전화번호 길이가 11자리 인지 체크
         Optional<User> findUser = userRepository.findByPhoneNum(phoneNum);
 
         Message message = new Message();
@@ -53,7 +81,9 @@ public class  MessageService {
         log.info(tmpStr);
         //messageService.sendOne(new SingleMessageSendingRequest(message));
 
-        return findUser.map(user -> new CheckPhoneResponse(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponse(tmpStr, "NEW_MEM"));
+        return ResponseEntity.ok().body( findUser.map(user -> new CheckPhoneResponse(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponse(tmpStr, "NEW_MEM")));
+
+        //return findUser.map(user -> new CheckPhoneResponse(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponse(tmpStr, "NEW_MEM"));
 
     }
 }

@@ -343,7 +343,7 @@ export default defineComponent({
   },
   watch: {
     email: function (val) {
-      const email = /\w+@\w+.(com|net)/
+      const email = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/
 
       if(!val.match(email)){
         this.emailCheck = true;
@@ -354,7 +354,7 @@ export default defineComponent({
       this.idCheck = false;
     },
     password: function (val){
-      const password =/^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/gm
+      const password =/(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\W)(?=\S+$).{8,16}/
 
       this.passwordCheck = !val.match(password);
     },
