@@ -109,16 +109,21 @@
       </div>
       <p v-if="!phoneCheck" style="color: red">필수항목입니다. 전화번호를 작성해주세요.</p>
 
-      <div v-if="this.checkCode !== ''" style="height: 75px; margin-top: 10px;">
+      <div v-if="this.checkCode !== ''" style="height: 65px; margin-top: 10px;">
+<!--      <div style="height: 65px; margin-top: 10px;">-->
         <div style="display: flex;">
           <v-text-field
               label="인증코드를 입력해주세요"
               outlined
               color="#434f58"
-              style="max-width: 80%"
+              style="width: 100%"
               v-model="phoneDubCode"
               :disabled="successCheck"
           ></v-text-field>
+
+            <div style="padding-top: 15px; padding-left: 10px; color: rgba(37,37,37,0.72)">
+              {{prettyTime()}}
+            </div>
 
           <v-btn color="DEEP_PINK"
                  @click="phoneDubCheck()"
@@ -126,6 +131,7 @@
                  id="phone_check">확인</v-btn>
         </div>
       </div>
+      <p v-if="expireCode" style="color: red">인증요청 시간이 지났습니다. 재요청 해주세요.</p>
 
       <v-dialog v-model="phoneCheckDialog" persistent width="auto">
         <v-card style="padding: 30px 20px 10px 20px">
@@ -196,7 +202,7 @@ import {API_BASE_URL} from "@/constant/basic";
 
 export default defineComponent({
   name: "EmailJoinView",
-  props: ['checkCode', 'socialType', 'checkIdDub'],
+  props: ['checkIdDub'],
   data(){
     return{
       show: false,
@@ -224,6 +230,12 @@ export default defineComponent({
       existsPhoneDialog: false,
       phoneCheckData: '',
       successCheck: false,
+      // 타이머
+      timeCounter : 10, //3분
+      expireCode: false,
+      checkCode: '',
+      socialType: ''
+
     }
   },
   methods: {
@@ -239,7 +251,50 @@ export default defineComponent({
       this.sendPhoneNum = true;
 
       const {phoneNum} = this
-      this.$emit('checkNum', {phoneNum})
+      //this.$emit('checkNum', {phoneNum})
+      axios.get(API_BASE_URL+`/api/v1/users/checkPhone/${phoneNum}`)
+          .then((res) => {
+            //alert(res)
+            console.log(res.data.num)
+            console.log(res.data.socialType)
+            console.log(res.data)
+            this.checkCode = res.data.num;
+            this.socialType = res.data.socialType;
+            this.start()
+          })
+          .catch((res) => {
+            console.log(res)
+          })
+    },
+    start(){
+      // 1초에 한번씩 start 호출
+      this.polling = setInterval( () =>{
+        this.timeCounter-- //1찍 감소
+        if (this.timeCounter <= 0) {
+          this.timeStop();
+          // 인증 코드 다시 보내야함.
+          //
+          this.sendPhoneBtn = false;
+          this.sendPhoneNum = false;
+          this.expireCode = true;
+          this.checkCode = '';
+          this.phoneNum = '';
+        }
+      },1000) // 1000ms, 1초
+    },
+    prettyTime() {
+      let time = this.timeCounter / 60
+      let minutes = parseInt(time)
+      let secondes = Math.round((time - minutes) * 60)
+      return this.pad(minutes, 2) + ":" + this.pad(secondes, 2)
+    },
+    // 2자리수로 만들어줌 09,08...
+    pad(n, width) {
+      n = n + '';
+      return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n
+    },
+    timeStop() {
+      clearInterval(this.polling)
     },
     register(){
       if(this.checkJoin()){
@@ -345,9 +400,7 @@ export default defineComponent({
     email: function (val) {
       const email = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/
 
-      if(!val.match(email)){
-        this.emailCheck = true;
-      }else this.emailCheck = false;
+      this.emailCheck = !val.match(email);
 
       this.emailCheck = !val.match(email);
       this.idCheckSuccess = !val.match(email);
@@ -379,6 +432,9 @@ export default defineComponent({
         this.idCheck = true;
       }
     }
+  },
+  beforeDestroy() {
+    clearInterval(this.polling)
   }
 })
 </script>
