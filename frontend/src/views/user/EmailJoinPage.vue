@@ -2,11 +2,8 @@
   <div>
     <email-join-view
       @register="register"
-      @checkNum="checkNum"
       @checkDubId="checkDubId"
       :checkIdDub="checkIdDub"
-      :checkCode="checkCode"
-      :socialType="socialType"
     >
     </email-join-view>
   </div>
@@ -29,8 +26,6 @@ export default defineComponent({
   data(){
     return {
       cookieName: useCookies().cookies.get('name'),
-      checkCode: '',
-      socialType: '',
       checkIdDub: true,
     }
   },
@@ -49,9 +44,9 @@ export default defineComponent({
       console.log(payload);
 
     },
-    checkNum(payload){
-      const {phoneNum} = payload;
-      alert(phoneNum)
+    /*checkNum(payload){
+      //const {phoneNum} = payload;
+      //alert(phoneNum)
       axios.get(API_BASE_URL+`/api/v1/users/checkPhone/${phoneNum}`)
           .then((res) => {
             //alert(res)
@@ -64,7 +59,7 @@ export default defineComponent({
           .catch((res) => {
             console.log(res)
           })
-    },
+    },*/
     checkDubId(payload){
       const {email} = payload;
       //alert(email)
