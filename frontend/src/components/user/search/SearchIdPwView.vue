@@ -18,28 +18,18 @@
       </v-row>
     </div> <!-- 아이디/비밀번호 찾기 -->
 
-    <div style="padding: 30px 0; margin: 25px">
+    <div>
+      <div style="margin-top: 15px">
+        <v-btn @click="phone()" text class="my_btn" style="border: 1px solid rgba(33,33,36,0.25); margin-top: 15px; height: 54px">
+          전화번호로 찾기
+        </v-btn>
 
-      <div style="display: flex; justify-content: center;">
-        <div style="font-size: 22px; color: #4d5159">Bossi 계정 연동 전화번호를 입력해주세요.</div>
+        <v-btn @click="mail()" text class="my_btn" style="border: 1px solid rgba(33,33,36,0.25); margin-top: 15px; height: 54px">
+          이메일로 찾기
+        </v-btn>
       </div>
     </div>
 
-    <div style="display: flex;">
-      <v-text-field
-          label="-를 제외한 번호만 입력해주세요."
-          outlined
-          color="#434f58"
-          style="max-width: 80%"
-          v-model="phoneNum"
-      ></v-text-field>
-
-      <v-btn color="DEEP_PINK"
-             depressed
-             :disabled = phoneCheck
-             @click="clickPhoneCheck()"
-             id="phone_check">인증요청</v-btn>
-    </div>
   </div>
 </template>
 
@@ -47,7 +37,20 @@
 import {defineComponent} from 'vue'
 
 export default defineComponent({
-  name: "SearchIdPwView"
+  name: "SearchIdPwView",
+  data(){
+    return{
+
+    }
+  },
+  methods: {
+    phone(){
+      this.$router.push({name: 'SearchPhoneIdPwPage'})
+    },
+    mail(){
+      this.$router.push({name: 'SearchMailIdPwPage'})
+    }
+  }
 })
 </script>
 
@@ -56,12 +59,10 @@ export default defineComponent({
   margin: 10px 27% 0 27%;
   height: 100%;
 }
-#phone_check{
-  font-size: 16px;
-  width: 18%;
+.my_btn{
+  width: 100%;
+  font-weight: bolder;
+  border-radius: 5px;
   height: 54px;
-  color: white;
-  align-content: center;
-  margin-left: 20px;
 }
 </style>

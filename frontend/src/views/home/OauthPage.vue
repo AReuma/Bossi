@@ -25,11 +25,11 @@ export default defineComponent({
           name: 'HomePage',
         });
 
-    const routeData = this.$router.resolve(
+    `/*const routeData = this.$router.resolve(
         {
           path: '/oauth2/login',
           name: 'OauthLoginPage',
-        });
+        });*/`
 
 
 
@@ -47,7 +47,7 @@ export default defineComponent({
       if(response === 'true') {
         openerWindow.document.location.href = routeHome.href; // 로그인 후 어디로?
       }else{
-        openerWindow.document.location.href = routeData.href;
+        openerWindow.document.location.href = routeHome.href;
       }
       window.close();
     }, 500)

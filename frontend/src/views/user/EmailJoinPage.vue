@@ -63,7 +63,7 @@ export default defineComponent({
     checkDubId(payload){
       const {email} = payload;
       //alert(email)
-      axios.get(API_BASE_URL + `/api/v1/users/checkId/${email}`)
+      axios.get(API_BASE_URL + `/api/v1/users/find/email/${email}`)
           .then((res) => {
             this.checkIdDub = res.data;
             alert(this.checkIdDub)

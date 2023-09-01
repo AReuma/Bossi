@@ -6,6 +6,10 @@ import JoinPage from "@/views/user/JoinPage.vue";
 import EmailJoinPage from "@/views/user/EmailJoinPage.vue";
 import OauthPage from "@/views/home/OauthPage.vue";
 import SearchIdPwPage from "@/views/user/search/SearchIdPwPage.vue";
+import SearchMailIdPwPage from "@/views/user/search/SearchMailIdPwPage.vue";
+import SearchPhoneIdPwPage from "@/views/user/search/SearchPhoneIdPwPage.vue";
+import SearchIdPwFoundPage from "@/views/user/search/SearchIdPwFoundPage.vue";
+import ChangePwPage from "@/views/user/search/ChangePwPage.vue";
 
 Vue.use(VueRouter)
 
@@ -36,10 +40,32 @@ const routes = [
     component: OauthPage
   },
   {
-    path: '/searchIdPw',
+    path: '/v1/auth/find',
     name: 'SearchIdPwPage',
     component: SearchIdPwPage
   },
+  {
+    path: '/v1/auth/find/mail',
+    name: 'SearchMailIdPwPage',
+    component: SearchMailIdPwPage
+  },
+  {
+    path: '/v1/auth/find/phone',
+    name: 'SearchPhoneIdPwPage',
+    component: SearchPhoneIdPwPage
+  },
+  {
+    path: '/v1/auth/find/phone/found',
+    name: 'SearchIdPwFoundPage',
+    component: SearchIdPwFoundPage,
+    props: true
+  },
+  {
+    path: '/v1/auth/find/phone/changePw',
+    name: "ChangePwPage",
+    component: ChangePwPage,
+    props: true
+  }
 ]
 
 const router = new VueRouter({

@@ -4,26 +4,19 @@ import com.example.bossi.entity.User;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.UserRepository;
-import com.example.bossi.response.user.CheckPhoneResponse;
+import com.example.bossi.response.user.CheckPhoneResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.model.Message;
-import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.regex.Pattern;
-
-import static com.example.bossi.exception.ErrorCode.BAD_REQUEST;
-import static com.example.bossi.exception.ErrorCode.NULL_REQUEST;
 
 @Service
 @Slf4j
@@ -45,7 +38,7 @@ public class  MessageService {
     private String outgoingPhoneNum;
 
     //public CheckPhoneResponse checkPhoneNum(String phoneNum) {
-    public ResponseEntity<?> checkPhoneNum(String phoneNum) {
+    public ResponseEntity<CheckPhoneResponseDto> checkPhoneNum(String phoneNum) {
         DefaultMessageService messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
         // 전화번호 null 체크
         if(phoneNum.isEmpty())
@@ -81,7 +74,7 @@ public class  MessageService {
         log.info(tmpStr);
         //messageService.sendOne(new SingleMessageSendingRequest(message));
 
-        return ResponseEntity.ok().body( findUser.map(user -> new CheckPhoneResponse(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponse(tmpStr, "NEW_MEM")));
+        return ResponseEntity.ok().body( findUser.map(user -> new CheckPhoneResponseDto(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponseDto(tmpStr, "NEW_MEM")));
 
         //return findUser.map(user -> new CheckPhoneResponse(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponse(tmpStr, "NEW_MEM"));
 

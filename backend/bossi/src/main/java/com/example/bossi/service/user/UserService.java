@@ -4,23 +4,21 @@ import com.example.bossi.entity.Role;
 import com.example.bossi.entity.SocialType;
 import com.example.bossi.entity.User;
 import com.example.bossi.entity.dto.UserJoinRequest;
+import com.example.bossi.entity.dto.UserLoginRequest;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.UserRepository;
-import com.example.bossi.response.user.CheckPhoneResponse;
+import com.example.bossi.response.user.FindIdPwResponseDto;
 import com.example.bossi.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.nurigo.sdk.message.model.Message;
-import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 @Service
 @Slf4j
@@ -121,4 +119,40 @@ public class UserService {
     }
 
 
+    public ResponseEntity<FindIdPwResponseDto> findIdPwByPhone(String phoneNum) {
+        if(phoneNum.isEmpty()) throw new AppException(ErrorCode.BAD_REQUEST, "전화번호값이 존재하지 않음");
+
+        phoneNum = validService.validPhoneCheck(phoneNum).toString();
+
+        Optional<User> findUser = userRepository.findByPhoneNum(phoneNum);
+
+        if(findUser.isPresent()){
+            String tmpStr = RandomStringUtils.randomNumeric(5);
+            String email = findUser.get().getEmail();
+            /*
+            dk**@naver.com 이런식으로 나오도록 구현
+            int endIndex = email.indexOf('@');
+
+            String domain = email.substring(endIndex);
+            email = email.substring(0, endIndex);
+
+            String tmpEmail = email.substring(2, endIndex);
+
+            email = email.replaceAll("["+tmpEmail+"]", "*") + domain;*/
+            return ResponseEntity.ok().body(new FindIdPwResponseDto(tmpStr, email, findUser.get().getSocialType().name()));
+        }
+        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<String> changePw(UserLoginRequest dto) {
+        User findUser = userRepository.findUserByEmail(dto.getEmail());
+
+        User encryptedUser = findUser.toBuilder()
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .build();
+
+        userRepository.save(encryptedUser);
+
+        return ResponseEntity.ok().body("비밀번호 변경 성공");
+    }
 }

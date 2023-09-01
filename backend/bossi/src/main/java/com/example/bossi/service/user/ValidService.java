@@ -15,7 +15,10 @@ public class ValidService {
 
     public void validEmailCheck(String email){
         String emailPattern = "^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$";
-        if(!Pattern.matches(emailPattern, email)) throw new AppException(ErrorCode.BAD_REQUEST, "이메일 형식이 잘못됨.");
+        if(!Pattern.matches(emailPattern, email)) {
+            log.error("이메일 형식이 잘못됨");
+            throw new AppException(ErrorCode.BAD_REQUEST, "이메일 형식이 잘못됨.");
+        }
     }
 
     public void validPwCheck(String pw){

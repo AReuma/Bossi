@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public class CheckPhoneResponse {
+public class CheckPhoneResponseDto {
 
     @ApiModelProperty(example = "인증코드")
     private final String num;

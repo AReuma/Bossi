@@ -9,7 +9,7 @@ import lombok.*;
 import jakarta.persistence.*;
 
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -34,7 +34,6 @@ public class User {
 
     private String imageUrl;
 
-    @NotBlank
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$", message = "핸드폰 번호의 형식이 아닙니다. 01x-xxx(x)-xxxx")
     private String phoneNum;
 
