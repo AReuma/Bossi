@@ -37,7 +37,13 @@ export default defineComponent({
 
             ParsingInfo(res.data.access_token);
 
-            this.$router.push({name: 'HomePage'});
+            // 첫 방문일 경우
+            if(cookies.get('registerStatus') === true){
+              alert('첫 방문자')
+            } else
+              this.$router.push({name: 'HomePage'});
+
+
           })
           .catch((res) => {
             console.log(res);

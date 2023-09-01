@@ -58,7 +58,7 @@
             @click:append="show = !show"
             label="비밀번호 (영문+숫자+특수문자 8자 이상)"
             outlined
-            style="height: 80px;"
+            style="height: 70px;"
             color="#434f58"
             v-model="password"
         ></v-text-field>
@@ -69,14 +69,14 @@
             @click:append="showRe = !showRe"
             label="비밀번호 확인"
             outlined
-            style="height: 82px;"
+            style="height: 70px;"
             color="#434f58"
             v-model="password2"
         ></v-text-field>
         <p v-if="passwordCheck2" style="color: red">비밀번호가 서로 다릅니다.</p>
       </div>
 
-      <div style="height: 100px; margin-top: 25px;">
+      <div style="height: 100px; margin-top: 15px;">
         <p>닉네임 <span style="color: red; font-weight: lighter">*</span></p>
         <v-text-field
             label="닉네임을 입력해주세요."
@@ -199,6 +199,7 @@
 import {defineComponent} from 'vue'
 import axios from "axios";
 import {API_BASE_URL} from "@/constant/basic";
+import {EXPIRE_TIME} from "@/constant/login";
 
 export default defineComponent({
   name: "EmailJoinView",
@@ -231,7 +232,7 @@ export default defineComponent({
       phoneCheckData: '',
       successCheck: false,
       // 타이머
-      timeCounter : 10, //3분
+      timeCounter : EXPIRE_TIME,
       expireCode: false,
       checkCode: '',
       socialType: ''
@@ -249,7 +250,10 @@ export default defineComponent({
     clickPhoneCheck(){
       this.sendPhoneBtn = true;
       this.sendPhoneNum = true;
+      if(this.expireCode === true) {
+        this.expireCode = false;
 
+      }
       const {phoneNum} = this
       //this.$emit('checkNum', {phoneNum})
       axios.get(API_BASE_URL+`/api/v1/users/checkPhone/${phoneNum}`)
@@ -272,13 +276,9 @@ export default defineComponent({
         this.timeCounter-- //1찍 감소
         if (this.timeCounter <= 0) {
           this.timeStop();
-          // 인증 코드 다시 보내야함.
-          //
-          this.sendPhoneBtn = false;
-          this.sendPhoneNum = false;
+          this.timeCounterReset();
           this.expireCode = true;
-          this.checkCode = '';
-          this.phoneNum = '';
+          // 인증 코드 다시 보내야함.
         }
       },1000) // 1000ms, 1초
     },
@@ -296,6 +296,14 @@ export default defineComponent({
     timeStop() {
       clearInterval(this.polling)
     },
+    timeCounterReset(){
+      this.sendPhoneBtn = false;
+      this.sendPhoneNum = false;
+      this.checkCode = '';
+      this.phoneNum = '';
+      this.phoneDubCode = '';
+      this.timeCounter = EXPIRE_TIME;
+    },
     register(){
       if(this.checkJoin()){
         alert('회원가입 성공')
@@ -307,7 +315,9 @@ export default defineComponent({
       }
     },
     phoneDubCheck(){
+      this.timeStop();
       if(this.socialType === "NEW_MEM"){
+        this.timeCounter = 0;
         if(this.phoneDubCode === this.checkCode){
           this.phoneCheckData = "인증 완료 되었습니다."
           this.phoneCheckDialog = true;
@@ -321,6 +331,7 @@ export default defineComponent({
           this.phoneCheckDialog = true
         }
       }else {
+        this.timeCounterReset();
         if(this.socialType === "GENERAL") {
           this.phoneCheckData = '회원가입이 된 전화번호 입니다.';
         }else {
@@ -397,7 +408,7 @@ export default defineComponent({
     }
   },
   watch: {
-    email: function (val) {
+    email: function (val) { // dkfma!123@gmail.com 회원가입이 안됨.
       const email = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/
 
       this.emailCheck = !val.match(email);

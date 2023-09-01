@@ -6,7 +6,7 @@
     </div>
 
     <div style="display: flex; justify-content: center; height: 18px">
-      <p><mark>로그인</mark>이 필요한 서비스입니다.</p>
+      <p><mark style="background-color: PINK">로그인</mark>이 필요한 서비스입니다.</p>
     </div>
 
     <div style="display: flex; justify-content: center; margin-top: 30px">

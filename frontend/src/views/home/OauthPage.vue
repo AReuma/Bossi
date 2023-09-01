@@ -27,9 +27,11 @@ export default defineComponent({
 
     const routeData = this.$router.resolve(
         {
-          path: '/snsRegister',
-          name: 'SnsRegisterPage',
+          path: '/oauth2/login',
+          name: 'OauthLoginPage',
         });
+
+
 
     setTimeout(() => {ParsingInfo(this.token.access_token)}, 500);
 
