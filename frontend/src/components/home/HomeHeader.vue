@@ -1,14 +1,32 @@
 <template>
     <div id='nav'>
       <div id="before_login">
-        <div class="before_login_button" style="margin-right: 160px">
-          고객센터
+        <div v-if="isUserLogin">
+          <div class="after_login_button" style="margin-right: 160px" @click="logout()">
+            로그아웃
+          </div>
+          <div class="after_login_button">
+            <v-icon small style="margin-right: 2px">mdi-message-outline</v-icon>
+            메시지
+          </div>
+          <div class="after_login_button" @click="register()">
+            <v-icon small style="margin-right: 2px">mdi-bell-outline</v-icon> 알림
+          </div>
+          <div class="after_login_button" @click="login()">
+            {{ nickName }} 님
+          </div>
         </div>
-        <div class="before_login_button" @click="register()">
-          회원가입
-        </div>
-        <div class="before_login_button" @click="login()">
-          로그인
+
+        <div v-else>
+          <div class="before_login_button" style="margin-right: 160px">
+            고객센터
+          </div>
+          <div class="before_login_button" @click="register()">
+            회원가입
+          </div>
+          <div class="before_login_button" @click="login()">
+            로그인
+          </div>
         </div>
       </div>
 
@@ -81,6 +99,9 @@
 </template>
 
 <script>
+import {mapActions} from "vuex";
+import {useCookies} from "vue3-cookies";
+
 export default {
   name: "HomeHeader",
   data() {
@@ -97,6 +118,7 @@ export default {
           '인기작가'
       ],
       clickCategory: 1,
+      nickName: useCookies().cookies.get("nickName")
     }
   },
   methods: {
@@ -109,26 +131,44 @@ export default {
     },
     register(){
       this.$router.push({name: 'JoinPage'})
+    },
+    ...mapActions(["logout"]),
+    logout(){
+      this.logout();
+    },
+  },
+  computed: {
+    isUserLogin() {
+      return this.$store.getters.isLogin;
     }
   }
+
 };
 </script>
 
 <style scoped>
-#before_login
-{
+#before_login {
   background-color: rgba(153,155,159,0.1);
   //background-color: red;
-  height: 30px;
+  padding-right: 140px;
+  height: 35px;
 }
 .before_login_button{
   float: right;
-  width: 70px;
+  width: 75px;
   box-sizing: border-box;
   text-align: center;
   margin-top: 8px;
   font-size: 11px;
 }
+.after_login_button{
+   float: right;
+   width: 70px;
+   box-sizing: border-box;
+   text-align: center;
+   margin-top: 8px;
+   font-size: 12px;
+ }
 #nav{
   background-color: white;
   color: #212124;
