@@ -1,6 +1,6 @@
 <template>
   <div>
-    MyPage
+    MyCouponListPage
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import {defineComponent} from 'vue'
 
 export default defineComponent({
-  name: "MyPage"
+  name: "MyCouponListPage"
 })
 </script>
 

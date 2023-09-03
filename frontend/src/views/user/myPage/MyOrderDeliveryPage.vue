@@ -1,6 +1,6 @@
 <template>
   <div>
-    MyPage
+    MyOrderDelivery
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import {defineComponent} from 'vue'
 
 export default defineComponent({
-  name: "MyPage"
+  name: "MyOrderDelivery"
 })
 </script>
 

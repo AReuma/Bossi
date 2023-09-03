@@ -1,6 +1,6 @@
 <template>
   <div>
-    MyPage
+
   </div>
 </template>
 
@@ -8,7 +8,7 @@
 import {defineComponent} from 'vue'
 
 export default defineComponent({
-  name: "MyPage"
+  name: "HomeHeaderCategory"
 })
 </script>
 
