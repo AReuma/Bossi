@@ -2,10 +2,11 @@
     <div id='nav'>
       <div id="before_login">
         <div v-if="isUserLogin">
-          <div class="after_login_button" style="margin-right: 10px" @click="logout()">
-            로그아웃
+          <div class="after_login_button" style="margin-right: 10px" @click="enteringStore()">
+            <v-icon small style="margin-right: 2px">mdi-storefront-outline</v-icon>
+            입점하기
           </div>
-          <div class="after_login_button">
+          <div class="after_login_button" style="margin-right: 8px">
             <v-icon small style="margin-right: 2px">mdi-message-outline</v-icon>
             메시지
           </div>
@@ -268,6 +269,9 @@ export default {
     hideCategoryList(index){
       this.category[index].backColor = 'white';
       this.category[index].icon = false;
+    },
+    enteringStore(){
+      this.$router.push({name: "EnteringStorePage"})
     }
   },
   computed: {
@@ -429,5 +433,6 @@ input {
   margin-left: 2px;
   margin-bottom: 8px;
   margin-right: 15px;
+  border-radius: 4px;
 }
 </style>

@@ -16,6 +16,7 @@ import MyOrderDeliveryPage from "@/views/user/myPage/MyOrderDeliveryPage.vue";
 import MyCouponListPage from "@/views/user/myPage/MyCouponListPage.vue";
 import PersonalInfoPage from "@/views/user/myPage/PersonalInfoPage.vue";
 import MyCartPage from "@/views/order/MyCartPage.vue";
+import EnteringStorePage from "@/views/manager/EnteringStorePage.vue";
 
 Vue.use(VueRouter)
 
@@ -83,24 +84,29 @@ const routes = [
     component: MyOrderDeliveryPage
   },
   {
-    path: 'user/me/favoriteproduct',
+    path: '/user/me/favoriteproduct',
     name: "FavoriteProductPage",
     component: FavoriteProductPage
   },
   {
-    path: 'user/me/coupon',
+    path: '/user/me/coupon',
     name: "MyCouponListPage",
     component: MyCouponListPage
   },
   {
-    path: 'user/me/personal',
+    path: '/user/me/personal',
     name: "PersonalInfoPage",
     component: PersonalInfoPage
   },
   {
-    path: 'user/cart',
+    path: '/user/cart',
     name: "MyCartPage",
     component: MyCartPage
+  },
+  {
+    path: '/user/enterStore',
+    name: "EnteringStorePage",
+    component: EnteringStorePage
   }
 ]
 
