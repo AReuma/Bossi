@@ -1,13 +1,13 @@
 package com.example.bossi.service.user;
 
-import com.example.bossi.entity.Role;
-import com.example.bossi.entity.SocialType;
-import com.example.bossi.entity.User;
+import com.example.bossi.entity.*;
+import com.example.bossi.entity.dto.EnteringStoreRequest;
 import com.example.bossi.entity.dto.UserJoinRequest;
 import com.example.bossi.entity.dto.UserLoginRequest;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
-import com.example.bossi.repository.UserRepository;
+import com.example.bossi.repository.user.UserRepository;
+import com.example.bossi.repository.user.WaitingListRepository;
 import com.example.bossi.response.user.FindIdPwResponseDto;
 import com.example.bossi.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
@@ -31,13 +31,15 @@ public class UserService {
 
     private final ValidService validService;
 
+    private final WaitingListRepository waitingListRepository;
+
     private final JwtTokenService jwtTokenService;
 
     public ResponseEntity<String> join(UserJoinRequest dto){
         // userJoinRequest -> null 체크, pw 길이 체크
         userRepository.findByEmail(dto.getEmail())
                 .ifPresent(user -> {
-                    throw new AppException(ErrorCode.USERNAME_DUPLICATED, dto.getEmail()+"은 이미 존재함.");
+                    throw new AppException(ErrorCode.USER_DUPLICATED, dto.getEmail()+"은 이미 존재함.");
                 });
 
         //전화번호 패턴/길이체크
@@ -94,7 +96,7 @@ public class UserService {
     public String login(String emil, String password){
         // emil 없음
         User selectedUser = userRepository.findByEmail(emil)
-                .orElseThrow(() -> new AppException(ErrorCode.USERNAME_NOT_FOUNT, "아이디가 존재하지않음"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUNT, "아이디가 존재하지않음"));
 
         // 비밀번호 틀림
         if(!passwordEncoder.matches(password, selectedUser.getPassword())) {
@@ -145,14 +147,44 @@ public class UserService {
     }
 
     public ResponseEntity<String> changePw(UserLoginRequest dto) {
+        //if(dto.getEmail().isEmpty()) throw new AppException(ErrorCode.BAD_REQUEST, "전화번호값이 존재하지 않음"); @Valid 로 체크함
+
+        validService.validEmailCheck(dto.getEmail());
+
         User findUser = userRepository.findUserByEmail(dto.getEmail());
 
-        User encryptedUser = findUser.toBuilder()
+        /*User encryptedUser = findUser.toBuilder()
                 .password(passwordEncoder.encode(dto.getPassword()))
-                .build();
+                .build();*/
 
-        userRepository.save(encryptedUser);
+        findUser.changePassword(passwordEncoder.encode(dto.getPassword()));
+        userRepository.saveAndFlush(findUser);
 
         return ResponseEntity.ok().body("비밀번호 변경 성공");
+    }
+
+    public ResponseEntity<String> enteringStore(EnteringStoreRequest dto) {
+
+        // waitingList 안에 아이디 중복 확인
+        waitingListRepository.findByEmail(dto.getEmail())
+                .ifPresent(i -> {
+                    throw new AppException(ErrorCode.USER_DUPLICATED, "이미 신청했습니다.");
+                });
+
+        // 보낼 메일 유효성 체크
+        validService.validEmailCheck(dto.sendEmail);
+
+        // 메일 보내기
+
+        // 신청자 리스트에 저장하기
+        WaitingList waitingUser = WaitingList.builder()
+                .email(dto.getEmail())
+                .sendEmail(dto.sendEmail)
+                .status(WaitingListStatus.WAIT)
+                .build();
+
+        waitingListRepository.save(waitingUser);
+
+        return ResponseEntity.ok().body("입점 대기 성공");
     }
 }
