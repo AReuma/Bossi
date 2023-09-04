@@ -1,7 +1,7 @@
 package com.example.bossi.filter;
 
 import com.example.bossi.entity.User;
-import com.example.bossi.repository.UserRepository;
+import com.example.bossi.repository.user.UserRepository;
 import com.example.bossi.service.jwt.JwtTokenService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;

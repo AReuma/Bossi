@@ -1,4 +1,4 @@
-package com.example.bossi.repository;
+package com.example.bossi.repository.user;
 
 import com.example.bossi.entity.SocialType;
 import com.example.bossi.entity.User;

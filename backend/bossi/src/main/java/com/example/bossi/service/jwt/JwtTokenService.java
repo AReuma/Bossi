@@ -2,10 +2,8 @@ package com.example.bossi.service.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.example.bossi.repository.UserRepository;
-import io.jsonwebtoken.Claims;
+import com.example.bossi.repository.user.UserRepository;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

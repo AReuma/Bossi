@@ -3,7 +3,7 @@ package com.example.bossi.service.user;
 import com.example.bossi.entity.User;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
-import com.example.bossi.repository.UserRepository;
+import com.example.bossi.repository.user.UserRepository;
 import com.example.bossi.response.user.CheckPhoneResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +74,7 @@ public class  MessageService {
         log.info(tmpStr);
         //messageService.sendOne(new SingleMessageSendingRequest(message));
 
-        return ResponseEntity.ok().body( findUser.map(user -> new CheckPhoneResponseDto(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponseDto(tmpStr, "NEW_MEM")));
+        return ResponseEntity.status(201).body( findUser.map(user -> new CheckPhoneResponseDto(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponseDto(tmpStr, "NEW_MEM")));
 
         //return findUser.map(user -> new CheckPhoneResponse(tmpStr, user.getSocialType().name())).orElseGet(() -> new CheckPhoneResponse(tmpStr, "NEW_MEM"));
 

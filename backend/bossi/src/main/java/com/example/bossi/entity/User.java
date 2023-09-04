@@ -10,12 +10,11 @@ import jakarta.persistence.*;
 
 @Entity
 @Builder(toBuilder = true)
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
-@Setter
 public class User {
-    //email, password, nickName, phoneNum, recommender, select
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USER_ID")
@@ -64,6 +63,14 @@ public class User {
 
     public void addCoupon(){
 
+    }
+
+    public void changePassword(String password){
+        this.password = password;
+    }
+
+    public void setNickName(String nickName){
+        this.nickName = nickName;
     }
 
     public void updateRefreshToken(String updateRefreshToken) {
