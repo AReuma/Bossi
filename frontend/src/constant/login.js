@@ -9,3 +9,5 @@ export const KAKAO_AUTH_URL = API_BASE_URL + '/oauth2/authorization/kakao';
 export const GOOGLE_AUTH_URL = API_BASE_URL + '/oauth2/authorization/google';
 export const GITHUB_AUTH_URL = API_BASE_URL + '/oauth2/authorization/github';
 export const NAVER_AUTH_URL = API_BASE_URL + '/oauth2/authorization/naver';
+
+export const EXPIRE_TIME = 10;

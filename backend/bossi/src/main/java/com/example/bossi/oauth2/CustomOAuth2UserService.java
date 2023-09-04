@@ -6,8 +6,7 @@ import com.example.bossi.entity.SocialType;
 import com.example.bossi.entity.User;
 import com.example.bossi.oauth2.UserInfo.OAuth2UserInfo;
 import com.example.bossi.oauth2.UserInfo.OAuth2UserInfoFactory;
-import com.example.bossi.repository.UserRepository;
-import jakarta.servlet.http.HttpSession;
+import com.example.bossi.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -75,8 +74,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .nickName(userInfo.getName())
                 .email(userInfo.getEmail())
                 .password(String.valueOf(tempPassword))
+                .nickName("Bossi")
+                .checkSMS(Boolean.FALSE)
                 .role(Role.USER)
-                .phoneNum(socialType.name())
                 .imageUrl("bossi_basic_profile_img.png")
                 .registerStatus(Boolean.FALSE)
                 .referralCode(referralCode)

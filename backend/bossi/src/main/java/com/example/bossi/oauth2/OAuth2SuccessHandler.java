@@ -3,7 +3,7 @@ package com.example.bossi.oauth2;
 import com.example.bossi.config.auth.PrincipalDetails;
 import com.example.bossi.entity.Role;
 import com.example.bossi.entity.User;
-import com.example.bossi.repository.UserRepository;
+import com.example.bossi.repository.user.UserRepository;
 import com.example.bossi.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

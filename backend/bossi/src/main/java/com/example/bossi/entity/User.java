@@ -9,13 +9,12 @@ import lombok.*;
 import jakarta.persistence.*;
 
 @Entity
-@Builder
-@NoArgsConstructor
+@Builder(toBuilder = true)
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
-@Setter
 public class User {
-    //email, password, nickName, phoneNum, recommender, select
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "USER_ID")
@@ -34,7 +33,6 @@ public class User {
 
     private String imageUrl;
 
-    @NotBlank
     @Pattern(regexp = "^\\d{3}-\\d{3,4}-\\d{4}$", message = "핸드폰 번호의 형식이 아닙니다. 01x-xxx(x)-xxxx")
     private String phoneNum;
 
@@ -65,6 +63,14 @@ public class User {
 
     public void addCoupon(){
 
+    }
+
+    public void changePassword(String password){
+        this.password = password;
+    }
+
+    public void setNickName(String nickName){
+        this.nickName = nickName;
     }
 
     public void updateRefreshToken(String updateRefreshToken) {

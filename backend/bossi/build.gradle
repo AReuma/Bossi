@@ -54,6 +54,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
 	//implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.0.2'
 
+	implementation 'org.springframework.boot:spring-boot-starter-mail' // 이메일
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

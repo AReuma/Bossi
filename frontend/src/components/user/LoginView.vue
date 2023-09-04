@@ -6,7 +6,7 @@
     </div>
 
     <div style="display: flex; justify-content: center; height: 18px">
-      <p><mark>로그인</mark>이 필요한 서비스입니다.</p>
+      <p><mark style="background-color: PINK">로그인</mark>이 필요한 서비스입니다.</p>
     </div>
 
     <div style="display: flex; justify-content: center; margin-top: 30px">
@@ -87,7 +87,7 @@
       <v-btn @click="search()" text color="rgba(33,33,36,0.6)">아이디/비밀번호 찾기</v-btn>
     </div>
 
-    <div v-if="showError" style="font-size: small; color: red; margin: 8px 0">
+    <div v-if="showError" style="font-size: small; color: red; margin: 8px 0">비
       아이디(로그인 전용 아이디) 또는 비밀번호를 잘못 입력했습니다.<br/>
       입력하신 내용을 다시 확인해주세요.
     </div>
