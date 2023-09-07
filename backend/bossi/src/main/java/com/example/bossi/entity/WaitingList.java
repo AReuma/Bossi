@@ -3,6 +3,8 @@ package com.example.bossi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Builder
 @NoArgsConstructor
@@ -22,7 +24,15 @@ public class WaitingList {
     @Enumerated(EnumType.STRING)
     private WaitingListStatus status;
 
-    public void updateUserStatus(WaitingListStatus status){
+    private LocalDateTime expirationTime;
+
+    public void updateUserWaitingUser(WaitingListStatus status){
+        LocalDateTime newLocalDateTime = LocalDateTime.now();
+
+        if(status == WaitingListStatus.ALLOW){
+            this.expirationTime = newLocalDateTime.plusMinutes(1);
+        }
+
         this.status = status;
     }
 }

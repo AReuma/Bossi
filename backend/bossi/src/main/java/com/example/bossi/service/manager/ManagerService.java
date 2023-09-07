@@ -10,14 +10,17 @@ import com.example.bossi.repository.manager.WaitingListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ManagerService {
 
@@ -28,9 +31,6 @@ public class ManagerService {
                 .map(w -> new WaitingUserListResponse(w.getId(), w.getEmail(), w.getSendEmail()))
                 .collect(Collectors.toList());
 
-        System.out.println("==========");
-        System.out.println(waitingUserList.get(0));
-        System.out.println("==========");
         return ResponseEntity.ok().body(waitingUserList);
     }
 
@@ -39,9 +39,15 @@ public class ManagerService {
         WaitingList findUser = waitingListRepository.findById(dto.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUNT, "사용자가 존재하지않는다."));
 
-        if(dto.isEnteringStatus()) findUser.updateUserStatus(WaitingListStatus.ALLOW);
-        else findUser.updateUserStatus(WaitingListStatus.REFUSAL);
+        if(dto.isEnteringStatus()) findUser.updateUserWaitingUser(WaitingListStatus.ALLOW);
+        else findUser.updateUserWaitingUser(WaitingListStatus.REFUSAL);
 
         return ResponseEntity.ok("입점 심사 결과 변경 완료");
+    }
+
+    @Transactional
+    public void call() {
+        LocalDateTime now = LocalDateTime.now();
+        waitingListRepository.deleteByExpirationTimeBefore(now);
     }
 }
