@@ -10,9 +10,11 @@ function ParsingInfo(token){
     console.log(result)
 
     let email = result.email;
+    let role = result.role;
     let nickName = result.nickName;
     let registerStatus = result.registerStatus;
 
+    useCookies().cookies.set('role', role)
     useCookies().cookies.set('email', email)
     useCookies().cookies.set('nickName', nickName)
     useCookies().cookies.set('registerStatus', registerStatus)

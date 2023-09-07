@@ -1,5 +1,7 @@
 package com.example.bossi.config;
 
+import com.example.bossi.config.handler.CustomAccessDeniedHandler;
+import com.example.bossi.entity.Role;
 import com.example.bossi.filter.CustomAuthenticationFilter;
 import com.example.bossi.filter.CustomAuthorizationFilter;
 import com.example.bossi.oauth2.CustomOAuth2UserService;
@@ -70,6 +72,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/v1/users/login").permitAll()
                 .requestMatchers("/api/v1/users/join").permitAll()
                 .requestMatchers("/api/v1/oauth2/**").permitAll()
+                .requestMatchers("/api/v1/manager/**").hasAnyAuthority("ADMIN")
                 .requestMatchers("/seller/**").hasRole("ROLE_SELLER")
                 .requestMatchers(DOC_URLS).permitAll()
                 .anyRequest().permitAll();
@@ -83,6 +86,10 @@ public class WebSecurityConfig {
                 .baseUri("/login/oauth2/code/*")
                 .and()
                 .successHandler(oAuth2SuccessHandler);
+
+        http
+                .exceptionHandling()
+                .accessDeniedHandler(new CustomAccessDeniedHandler());
 
         return http.build();
     }

@@ -1,4 +1,7 @@
-import {LOGOUT} from "@/store/mutation-types";
+import {
+    ACCESS_DENIED, FETCH_WAITING_LIST_USERS,
+    LOGOUT,
+} from "@/store/mutation-types";
 import {useCookies} from "vue3-cookies";
 
 
@@ -11,5 +14,11 @@ export default {
         useCookies().cookies.remove('refresh_token');
 
         location.reload();
+    },
+    [FETCH_WAITING_LIST_USERS](state, waitingListUsers){
+        state.waitingListUsers = waitingListUsers;
+    },
+    [ACCESS_DENIED](){
+        this.$router.push()
     }
 }

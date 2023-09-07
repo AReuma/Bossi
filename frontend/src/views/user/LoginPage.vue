@@ -35,14 +35,22 @@ export default defineComponent({
             cookies.set('access_token', res.data.access_token, SAVE_COOKIE_ACCESS);
             cookies.set('refresh_token', res.data.refresh_token, SAVE_COOKIE_REFRESH);
 
-            ParsingInfo(res.data.access_token);
+            setTimeout(() => {ParsingInfo(res.data.access_token)}, 1000);
 
-            // 첫 방문일 경우
-            if(cookies.get('registerStatus') === true){
-              alert('첫 방문자')
-            } else
-              this.$router.push({name: 'HomePage'});
+            const promise = new Promise((resolve) => {
+              setTimeout(function () {
+                console.log(cookies.get('registerStatus'))
+                resolve(ParsingInfo(res.data.access_token))
+              }, 500)
+            })
 
+            promise.then(() => {
+              if(cookies.get('role') === "ROLE_ADMIN"){
+                alert('manager')
+                this.$router.push({name: 'ManagerMainPage'})
+              } else
+                this.$router.push({name: 'HomePage'});
+            })
 
           })
           .catch((res) => {

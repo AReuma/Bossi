@@ -1,8 +1,8 @@
 package com.example.bossi.controller.user;
 
-import com.example.bossi.entity.dto.EnteringStoreRequest;
-import com.example.bossi.entity.dto.UserJoinRequest;
-import com.example.bossi.entity.dto.UserLoginRequest;
+import com.example.bossi.dto.EnteringStoreRequest;
+import com.example.bossi.dto.UserJoinRequest;
+import com.example.bossi.dto.UserLoginRequest;
 import com.example.bossi.response.user.CheckPhoneResponseDto;
 import com.example.bossi.response.user.FindIdPwResponseDto;
 import com.example.bossi.service.user.MessageService;

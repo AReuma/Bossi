@@ -1,13 +1,13 @@
 package com.example.bossi.service.user;
 
 import com.example.bossi.entity.*;
-import com.example.bossi.entity.dto.EnteringStoreRequest;
-import com.example.bossi.entity.dto.UserJoinRequest;
-import com.example.bossi.entity.dto.UserLoginRequest;
+import com.example.bossi.dto.EnteringStoreRequest;
+import com.example.bossi.dto.UserJoinRequest;
+import com.example.bossi.dto.UserLoginRequest;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.user.UserRepository;
-import com.example.bossi.repository.user.WaitingListRepository;
+import com.example.bossi.repository.manager.WaitingListRepository;
 import com.example.bossi.response.user.FindIdPwResponseDto;
 import com.example.bossi.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
@@ -167,7 +167,7 @@ public class UserService {
 
         // waitingList 안에 아이디 중복 확인
         waitingListRepository.findByEmail(dto.getEmail())
-                .ifPresent(i -> {
+                .ifPresent(e -> {
                     throw new AppException(ErrorCode.USER_DUPLICATED, "이미 신청했습니다.");
                 });
 

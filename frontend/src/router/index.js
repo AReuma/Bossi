@@ -17,6 +17,9 @@ import MyCouponListPage from "@/views/user/myPage/MyCouponListPage.vue";
 import PersonalInfoPage from "@/views/user/myPage/PersonalInfoPage.vue";
 import MyCartPage from "@/views/order/MyCartPage.vue";
 import EnteringStorePage from "@/views/manager/EnteringStorePage.vue";
+import ManagerWaitingListView from "@/components/manager/auth/ManagerWaitingListView.vue";
+import ManagerMainPage from "@/views/manager/auth/ManagerMainPage.vue";
+import ManagerAccessDeniedPage from "@/views/manager/auth/ManagerAccessDeniedPage.vue";
 
 Vue.use(VueRouter)
 
@@ -107,8 +110,38 @@ const routes = [
     path: '/user/enterStore',
     name: "EnteringStorePage",
     component: EnteringStorePage
+  },
+  { path: '/manager/category', component: ManagerMainPage, name: "ManagerMainPage",
+    children: [
+      {
+        path: '1',
+        component: ManagerWaitingListView
+      },
+      {
+        path: '2',
+        component: ManagerWaitingListView,
+      },
+      {
+        path: '3',
+        component: ManagerWaitingListView
+      },
+      {
+        path: '4',
+        component: ManagerWaitingListView
+      },
+      {
+        path: '5',
+        component: ManagerWaitingListView
+      }
+    ]
+  },
+  {
+    path: '/manager/denied',
+    name: "ManagerAccessDeniedPage",
+    component: ManagerAccessDeniedPage
   }
 ]
+
 
 const router = new VueRouter({
   mode: 'history',

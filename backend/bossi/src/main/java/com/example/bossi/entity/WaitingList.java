@@ -21,4 +21,8 @@ public class WaitingList {
 
     @Enumerated(EnumType.STRING)
     private WaitingListStatus status;
+
+    public void updateUserStatus(WaitingListStatus status){
+        this.status = status;
+    }
 }
