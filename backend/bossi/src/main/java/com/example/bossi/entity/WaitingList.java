@@ -30,7 +30,7 @@ public class WaitingList {
         LocalDateTime newLocalDateTime = LocalDateTime.now();
 
         if(status == WaitingListStatus.ALLOW){
-            this.expirationTime = newLocalDateTime.plusMinutes(1);
+            this.expirationTime = newLocalDateTime.plusWeeks(1);
         }
 
         this.status = status;
