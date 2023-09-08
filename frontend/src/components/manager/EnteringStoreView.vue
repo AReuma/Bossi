@@ -71,7 +71,7 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="DEEP_PINK" depressed style="color: white; width: 27%; height: 40px" @click="existDialog = false">확인</v-btn>
+            <v-btn color="DEEP_PINK" depressed style="color: white; width: 27%; height: 40px" @click="closeExistDialog()">확인</v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
         </v-card>
@@ -126,6 +126,10 @@ export default defineComponent({
       }
     },
     gMain(){
+      this.$router.push({name: "HomePage"})
+    },
+    closeExistDialog(){
+      this.existDialog = false;
       this.$router.push({name: "HomePage"})
     }
   }

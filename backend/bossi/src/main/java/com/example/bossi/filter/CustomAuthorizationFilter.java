@@ -3,7 +3,6 @@ package com.example.bossi.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.bossi.config.auth.PrincipalDetails;
 import com.example.bossi.config.jwt.JwtProperties;
@@ -17,18 +16,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.example.bossi.config.jwt.JwtProperties.SECRET;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -127,6 +123,8 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter { // 요청 
             if (refreshToken == null) {
                 checkAccessTokenAndAuthentication(request, response, filterChain);
             }*/
+        }else {
+            filterChain.doFilter(request, response);
         }
     }
 

@@ -28,6 +28,7 @@ export default defineComponent({
       axios.post(API_BASE_URL+"/api/v1/users/enteringStore", {email, sendEmail})
           .then((res) => {
             //let reg = /[^가-힣]/g;
+            this.$router.go(0);
             console.log(res)
           })
           .catch((res) => {
