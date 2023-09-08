@@ -1,4 +1,4 @@
-package com.example.bossi.entity.dto;
+package com.example.bossi.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

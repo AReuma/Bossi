@@ -11,7 +11,10 @@ export default new Vuetify({
                 PINK: '#fdcbcc',
                 DEEP_PINK: '#fc9899',
                 FONT_COLOR: '#3d4148',
-                FONT_COLOR2: '#434f58'
+                FONT_COLOR2: '#434f58',
+                BACK_PINK1: 'rgba(252,152,153,0.8)',
+                BACK_PINK3: 'rgba(252,152,153,0.8)',
+                BACK_PINK2: '#434f58',
             },
         },
     }

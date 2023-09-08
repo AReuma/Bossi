@@ -1,4 +1,4 @@
-package com.example.bossi.entity.dto;
+package com.example.bossi.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.example.bossi.entity.dto;
+package com.example.bossi.dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

@@ -1,25 +1,35 @@
 package com.example.bossi.filter;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.bossi.config.auth.PrincipalDetails;
+import com.example.bossi.config.jwt.JwtProperties;
 import com.example.bossi.entity.User;
 import com.example.bossi.repository.user.UserRepository;
 import com.example.bossi.service.jwt.JwtTokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
+import static com.example.bossi.config.jwt.JwtProperties.SECRET;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -50,7 +60,49 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter { // 요청 
 
             String authorizationHeader = request.getHeader(AUTHORIZATION);
 
-            log.info("authorizationHeader : {}", request.getServletPath());
+            if(authorizationHeader != null && authorizationHeader.startsWith(JwtProperties.TOKEN_PREFIX)){
+                try {
+                    String token = authorizationHeader.replace(JwtProperties.TOKEN_PREFIX, "");
+                    log.info("token" + token);
+
+
+                    JwtTokenService jwtTokenService = new JwtTokenService(userRepository);
+                    Optional<String> s = jwtTokenService.extractAccessToken(request);
+                    System.out.println("====");
+                    System.out.println(s);
+                    System.out.println("====");
+
+                    Algorithm algorithm = Algorithm.HMAC512(JwtProperties.SECRET.getBytes());
+                    JWTVerifier verifier = JWT.require(algorithm).build();
+                    DecodedJWT decodedJWT = verifier.verify(token);
+
+                    String email = JWT.require(Algorithm.HMAC512(SECRET)).build().verify(token).getClaim("email").asString();
+                    String id = decodedJWT.getSubject();
+                    log.info("id: "+email);
+
+                    User memberEntity = userRepository.findUserByEmail(email);
+                    PrincipalDetails principalDetails = new PrincipalDetails(memberEntity);
+
+
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(id, null, principalDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                    filterChain.doFilter(request, response);
+                }catch (Exception e){
+                    log.error("Error logging in : {}", e.getMessage());
+                    response.setHeader("error", e.getMessage());
+                    response.setStatus(FORBIDDEN.value());
+                    //response.sendError(FORBIDDEN.value());
+
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error_message",e.getMessage());
+
+                    response.setContentType(APPLICATION_JSON_VALUE);
+
+                    new ObjectMapper().writeValue(response.getOutputStream(), error);
+                }
+
+           /* log.info("authorizationHeader : {}", request.getServletPath());
             log.info("authorizationHeader : {}", jwtService.extractAccessToken(request));
 
             String refreshToken = jwtService.extractRefreshToken(request)
@@ -70,11 +122,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter { // 요청 
             // AccessToken이 유효하다면, 인증 객체가 담긴 상태로 다음 필터로 넘어가기 때문에 인증 성공
             if (refreshToken == null) {
                 checkAccessTokenAndAuthentication(request, response, filterChain);
-            }
+            }*/
+        }else {
+            filterChain.doFilter(request, response);
         }
     }
 
-    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
+    /*public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
 
         userRepository.findByRefreshToken(refreshToken)
                 .ifPresent(user -> {
@@ -120,5 +174,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter { // 요청 
                         authoritiesMapper.mapAuthorities(userDetailsUser.getAuthorities()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
+    }*/
+        }
 }

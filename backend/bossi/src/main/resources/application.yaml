@@ -18,15 +18,30 @@ spring:
     show-sql: true
     generate-ddl: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
+        show_sql: true
 
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "kuuniin@gmail.com"
+    password: "gymsxynkchnlhvys"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            required: true
+            enable: true
 
   profiles:
     include: oauth
@@ -94,4 +109,6 @@ springdoc:
 #    disabled: true
 #  default-consumes-media-type: application/json;charset=UTF-8
 #  default-produces-media-type: application/json;charset=UTF-8
-
+logging:
+  level:
+    org.hibernate.sql: debug

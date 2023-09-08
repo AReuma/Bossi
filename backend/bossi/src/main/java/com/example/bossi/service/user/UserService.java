@@ -1,14 +1,15 @@
 package com.example.bossi.service.user;
 
 import com.example.bossi.entity.*;
-import com.example.bossi.entity.dto.EnteringStoreRequest;
-import com.example.bossi.entity.dto.UserJoinRequest;
-import com.example.bossi.entity.dto.UserLoginRequest;
+import com.example.bossi.dto.EnteringStoreRequest;
+import com.example.bossi.dto.UserJoinRequest;
+import com.example.bossi.dto.UserLoginRequest;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.user.UserRepository;
-import com.example.bossi.repository.user.WaitingListRepository;
+import com.example.bossi.repository.manager.WaitingListRepository;
 import com.example.bossi.response.user.FindIdPwResponseDto;
+import com.example.bossi.service.email.EmailSenderService;
 import com.example.bossi.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,8 @@ public class UserService {
     private final ValidService validService;
 
     private final WaitingListRepository waitingListRepository;
+
+    private final EmailSenderService emailSenderService;
 
     private final JwtTokenService jwtTokenService;
 
@@ -167,7 +170,7 @@ public class UserService {
 
         // waitingList 안에 아이디 중복 확인
         waitingListRepository.findByEmail(dto.getEmail())
-                .ifPresent(i -> {
+                .ifPresent(e -> {
                     throw new AppException(ErrorCode.USER_DUPLICATED, "이미 신청했습니다.");
                 });
 
@@ -175,6 +178,7 @@ public class UserService {
         validService.validEmailCheck(dto.sendEmail);
 
         // 메일 보내기
+        emailSenderService.sendEmailWithAttachment(dto.sendEmail, "123");
 
         // 신청자 리스트에 저장하기
         WaitingList waitingUser = WaitingList.builder()

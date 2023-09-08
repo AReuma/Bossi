@@ -38,3 +38,4 @@ out/
 
 application.yaml
 application-API-KEY.properties
+application-MAIL.properties

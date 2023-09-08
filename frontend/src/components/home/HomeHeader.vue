@@ -20,7 +20,7 @@
                 <router-link class="custom-link" :to="{name: item.routerName}" :style="{color: item.textColor}"> {{item.name}} </router-link>
               </div>
               <hr style="margin: 8px 0; border: 0.5px solid rgba(67,79,88,0.2);"/>
-              <div style="padding: 2px" @click="logout" @mouseover="changeTextColorLogout" @mouseleave="resetTextColorLogout" :style="{color: changeTextColorLogoutColor}">
+              <div style="padding: 2px" @click="logoutBtn" @mouseover="changeTextColorLogout" @mouseleave="resetTextColorLogout" :style="{color: changeTextColorLogoutColor}">
                 로그아웃
               </div>
             </div>
@@ -227,7 +227,7 @@ export default {
       this.$router.push({name: 'JoinPage'})
     },
     ...mapActions(["logout"]),
-    logout(){
+    logoutBtn(){
       this.logout();
     },
     mouseover(){
