@@ -20,6 +20,9 @@ import EnteringStorePage from "@/views/manager/EnteringStorePage.vue";
 import ManagerWaitingListView from "@/components/manager/auth/ManagerWaitingListView.vue";
 import ManagerMainPage from "@/views/manager/auth/ManagerMainPage.vue";
 import ManagerAccessDeniedPage from "@/views/manager/auth/ManagerAccessDeniedPage.vue";
+import LiverOrderProductPage from "@/views/sell/LiverOrderProductPage.vue";
+import ProductDetailPage from "@/views/sell/ProductDetailPage.vue";
+import SellerProductCreatePage from "@/views/seller/SellerProductCreatePage.vue";
 
 Vue.use(VueRouter)
 
@@ -139,6 +142,21 @@ const routes = [
     path: '/manager/denied',
     name: "ManagerAccessDeniedPage",
     component: ManagerAccessDeniedPage
+  },
+  {
+    path: '/sell/liver-order-product',
+    name: "LiverOrderProductPage",
+    component: LiverOrderProductPage
+  },
+  {
+    path: '/sell/product',
+    name: "ProductDetailPage",
+    component: ProductDetailPage
+  },
+  {
+    path: '/seller/product/create',
+    name: "SellerProductCreatePage",
+    component: SellerProductCreatePage
   }
 ]
 

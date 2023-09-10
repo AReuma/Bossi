@@ -1,4 +1,5 @@
 import {
+    FETCH_PRODUCT_CONTENT,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
 } from './mutation-types'
@@ -30,5 +31,14 @@ export default {
             .catch((res) => {
                 throw res;
         })
+    },
+    fetchProductContent({commit}, productId) {
+        return axios.get(API_BASE_URL+`/api/v1/product/${productId}`)
+            .then((res) => {
+                commit(FETCH_PRODUCT_CONTENT, res.data)
+            })
+            .catch((res) => {
+                console.log(res)
+            })
     }
 }

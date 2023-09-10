@@ -13,8 +13,7 @@ export default new Vuetify({
                 FONT_COLOR: '#3d4148',
                 FONT_COLOR2: '#434f58',
                 BACK_PINK1: 'rgba(252,152,153,0.8)',
-                BACK_PINK3: 'rgba(252,152,153,0.8)',
-                BACK_PINK2: '#434f58',
+                LINE_COLOR: 'rgba(67,79,88,0.11)'
             },
         },
     }

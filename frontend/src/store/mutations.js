@@ -1,5 +1,5 @@
 import {
-    ACCESS_DENIED, FETCH_WAITING_LIST_USERS,
+    ACCESS_DENIED, FETCH_PRODUCT_CONTENT, FETCH_WAITING_LIST_USERS,
     LOGOUT,
 } from "@/store/mutation-types";
 import {useCookies} from "vue3-cookies";
@@ -20,5 +20,8 @@ export default {
     },
     [ACCESS_DENIED](){
         this.$router.push()
+    },
+    [FETCH_PRODUCT_CONTENT](state, productContent){
+        state.productContent = productContent;
     }
 }
