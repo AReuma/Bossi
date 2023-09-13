@@ -4,6 +4,7 @@ import com.example.bossi.entity.*;
 import com.example.bossi.entity.product.Category;
 import com.example.bossi.repository.manager.WaitingListRepository;
 import com.example.bossi.repository.seller.CategoryRepository;
+import com.example.bossi.repository.seller.SellerRepository;
 import com.example.bossi.repository.user.UserRepository;
 import com.example.bossi.service.manager.ManagerService;
 import com.example.bossi.service.user.UserService;
@@ -27,6 +28,7 @@ public class UserInitDB {
         initService.dbInit1();
         initService.dbInit2();
         initService.dbInit3();
+        initService.dbInit4();
     }
 
     @Component
@@ -39,6 +41,7 @@ public class UserInitDB {
         private final UserRepository userRepository;
         private final WaitingListRepository waitingListRepository;
         private final CategoryRepository categoryRepository;
+        private final SellerRepository sellerRepository;
 
         public void dbInit1(){
             User user = createUser(1L, "kuuniin@gmail.com", passwordEncoder.encode("dkfma!123"), "유저1", "010-0114-0114", Boolean.TRUE, SocialType.GENERAL, Role.USER, Boolean.TRUE);
@@ -75,6 +78,14 @@ public class UserInitDB {
                 Category category1 = Category.builder().name(s).build();
                 categoryRepository.save(category1);
             }
+        }
+
+        public void dbInit4(){
+            Seller seller1 = Seller.builder()
+                    .email("dkfma@naver.com")
+                    .build();
+
+            sellerRepository.save(seller1);
         }
 
         private static WaitingList createWaitingList(Long id, String email, String sendEmail, WaitingListStatus status) {

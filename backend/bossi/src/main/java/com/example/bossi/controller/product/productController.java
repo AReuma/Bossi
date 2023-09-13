@@ -20,9 +20,9 @@ public class productController {
     private final SellerService sellerService;
 
     @GetMapping("/{id}")
-    public CreateContentRequest content(@PathVariable(name = "id") Long id ){
+    public void content(@PathVariable(name = "id") Long id ){
         log.info("content");
 
-        return sellerService.showContent(id);
+        //return sellerService.showContent(id);
     }
 }

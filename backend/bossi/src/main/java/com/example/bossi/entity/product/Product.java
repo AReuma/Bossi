@@ -35,7 +35,8 @@ public class Product {
     private Category category;
 
     // 한개의 제품에는 여러개의 옵션이 있다.
-    @OneToMany(mappedBy = "product")
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductOption> productOptionList = new ArrayList<>();
 
     // 한개의 제품에는 여러개의 피드백이 있다.
@@ -44,28 +45,54 @@ public class Product {
 
     // 한개의 작품에는 한개의 설명 내용이 있다.
     @JoinColumn(name = "PRODUCT_CONTENT_ID")
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private ProductContent productContent;
 
     private String name;    // 상품 이름
-    private int price;      // 상품 가격
-    private int stockQuantity;      // 갯수
+    private float price;      // 상품 가격
+    private int stockQuantity;      // 개수
+    private int salesQuantity;      // 판매 개수
 
     private int ratingCont;     // 할인율
-    private int ratingSum;      // 할인된 최종 금액
+    private float ratingSum;      // 할인된 최종 금액
 
-    private int deliveryCharge;     // 배송비
+    private float deliveryCharge;     // 배송비
 
     public void setSeller(Seller sellers){
         this.seller = sellers;
     }
 
+    public void setProductContent(ProductContent content) {
+        this.productContent = content;
+        content.setProduct(this);
+    }
+
+    // === 생성 메서드  ===//
+    public static Product createProduct(Seller seller, Category category, ProductContent productContent, String name, float price, int stockQuantity, int ratingCont, float ratingSum, float deliveryCharge){
+        Product product = Product.builder()
+                .seller(seller)
+                .category(category)
+                .productContent(productContent)
+                .name(name)
+                .price(price)
+                .stockQuantity(stockQuantity)
+                .ratingCont(ratingCont)
+                .ratingSum(ratingSum)
+                .productOptionList(new ArrayList<>())
+                .deliveryCharge(deliveryCharge)
+                .salesQuantity(0)
+                .build();
+
+        product.setProductContent(productContent);
+
+        return product;
+    }
+
+
     public void addProductOptionList(ProductOption productOption){
         productOptionList.add(productOption);
         productOption.setProduct(this);
-
     }
-
     public void addFeedback(Feedback feedback){
         feedbacks.add(feedback);
         feedback.setProduct(this);

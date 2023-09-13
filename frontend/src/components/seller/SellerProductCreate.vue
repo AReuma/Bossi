@@ -6,7 +6,7 @@
         style="margin-top: 8px; max-width: 180px; max-height: 45px;"
         height="45"
         color="DEEP_PINK"
-        v-model="selectedItem"
+        v-model="category"
         :items="categoryList"
         item-text="category"
         item-value="categoryId"
@@ -41,11 +41,12 @@
 
         <div style="margin-top: 14px; margin-right: 20px; width: 33%">
           <span class="input-name">배송비: </span> <br/>
-          <input v-model="deliveryCount" type="text" placeholder=" ex) 3500" class="input-element" @input="formatInput(2)">
-          <div style="margin-top: 12px">
-            <v-checkbox style="height: 35px;" label="무료 배송 가격 설정" v-model="checkFreeDelivery"></v-checkbox>
+          <input v-bind:class="{ 'disabled-button': checkFreeDelivery }" v-model="deliveryCount" :disabled="checkFreeDelivery" type="text" placeholder=" ex) 3500" class="input-element" @input="formatInput(2)">
+          <div style="margin-top: 10px">
+            <v-checkbox style="height: 15px;" label="무료 배송" v-model="checkFreeDelivery"></v-checkbox>
+            <v-checkbox style="height: 35px;" label="무료 배송 가격 설정" v-model="checkFreeDeliveryFreePrice"></v-checkbox>
             <span style="font-size: 14px; color: #9f9fa2"> * 작가님 전 상품 주문 총합에 따른 무료배송 설정 </span>
-            <input v-if="checkFreeDelivery" v-model="freeCount" type="text" placeholder=" ex) 100000" class="input-element" @input="formatInput(3)">
+            <input v-if="checkFreeDeliveryFreePrice" v-model="freeCount" type="text" placeholder=" ex) 100000" class="input-element" @input="formatInput(3)">
           </div>
         </div>
 
@@ -55,7 +56,7 @@
       <div style="margin-top: 20px">
         <span class="input-name">수량: </span> <br/>
         <v-checkbox style="height: 35px" v-model="noCount" label="수량 제한 없음"></v-checkbox>
-        <input v-if="!noCount" v-model="count" type="text" placeholder=" ex) 100" class="input-element">
+        <input v-if="!noCount" v-model="stockQuantity" type="text" placeholder=" ex) 100" class="input-element">
       </div>
 
       <div style="margin-top: 20px">
@@ -79,6 +80,8 @@
         </div>
       </div>
     </div>
+
+    {{detailOption}}
 
     <div style="font-size: 20px; margin-top: 40px">작품 정보 작성: </div>
 
@@ -250,12 +253,13 @@ export default defineComponent({
       deliveryCount: '',
       freeCount: '',
       noCount: true,
-      count: '',
+      stockQuantity: '',
       selectedFile: null,
       previewURL: null,
       imgDialog: false,
-      selectedItem: null,
+      category: null,
       checkFreeDelivery: false,
+      checkFreeDeliveryFreePrice: false,
       options: [
         {value: ''}
       ],
@@ -343,26 +347,86 @@ export default defineComponent({
       //this.editor.chain().focus().setImage({ src: imageUrl }).run()
       this.editor.commands.setImage({src: imageUrl})
     },
-    saveContent(){
-      let title = this.title;
-      let allImgUrlList = this.imgUploadAll;
+    makeImageList(content){
 
-      const content = this.editor.getHTML();
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, 'text/html');
 
       const imageTags = doc.querySelectorAll('img');
       const imgUrlList = Array.from(imageTags).map(img => img.src);
 
-      const imgUrlLists = this.sliceImgUrl(imgUrlList);
-      console.log(imgUrlLists)
-      axios.post(API_BASE_URL+"/api/v1/seller/product/create", {title, content, imgUrlLists, allImgUrlList})
-          .then((res) => {
-            console.log(res)
-          })
-          .catch((res) => {
-            console.log(res)
-          })
+      return this.sliceImgUrl(imgUrlList);
+    },
+    replaceElement(element){
+      return parseFloat(element.replace(/,/g, ''));
+    },
+    saveContent(){
+      const {category, title, rating, options, detailOption} = this;
+      let price = parseFloat(this.price.replace(/,/g, ''));
+      let ratingPrice = parseFloat(this.ratingPrice.replace(/,/g, ''));
+      let deliveryCount = parseFloat(this.deliveryCount.replace(/,/g, ''));
+
+      console.log(price)
+      console.log(ratingPrice)
+      console.log(deliveryCount)
+      const content = this.editor.getHTML();
+
+      /*if(category === null || title === null || price === null || content === null){
+        alert('내용을 채워야 저장할 수 있습니다!')
+      }else {*/
+        /*if(rating > 0) {
+          let ratingPrice = this.ratingPrice;
+        }
+
+        if(this.checkFreeDelivery){
+          let deliverCount = this.deliveryCount;
+        }
+
+        if(this.checkFreeDeliveryFreePrice){
+          let freeDeliveryCount = this.freeCount;
+        }*/
+
+        let freeCount;
+        if(this.checkFreeDeliveryFreePrice) {
+          freeCount = parseFloat(this.freeCount.replace(/,/g, ''));
+        }else {
+          freeCount = -1
+        }
+
+        console.log(freeCount)
+
+        let stockQuantity;
+        if(this.noCount){
+          stockQuantity =-1
+        }else {
+          stockQuantity = this.stockQuantity
+          console.log(stockQuantity+detailOption)
+        }
+
+
+        let allImgUrlList = this.imgUploadAll;
+
+        if(allImgUrlList.length === 0){
+          console.log('비어있다')
+          allImgUrlList.push("")
+        }
+
+        console.log(allImgUrlList)
+
+        let imgUrlLists = this.makeImageList(content);
+
+        console.log(imgUrlLists)
+        console.log(rating);
+
+        console.log(options)
+        axios.post(API_BASE_URL+"/api/v1/seller/product/create", {category, title, price, rating, ratingPrice, deliveryCount, freeCount, options, detailOption, stockQuantity, content, imgUrlLists, allImgUrlList})
+            .then((res) => {
+              console.log(res)
+            })
+            .catch((res) => {
+              console.log(res)
+            })
+      //}
 
     },
     sliceImgUrl(arr){
@@ -459,5 +523,9 @@ export default defineComponent({
       outline: 3px solid #68CEF8;
     }
   }
+}
+
+.disabled-button {
+  background-color: rgba(106,106,106,0.07)
 }
 </style>

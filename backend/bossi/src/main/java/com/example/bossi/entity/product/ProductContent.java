@@ -18,14 +18,14 @@ public class ProductContent {
     @Column(name = "PRODUCT_CONTENT_ID")
     private Long id;
 
-    private String title;
-
     @Lob
     @Column(columnDefinition="MEDIUMTEXT")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productContent")
+    @OneToOne(mappedBy = "productContent", fetch = FetchType.LAZY)
     private Product product;
 
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 }

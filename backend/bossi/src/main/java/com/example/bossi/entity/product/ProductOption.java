@@ -1,10 +1,14 @@
 package com.example.bossi.entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Builder
@@ -22,12 +26,32 @@ public class ProductOption {
     @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "productOption", cascade = CascadeType.ALL)
+    private List<ProductDetailOption> productDetailOptionList = new ArrayList<>();
+
     private String optionsName;
 
-    private String optionValue;
-
-    public void setProduct(Product product){
+    public void setProduct(Product product) {
         this.product = product;
+    }
+
+
+    public void addProductDetailOptionList(ProductDetailOption productDetailOption){
+        this.productDetailOptionList.add(productDetailOption);
+        productDetailOption.setProductOption(this);
+    }
+
+    public static ProductOption createProductOption(String optionsName, Product product){
+        ProductOption productOption = ProductOption.builder()
+                .optionsName(optionsName)
+                .product(product)
+                .productDetailOptionList(new ArrayList<>())
+                .build();
+
+        product.addProductOptionList(productOption);
+
+        return productOption;
     }
 
 }

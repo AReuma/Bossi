@@ -2,79 +2,116 @@ package com.example.bossi.service.seller;
 
 import com.example.bossi.dto.FileDetail;
 import com.example.bossi.dto.seller.CreateContentRequest;
-import com.example.bossi.entity.product.Category;
-import com.example.bossi.entity.product.Product;
-import com.example.bossi.entity.product.ProductContent;
+import com.example.bossi.entity.Seller;
+import com.example.bossi.entity.product.*;
+import com.example.bossi.exception.AppException;
+import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.seller.CategoryRepository;
 import com.example.bossi.repository.seller.ProductContentRepository;
 import com.example.bossi.repository.seller.ProductRepository;
 import com.example.bossi.repository.seller.SellerRepository;
 import com.example.bossi.response.product.CategoryResponse;
 import com.example.bossi.response.product.FileUploadResponse;
-import com.example.bossi.response.product.ProductContentResponse;
 import com.example.bossi.service.aws.AwsS3UploadService;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SellerService {
 
     private final ProductRepository productRepository;
+    private final SellerRepository sellerRepository;
     private final ProductContentRepository productContentRepository;
     private final CategoryRepository categoryRepository;
     private final AwsS3UploadService uploadService;
 
+    @Transactional
     public ResponseEntity<String> createContent(CreateContentRequest request) {
-        System.out.println("================");
-        System.out.println(request.getContent());
-        System.out.println("================");
 
-        Product product = Product.builder()
-                .name("test")
+        // 판매자 찾기
+        Seller seller = sellerRepository.findByEmail("dkfma@naver.com");
+
+        // 옵션 value 값만 가지고 오기
+        List<String> values = new ArrayList<>();
+        for(Map<String, String> map : request.getOptions()){
+            String value = map.get("value");
+            values.add(value);
+        }
+
+        // content
+        ProductContent productContent = ProductContent.builder()
+                .content(request.getContent())
                 .build();
+
+
+        // 카테고리 찾기
+        //Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST, "존재하지 않는 카테고리"));
+        Category category = categoryRepository.findById(1L).orElseThrow(() ->  new AppException(ErrorCode.BAD_REQUEST, "x"));
+
+        //product
+        Product product = Product.createProduct(seller, category, productContent, request.getTitle(), request.getPrice(), request.getStockQuantity(), request.getRating(), request.getRatingPrice(), request.getDeliveryCount());
+
+        // 옵션 생성하기
+        List<ProductOption> productOptionList = new ArrayList<>();
+        for (String s : values) {
+            ProductOption productOption =
+                    ProductOption.createProductOption(s, product);
+
+            productOptionList.add(productOption);
+        }
+
+        // OptionDetail
+        for(int i = 0; i < request.getDetailOption().size(); i++){
+            for(int j = 0; j < request.getDetailOption().get(i).size(); j++){
+                String value = request.getDetailOption().get(i).get(j).get("value");
+                ProductDetailOption.createDetailOption(value, productOptionList.get(i));
+            }
+        }
+
 
         productRepository.save(product);
 
-        if(!request.getImgUrlLists().isEmpty()){
+        // 이미지 검사
+        // getImgUrlLists() 저장했을때 남아있는 사진
+        // getAllImgUrlList() 업로드된 모든 사진
+        if(!request.getAllImgUrlList().isEmpty() ){
 
             for (String o : request.getImgUrlLists()) {
                 request.getAllImgUrlList().remove(o);
             }
 
-            uploadService.deleteMissingImages(request.getAllImgUrlList());
+            if(request.getAllImgUrlList().size() != 0) {
+                uploadService.deleteMissingImages(request.getAllImgUrlList());
+            }
         }
 
-        ProductContent productContent = ProductContent.builder()
-                .content(request.getContent())
-                .product(product)
-                .build();
-
-        productContentRepository.save(productContent);
-
-        return ResponseEntity.ok().body("");
+        return ResponseEntity.ok().body("업로드 완료");
     }
 
+    @Transactional
     public FileUploadResponse save(MultipartFile multipartFile, String id) {
         FileDetail fileDetail = FileDetail.multipartOf(multipartFile);
         String imgUrl = uploadService.store(fileDetail.getPath(), multipartFile, id);
         return new FileUploadResponse(imgUrl, fileDetail.getId());
     }
 
-    public CreateContentRequest showContent(Long id) {
+    public void showContent(Long id) {
         ProductContent productContentByProductId = productContentRepository.findProductContentByProductId(id);
         List<String> test = new ArrayList<>();
         List<String> test2 = new ArrayList<>();
 
-        return new CreateContentRequest("title", productContentByProductId.getContent(), test, test2);
+        //return new CreateContentRequest("title", productContentByProductId.getContent(), test, test2);
     }
 
     public ResponseEntity<List<CategoryResponse>> categoryList() {

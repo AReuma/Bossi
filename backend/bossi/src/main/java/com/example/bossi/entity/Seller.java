@@ -21,6 +21,8 @@ public class Seller {
     @Column(name = "SELLER_ID")
     private Long id;
 
+    private String email;
+
     @OneToMany(mappedBy = "seller")
     private List<Product> productList = new ArrayList<>();
 
