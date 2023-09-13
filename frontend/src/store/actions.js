@@ -1,4 +1,5 @@
 import {
+    FETCH_CATEGORY_LIST,
     FETCH_PRODUCT_CONTENT,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
@@ -39,6 +40,12 @@ export default {
             })
             .catch((res) => {
                 console.log(res)
+            })
+    },
+    fetchCategoryList({commit}) {
+        return axios.get(API_BASE_URL+'/api/v1/seller/product/category')
+            .then((res) => {
+                commit(FETCH_CATEGORY_LIST, res.data)
             })
     }
 }

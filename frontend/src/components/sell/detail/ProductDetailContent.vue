@@ -80,7 +80,8 @@
 
       ㅎㅎ 리얼남매<br/>-->
 
-      <editor-content :editor="editor" :content="productContent.content" />
+<!--      <editor-content :editor="editor" :content="productContent.content" />-->
+      <div v-html="productContent.content"></div>
     </div>
   </div>
 </template>
@@ -89,15 +90,12 @@
 import {defineComponent} from 'vue'
 import {Swiper, SwiperSlide} from "vue-awesome-swiper";
 import 'swiper/css/swiper.css'
-import {Editor, EditorContent} from '@tiptap/vue-2';
-import StarterKit from "@tiptap/starter-kit";
 
 export default defineComponent({
   name: "ProductDetailContent",
   components: {
     Swiper,
     SwiperSlide,
-    editorContent: EditorContent,
   },
   props: {
     productContent: {
@@ -125,14 +123,7 @@ export default defineComponent({
     }
   },
   created() {
-    this.editor = new Editor({
-      extensions: [
-        StarterKit
-      ],
-      /*content: this.productContent.content*/
-    })
 
-    this.editor.commands.setContent(this.productContent.content)
   }
 })
 </script>

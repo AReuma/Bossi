@@ -24,7 +24,7 @@ export default defineComponent({
     ...mapState(["productContent"])
   },
   mounted() {
-    axios.get(API_BASE_URL+`/api/v1/product/1`)
+    axios.get(API_BASE_URL+`/api/v1/product/4`)
         .then((res) => {
           this.$store.commit(FETCH_PRODUCT_CONTENT, res.data)
         })

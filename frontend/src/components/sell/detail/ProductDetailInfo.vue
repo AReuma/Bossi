@@ -1,6 +1,6 @@
 <template>
   <div style="height: 100%; width: 50%; padding: 10px; border: 1px solid rebeccapurple">
-    <v-card height="670px" width="100%" style="padding: 10px; border: 1px solid #bbbbbb" elevation="0">
+    <v-card height="670px" width="10\0%" style="padding: 10px; border: 1px solid #bbbbbb" elevation="0">
       <div style="display: flex; align-items: center; border: 1px solid pink">
         <img style="border-radius: 80%; border: 1px solid rgba(187,187,187,0.43); margin-right: 10px" src="../../../assets/logo/Bossi_logo_1.png" height="50" width="50"/>
         <div style="font-family: GmarketSansBold, sans-serif">동그라미</div>

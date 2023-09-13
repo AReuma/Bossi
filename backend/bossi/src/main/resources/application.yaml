@@ -112,3 +112,17 @@ springdoc:
 logging:
   level:
     org.hibernate.sql: debug
+
+
+cloud:
+  aws:
+    s3:
+      bucket: my.example.s3.bucket.bossi
+    credentials:
+      access-key: ${S3-ACCESS-KEY}
+      secret-key: ${S3-SECRET-KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false

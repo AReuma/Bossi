@@ -11,5 +11,6 @@ public class CreateContentRequest {
 
     public String title;
     public String content;
-    //public List<String> imgUrl;
+    private List<String> imgUrlLists;
+    private List<String> allImgUrlList;
 }

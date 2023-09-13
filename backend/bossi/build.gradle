@@ -50,6 +50,13 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail' // 이메일
 
+	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core
+	implementation 'com.amazonaws:aws-java-sdk-core:1.12.547'
+
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'mysql:mysql-connector-java:8.0.32'

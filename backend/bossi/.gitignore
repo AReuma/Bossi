@@ -36,6 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-application.yaml
-application-API-KEY.properties
-application-MAIL.properties
+*.yaml
+*.properties
