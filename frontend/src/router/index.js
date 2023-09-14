@@ -23,6 +23,8 @@ import ManagerAccessDeniedPage from "@/views/manager/auth/ManagerAccessDeniedPag
 import LiverOrderProductPage from "@/views/sell/LiverOrderProductPage.vue";
 import ProductDetailPage from "@/views/sell/ProductDetailPage.vue";
 import SellerProductCreatePage from "@/views/seller/SellerProductCreatePage.vue";
+import SellerMainPage from "@/views/seller/SellerMainPage.vue";
+import SellerMainDashboard from "@/components/seller/main/SellerMainDashboard.vue";
 
 Vue.use(VueRouter)
 
@@ -157,7 +159,35 @@ const routes = [
     path: '/seller/product/create',
     name: "SellerProductCreatePage",
     component: SellerProductCreatePage
-  }
+  },
+  { path: '/seller/main', component: SellerMainPage, name: "SellerMainPage",
+    children: [
+      {
+        path: '1',
+        component: SellerMainDashboard
+      },
+      {
+        path: '2',
+        component: SellerMainDashboard,
+      },
+      {
+        path: '3',
+        component: SellerMainDashboard
+      },
+      {
+        path: '4',
+        component: SellerMainDashboard
+      },
+      {
+        path: '5',
+        component: SellerMainDashboard
+      },
+      {
+        path: '6',
+        component: SellerMainDashboard
+      }
+    ]
+  },
 ]
 
 

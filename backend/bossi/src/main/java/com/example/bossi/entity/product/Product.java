@@ -39,6 +39,11 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductOption> productOptionList = new ArrayList<>();
 
+    // 한개의 작품에는 여러개의 작품 설명 이미지가 있을 수 있다.
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ProductContentImg> productContentImgList = new ArrayList<>();
+
     // 한개의 제품에는 여러개의 피드백이 있다.
     @OneToMany(mappedBy = "product")
     private List<Feedback> feedbacks = new ArrayList<>();
@@ -96,5 +101,10 @@ public class Product {
     public void addFeedback(Feedback feedback){
         feedbacks.add(feedback);
         feedback.setProduct(this);
+    }
+
+    public void addProductContentImg(ProductContentImg productContentImg) {
+        productContentImgList.add(productContentImg);
+        productContentImg.setProduct(this);
     }
 }

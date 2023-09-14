@@ -1,5 +1,5 @@
 <template>
-  <div style="margin: 0 12%; display: flex; align-content: center; justify-content: center; background-color: rgba(236,236,236,0.3)">
+  <div style="margin: 0 12%; display: flex; align-content: center; justify-content: center; background-color: rgba(216, 204, 204, 0.47);">
     <div id="title" style="">
       <div id="bColor">B</div>
       <div id="ossiColor">ossi 작품 등록 :)</div>

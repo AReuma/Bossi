@@ -46,9 +46,9 @@ public class AwsS3UploadService {
             }
             // 이미지의 URL 생성
 
-            return objectKey;
             //return amazonS3Client.getUrl(bucket, objectKey).toString();
         }
+        return objectKey;
     }
 
     public void deleteMissingImages(List<String> deleteList){

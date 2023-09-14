@@ -10,7 +10,6 @@ import java.util.Map;
 @Getter
 public class CreateContentRequest {
 
-    private String email;
     private String category;
     private String title;
     private Float price;

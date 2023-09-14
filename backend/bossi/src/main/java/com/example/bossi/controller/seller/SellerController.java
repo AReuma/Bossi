@@ -8,6 +8,7 @@ import com.example.bossi.service.seller.SellerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,8 +31,14 @@ public class SellerController {
         return sellerService.categoryList();
     }
 
+    @PostMapping("/{id}/saveProductImage")
+    public ResponseEntity<String> saveProductImage(@RequestPart("productImages") List<MultipartFile> productImages, @PathVariable Long id){
+        log.info("saveProductImage");
+        return sellerService.saveProductImage(productImages, id);
+    }
+
     @PostMapping("/create")
-    public ResponseEntity<String> createContent(@RequestBody CreateContentRequest contentRequest){
+    public ResponseEntity<Long> createContent(@RequestBody CreateContentRequest contentRequest){
         log.info("createContent");
 
         return sellerService.createContent(contentRequest);

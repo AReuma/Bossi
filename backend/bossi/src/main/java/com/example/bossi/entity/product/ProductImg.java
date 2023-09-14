@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.parameters.P;
 
 @Entity
 @Builder
@@ -18,5 +19,18 @@ public class ProductImg {
     @Column(name = "PRODUCT_IMG_ID")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "PRODUCT_ID")
+    private Product product;
+
     private String img;
+
+    public static ProductImg saveProductImg(String img, Product product){
+        ProductImg productImg = ProductImg.builder()
+                .img(img)
+                .product(product)
+                .build();
+
+        return productImg;
+    }
 }

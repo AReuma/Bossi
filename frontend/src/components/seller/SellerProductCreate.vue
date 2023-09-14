@@ -22,6 +22,37 @@
         <input v-model="title" placeholder=" 제목" type="text" class="input-element" style="width: 100%">
       </div>
 
+      <div>
+        <div style="margin-top: 20px; font-size: 18px">
+          대표이미지:
+        </div>
+
+        <div>
+          <div class="container-image">
+            <v-btn icon @click="addProductImage">
+              <v-icon x-large>mdi-camera</v-icon>
+            </v-btn>
+
+            <p v-if="previewProductURL.length === 0" style="text-align: center; margin-top: 5px">
+            대표 이미지를 선택해주세요.
+              <br>
+            첫번째 사진은 검색결과에 뜰 사진입니다.
+            </p>
+
+            <div style="border: #4d5159 1px solid; display: flex; overflow: hidden; overflow-x: auto">
+              <div v-for="(image, index) in previewProductURL" :key="index" class="preview-container">
+                <v-icon @click="deleteProductImage(index)" style="position: absolute; z-index: 3; background-color: #bbbbbb">mdi-window-close</v-icon>
+                <img :src="image" alt="이미지 미리보기" style="max-height: 250px">
+              </div>
+            </div>
+
+            <input multiple type="file" style="display: none" ref="uploadItemFile"  @change="previewProductImage" />
+          </div>
+
+
+        </div>
+      </div>
+
       <div style="display: flex; margin-top: 20px">
         <div style="margin-top: 14px; margin-right: 20px; width: 33%">
           <span class="input-name">가격: </span> <br/>
@@ -192,6 +223,7 @@
       </div>
     </div>
 
+
     <v-dialog v-model="imgDialog" persistent width="auto" @keydown.enter="imgDialog = false">
       <v-card style="padding: 40px 20px 10px 20px">
         <v-card-text style="font-size: 20px">
@@ -256,6 +288,8 @@ export default defineComponent({
       stockQuantity: '',
       selectedFile: null,
       previewURL: null,
+      selectProductFile: [],
+      previewProductURL: [],
       imgDialog: false,
       category: null,
       checkFreeDelivery: false,
@@ -266,6 +300,7 @@ export default defineComponent({
       detailOption: [],
       imgUploadList: [],
       imgUploadAll: [],
+      ProductImgDialog: false
     };
   },
   methods: {
@@ -313,6 +348,26 @@ export default defineComponent({
         reader.readAsDataURL(file);
         this.selectedFile = file;
       }
+    },
+    addProductImage(){
+      this.$refs.uploadItemFile.click()
+    },
+    deleteProductImage(index){
+      this.previewProductURL.splice(index, 1)
+      this.selectProductFile.splice(index, 1)
+    },
+    previewProductImage(event){
+      const files = event.target.files;
+
+      for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          this.previewProductURL.push(reader.result);
+        };
+        reader.readAsDataURL(files[i]);
+      }
+      this.selectProductFile.push(files)
     },
     uploadImage() {
       const formData = new FormData();
@@ -386,46 +441,68 @@ export default defineComponent({
           let freeDeliveryCount = this.freeCount;
         }*/
 
-        let freeCount;
-        if(this.checkFreeDeliveryFreePrice) {
-          freeCount = parseFloat(this.freeCount.replace(/,/g, ''));
-        }else {
-          freeCount = -1
-        }
+      let freeCount;
+      if(this.checkFreeDeliveryFreePrice) {
+        freeCount = parseFloat(this.freeCount.replace(/,/g, ''));
+      }else {
+        freeCount = -1
+      }
 
-        console.log(freeCount)
+      console.log(freeCount)
 
-        let stockQuantity;
-        if(this.noCount){
-          stockQuantity =-1
-        }else {
-          stockQuantity = this.stockQuantity
-          console.log(stockQuantity+detailOption)
-        }
+      let stockQuantity;
+      if(this.noCount){
+        stockQuantity =-1
+      }else {
+        stockQuantity = this.stockQuantity
+        console.log(stockQuantity+detailOption)
+      }
 
 
-        let allImgUrlList = this.imgUploadAll;
+      let allImgUrlList = this.imgUploadAll;
 
-        if(allImgUrlList.length === 0){
-          console.log('비어있다')
-          allImgUrlList.push("")
-        }
+      if(allImgUrlList.length === 0){
+        console.log('비어있다')
+        allImgUrlList.push("")
+      }
 
-        console.log(allImgUrlList)
+      console.log(allImgUrlList)
 
-        let imgUrlLists = this.makeImageList(content);
+      let imgUrlLists = this.makeImageList(content);
 
-        console.log(imgUrlLists)
-        console.log(rating);
+      console.log(imgUrlLists)
+      console.log(rating);
 
-        console.log(options)
-        axios.post(API_BASE_URL+"/api/v1/seller/product/create", {category, title, price, rating, ratingPrice, deliveryCount, freeCount, options, detailOption, stockQuantity, content, imgUrlLists, allImgUrlList})
-            .then((res) => {
-              console.log(res)
+      const formData = new FormData();
+
+      console.log("==========")
+      console.log(this.selectProductFile)
+
+      //this.selectProductFile[0].forEach(image => formData.append('productImages', image))
+      for(let i = 0; i < this.selectProductFile[0].length; i++){
+        formData.append('productImages', this.selectProductFile[0][i])
+      }
+
+      console.log(options)
+      axios.post(API_BASE_URL+"/api/v1/seller/product/create", {category, title, price, rating, ratingPrice, deliveryCount, freeCount, options, detailOption, stockQuantity, content, imgUrlLists, allImgUrlList})
+          .then((res) => {
+            let id = res.data
+
+            axios.post(API_BASE_URL+`/api/v1/seller/product/${id}/saveProductImage`, formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
             })
-            .catch((res) => {
-              console.log(res)
-            })
+                .then((res) => {
+                  console.log(res)
+                  if(res.status === 200){
+                    //this.$router.push() // 이미지 업로드 되면 어디로 이동
+                  }
+                })
+          })
+          .catch((res) => {
+            console.log(res)
+          })
       //}
 
     },
@@ -527,5 +604,17 @@ export default defineComponent({
 
 .disabled-button {
   background-color: rgba(106,106,106,0.07)
+}
+
+.container-image {
+  border: #4d5159 1px solid;
+  height: 300px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  overflow: hidden;
+  overflow-x: scroll;
 }
 </style>

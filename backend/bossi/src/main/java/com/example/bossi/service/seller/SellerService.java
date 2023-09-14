@@ -6,14 +6,10 @@ import com.example.bossi.entity.Seller;
 import com.example.bossi.entity.product.*;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
-import com.example.bossi.repository.seller.CategoryRepository;
-import com.example.bossi.repository.seller.ProductContentRepository;
-import com.example.bossi.repository.seller.ProductRepository;
-import com.example.bossi.repository.seller.SellerRepository;
+import com.example.bossi.repository.seller.*;
 import com.example.bossi.response.product.CategoryResponse;
 import com.example.bossi.response.product.FileUploadResponse;
 import com.example.bossi.service.aws.AwsS3UploadService;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +31,10 @@ public class SellerService {
     private final ProductContentRepository productContentRepository;
     private final CategoryRepository categoryRepository;
     private final AwsS3UploadService uploadService;
+    private final ProductImgRepository productImgRepository;
 
     @Transactional
-    public ResponseEntity<String> createContent(CreateContentRequest request) {
+    public ResponseEntity<Long> createContent(CreateContentRequest request) {
 
         // 판매자 찾기
         Seller seller = sellerRepository.findByEmail("dkfma@naver.com");
@@ -54,13 +51,19 @@ public class SellerService {
                 .content(request.getContent())
                 .build();
 
-
         // 카테고리 찾기
         //Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST, "존재하지 않는 카테고리"));
         Category category = categoryRepository.findById(1L).orElseThrow(() ->  new AppException(ErrorCode.BAD_REQUEST, "x"));
 
         //product
         Product product = Product.createProduct(seller, category, productContent, request.getTitle(), request.getPrice(), request.getStockQuantity(), request.getRating(), request.getRatingPrice(), request.getDeliveryCount());
+
+        // Content 이미지 저장
+        if(!request.getImgUrlLists().isEmpty()){
+            for (String imgUrl : request.getImgUrlLists()) {
+                ProductContentImg.createProductContentImg(product, imgUrl);
+            }
+        }
 
         // 옵션 생성하기
         List<ProductOption> productOptionList = new ArrayList<>();
@@ -85,18 +88,18 @@ public class SellerService {
         // 이미지 검사
         // getImgUrlLists() 저장했을때 남아있는 사진
         // getAllImgUrlList() 업로드된 모든 사진
-        if(!request.getAllImgUrlList().isEmpty() ){
+        if(!request.getAllImgUrlList().isEmpty() && request.getAllImgUrlList().get(0) == null){
 
             for (String o : request.getImgUrlLists()) {
                 request.getAllImgUrlList().remove(o);
             }
 
-            if(request.getAllImgUrlList().size() != 0) {
+            if(!request.getAllImgUrlList().isEmpty() && request.getAllImgUrlList().get(0) == null) {
                 uploadService.deleteMissingImages(request.getAllImgUrlList());
             }
         }
 
-        return ResponseEntity.ok().body("업로드 완료");
+        return ResponseEntity.ok().body(product.getId());
     }
 
     @Transactional
@@ -121,5 +124,24 @@ public class SellerService {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok().body(categoryList);
+    }
+
+    @Transactional
+    public ResponseEntity<String> saveProductImage(List<MultipartFile> productImages, Long id) {
+        // 상품 검색
+        Product product = productRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST, "등록할 상품이 없음"));
+
+        // s3 이미지 저장
+        for (MultipartFile multipartFile : productImages) {
+            FileDetail fileDetail = FileDetail.multipartOf(multipartFile);
+            //String imgUrl = uploadService.store(fileDetail.getPath(), multipartFile, product.getSeller().getEmail());
+            String imgUrl = uploadService.store(fileDetail.getPath(), multipartFile, "testId");
+
+            // db에 이미지 이름 저장
+            ProductImg productImg = ProductImg.saveProductImg(imgUrl, product);
+            productImgRepository.save(productImg);
+        }
+
+        return ResponseEntity.ok().body("이미지 업로드 성공");
     }
 }
