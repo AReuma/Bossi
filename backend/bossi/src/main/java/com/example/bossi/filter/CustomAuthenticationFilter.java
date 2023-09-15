@@ -39,9 +39,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 //        this.authenticationManager = authenticationManager;
 //    }
 
-    public CustomAuthenticationFilter(AuthenticationManager authentication){
-        this.authenticationManager = authentication;
 
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
         setFilterProcessesUrl("/api/v1/users/login");
     }
 

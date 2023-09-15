@@ -53,7 +53,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter { // 요청 
         log.info(request.getServletPath());
 
         // 패턴이 제대로 안됨.
-        if(request.getServletPath().equals("/api/v1/users/login") || request.getServletPath().equals("/api/v1/oauth2/redirect") || request.getServletPath().equals("/swagger-ui")) {
+        if(request.getServletPath().equals("/api/v1/users/login") || request.getServletPath().equals("/api/v1/oauth2/redirect") || request.getServletPath().equals("/swagger-ui") || request.getServletPath().equals("/api/v1/seller/login")) {
             log.info("nonono!");
             filterChain.doFilter(request, response);
         }else { // 로그인 외 모든 요청에 filter 처리
