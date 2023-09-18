@@ -7,6 +7,7 @@ import com.example.bossi.util.MultipartUtil;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,16 @@ public class AwsS3UploadService {
     public String store(String fullPath, MultipartFile multipartFile, String id) {
         LocalDate localDate = LocalDate.now();
         String folderKey = "users/"+id+"/"+localDate+"/";
+        return saveImg(fullPath, multipartFile, folderKey);
+    }
+
+    public String saveSellerImg(String fullPath, MultipartFile multipartFile) {
+        String folderKey = "/sellerProfile";
+        return saveImg(fullPath, multipartFile, folderKey);
+    }
+
+    @NotNull
+    private String saveImg(String fullPath, MultipartFile multipartFile, String folderKey) {
         String objectKey = folderKey + fullPath;
 
         File file = new File(MultipartUtil.getLocalHomeDirectory(), fullPath);

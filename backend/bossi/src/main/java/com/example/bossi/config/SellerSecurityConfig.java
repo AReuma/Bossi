@@ -47,7 +47,6 @@ public class SellerSecurityConfig {
 
     private final JwtSellerTokenService jwtSellerTokenService;
     private final SellerRepository sellerRepository;
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final SellerDetailsService sellerDetailsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -84,8 +83,7 @@ public class SellerSecurityConfig {
                 .securityMatcher("/api/v1/seller/login")
                 /*.authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/v1/seller/login").permitAll() // "/api/v1/seller/login" 경로에 대한 설정
-                                .anyRequest().authenticated()
+                                .requestMatchers("/api/v1/seller/**").hasAnyAuthority("BOSS") // "/api/v1/seller/login" 경로에 대한 설정
                 )*/
                 .formLogin().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -93,7 +91,9 @@ public class SellerSecurityConfig {
                 .addFilter(new CustomSellerAuthenticationFilter(sellerAuthenticationManager(null)))
                 .addFilterBefore(new CustomSellerAuthorizationFilter(jwtSellerTokenService, sellerRepository), UsernamePasswordAuthenticationFilter.class);
 
-
+        http.
+                authorizeHttpRequests()
+                .requestMatchers("/api/v1/seller/product/**").permitAll();
         return http.build();
     }
 

@@ -2,6 +2,8 @@ server:
   port: 7777
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   mvc:
     path match:
       matching-strategy: ant_path_matcher
@@ -18,7 +20,7 @@ spring:
     show-sql: true
     generate-ddl: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -112,6 +114,7 @@ springdoc:
 logging:
   level:
     org.hibernate.sql: debug
+    #org.springframework.security: debug
 
 
 cloud:
@@ -126,3 +129,5 @@ cloud:
       auto: false
     stack:
       auto: false
+
+

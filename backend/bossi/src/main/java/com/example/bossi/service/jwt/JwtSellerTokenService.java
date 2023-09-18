@@ -33,14 +33,13 @@ public class JwtSellerTokenService {
     /**
      * AccessToken 생성 메소드
      */
-    public static String createAccessToken(String email, String nickName, String role, Boolean registerStatus){
+    public static String createAccessToken(String email, String role, Long id){
         Date now = new Date();
 
         return JWT.create()
                 .withClaim("email", email)
-                .withClaim("nickName", nickName)
-                .withClaim("registerStatus", registerStatus)
                 .withClaim("role", role)
+                .withClaim("seller_id", id)
                 .withSubject(ACCESS_HEADER)
                 .withSubject(ACCESS_HEADER)
                 .withExpiresAt(new Date(now.getTime() + EXPIRATION_TIME_ACCESS))

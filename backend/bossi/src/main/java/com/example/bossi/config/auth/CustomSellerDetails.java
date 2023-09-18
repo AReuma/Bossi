@@ -57,6 +57,10 @@ public class CustomSellerDetails implements UserDetails {
         return seller.getRole().getKey();
     }
 
+    public Long getId() {
+        return seller.getId();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         // 계정 만료 되었니?

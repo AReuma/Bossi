@@ -25,6 +25,8 @@ import ProductDetailPage from "@/views/sell/ProductDetailPage.vue";
 import SellerProductCreatePage from "@/views/seller/SellerProductCreatePage.vue";
 import SellerMainPage from "@/views/seller/SellerMainPage.vue";
 import SellerMainDashboard from "@/components/seller/main/SellerMainDashboard.vue";
+import SellerRegisterPage from "@/views/seller/SellerRegisterPage.vue";
+import SellerLoginPage from "@/views/seller/SellerLoginPage.vue";
 
 Vue.use(VueRouter)
 
@@ -188,6 +190,16 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/seller/join',
+    name: "SellerRegisterPage",
+    component: SellerRegisterPage
+  },
+  {
+    path: '/seller/login',
+    name: "SellerLoginPage",
+    component: SellerLoginPage
+  }
 ]
 
 

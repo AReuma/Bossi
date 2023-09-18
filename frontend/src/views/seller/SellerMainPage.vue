@@ -20,7 +20,10 @@ export default defineComponent({
     }
   },
   mounted() {
-    if(this.$route.path.search([/1-6/]) !== -1) this.index = false;
+    console.log(this.$route.path)
+    if(this.$route.path.search([/1-6/]) !== -1){
+      this.index = false;
+    }
   }
 })
 </script>

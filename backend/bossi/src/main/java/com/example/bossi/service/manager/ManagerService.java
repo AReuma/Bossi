@@ -42,11 +42,10 @@ public class ManagerService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUNT, "사용자가 존재하지않는다."));
 
         if(dto.isEnteringStatus()){
-            findUser.updateUserWaitingUser(WaitingListStatus.ALLOW);
             emailSenderService.sendEmailWithAttachment(findUser.getSendEmail(),WaitingListStatus.ALLOW.name());
+            findUser.updateUserWaitingUser(WaitingListStatus.ALLOW);
         }
         else {
-            findUser.updateUserWaitingUser(WaitingListStatus.REFUSAL);
             emailSenderService.sendEmailWithAttachment(findUser.getSendEmail(),WaitingListStatus.REFUSAL.name());
         }
 

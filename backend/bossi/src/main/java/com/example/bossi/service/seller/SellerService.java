@@ -2,10 +2,14 @@ package com.example.bossi.service.seller;
 
 import com.example.bossi.dto.FileDetail;
 import com.example.bossi.dto.seller.CreateContentRequest;
+import com.example.bossi.dto.seller.JoinSellerRequest;
 import com.example.bossi.entity.Seller;
+import com.example.bossi.entity.WaitingList;
+import com.example.bossi.entity.WaitingListStatus;
 import com.example.bossi.entity.product.*;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
+import com.example.bossi.repository.manager.WaitingListRepository;
 import com.example.bossi.repository.seller.*;
 import com.example.bossi.response.product.CategoryResponse;
 import com.example.bossi.response.product.FileUploadResponse;
@@ -13,6 +17,7 @@ import com.example.bossi.service.aws.AwsS3UploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,16 +33,18 @@ public class SellerService {
 
     private final ProductRepository productRepository;
     private final SellerRepository sellerRepository;
+    private final WaitingListRepository waitingListRepository;
     private final ProductContentRepository productContentRepository;
     private final CategoryRepository categoryRepository;
     private final AwsS3UploadService uploadService;
     private final ProductImgRepository productImgRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public ResponseEntity<Long> createContent(CreateContentRequest request) {
 
         // 판매자 찾기
-        Seller seller = sellerRepository.findByEmail("dkfma@naver.com");
+        Seller seller = sellerRepository.findById(Long.parseLong(request.getSellerId())).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUNT, "판매자가 없음"));
 
         // 옵션 value 값만 가지고 오기
         List<String> values = new ArrayList<>();
@@ -52,8 +59,8 @@ public class SellerService {
                 .build();
 
         // 카테고리 찾기
-        //Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST, "존재하지 않는 카테고리"));
-        Category category = categoryRepository.findById(1L).orElseThrow(() ->  new AppException(ErrorCode.BAD_REQUEST, "x"));
+        Category category = categoryRepository.findById(Long.parseLong(request.getCategory())).orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST, "존재하지 않는 카테고리"));
+        //Category category = categoryRepository.findById(1L).orElseThrow(() ->  new AppException(ErrorCode.BAD_REQUEST, "x"));
 
         //product
         Product product = Product.createProduct(seller, category, productContent, request.getTitle(), request.getPrice(), request.getStockQuantity(), request.getRating(), request.getRatingPrice(), request.getDeliveryCount());
@@ -135,7 +142,7 @@ public class SellerService {
         for (MultipartFile multipartFile : productImages) {
             FileDetail fileDetail = FileDetail.multipartOf(multipartFile);
             //String imgUrl = uploadService.store(fileDetail.getPath(), multipartFile, product.getSeller().getEmail());
-            String imgUrl = uploadService.store(fileDetail.getPath(), multipartFile, "testId");
+            String imgUrl = uploadService.store(fileDetail.getPath(), multipartFile, String.valueOf(id));
 
             // db에 이미지 이름 저장
             ProductImg productImg = ProductImg.saveProductImg(imgUrl, product);
@@ -143,5 +150,27 @@ public class SellerService {
         }
 
         return ResponseEntity.ok().body("이미지 업로드 성공");
+    }
+
+    @Transactional
+    public ResponseEntity<String> registerSeller(JoinSellerRequest joinSellerRequest) {
+
+        // 승인 받은 메일 확인하기
+        // findUser.updateUserWaitingUser(WaitingListStatus.REFUSAL);
+        WaitingList waitingUser = waitingListRepository.findBySendEmail(joinSellerRequest.getApprovedEmail()).orElseThrow(() -> new AppException(ErrorCode.FORBIDDEN, "인증되지 않은 회원입니다."));
+
+        // 가입 후 waitingList db에서 삭제
+        waitingUser.updateUserWaitingUser(WaitingListStatus.JOIN);
+
+        // s3 이미지 보내기
+        FileDetail fileDetail = FileDetail.multipartOf(joinSellerRequest.getProfileImg());
+        String imgUrl = uploadService.saveSellerImg(fileDetail.getPath(), joinSellerRequest.getProfileImg());
+
+        // Seller 만들기
+        Seller seller = Seller.createSeller(joinSellerRequest.getEmail(), passwordEncoder.encode(joinSellerRequest.getPassword()), joinSellerRequest.getStoreName(), joinSellerRequest.getStoreBio(), imgUrl, joinSellerRequest.getStoreIntroduction());
+
+        sellerRepository.save(seller);
+
+        return ResponseEntity.ok().body("ok");
     }
 }

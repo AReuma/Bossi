@@ -54,7 +54,7 @@ public class CustomSellerAuthorizationFilter extends OncePerRequestFilter { // �
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("필터 순서 : CustomAuthorizationFilter");
+        log.info("필터 순서 : CustomSellerAuthorizationFilter");
         log.info(request.getServletPath());
 
         // 패턴이 제대로 안됨.

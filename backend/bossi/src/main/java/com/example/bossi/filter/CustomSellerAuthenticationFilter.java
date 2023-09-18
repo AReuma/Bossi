@@ -4,6 +4,7 @@ import com.example.bossi.config.auth.CustomSellerDetails;
 import com.example.bossi.config.auth.PrincipalDetails;
 import com.example.bossi.entity.Seller;
 import com.example.bossi.entity.User;
+import com.example.bossi.service.jwt.JwtSellerTokenService;
 import com.example.bossi.service.jwt.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -100,8 +101,8 @@ public class CustomSellerAuthenticationFilter extends UsernamePasswordAuthentica
 
         System.out.println(seller.getUsername());
         //String access_token = JwtTokenService.createAccessToken(seller.getUsername(), seller.getName(), user.getRole(), user.getRegisterStatus());
-        String access_token = "Abd";
-        String refresh_token = JwtTokenService.createRefreshToken();
+        String access_token = JwtSellerTokenService.createAccessToken(seller.getUsername(), seller.getRole(), seller.getId());
+        String refresh_token = JwtSellerTokenService.createRefreshToken();
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token",access_token);

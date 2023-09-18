@@ -112,8 +112,6 @@
       </div>
     </div>
 
-    {{detailOption}}
-
     <div style="font-size: 20px; margin-top: 40px">작품 정보 작성: </div>
 
     <hr style="margin: 10px 0 25px 0; border: 1px solid rgba(67,79,88,0.11)"/>
@@ -259,6 +257,7 @@ import {Color} from "@tiptap/extension-color";
 import {TextStyle} from "@tiptap/extension-text-style";
 import Blockquote from '@tiptap/extension-blockquote'
 import index from "vuex";
+import {useCookies} from "vue3-cookies";
 
 export default defineComponent({
   name: "SellerProductCreate",
@@ -277,6 +276,7 @@ export default defineComponent({
   },
   data() {
     return {
+      sellerId: useCookies().cookies.get('sellerId'),
       editor: null,
       title: '',
       price: '',
@@ -372,7 +372,7 @@ export default defineComponent({
     uploadImage() {
       const formData = new FormData();
       formData.append('image', this.selectedFile);
-      formData.append('id', "testId");
+      formData.append('id', this.sellerId);
 
       console.log(this.selectedFile)
 
@@ -416,7 +416,7 @@ export default defineComponent({
       return parseFloat(element.replace(/,/g, ''));
     },
     saveContent(){
-      const {category, title, rating, options, detailOption} = this;
+      const {sellerId, category, title, rating, options, detailOption} = this;
       let price = parseFloat(this.price.replace(/,/g, ''));
       let ratingPrice = parseFloat(this.ratingPrice.replace(/,/g, ''));
       let deliveryCount = parseFloat(this.deliveryCount.replace(/,/g, ''));
@@ -426,7 +426,7 @@ export default defineComponent({
       console.log(deliveryCount)
       const content = this.editor.getHTML();
 
-      /*if(category === null || title === null || price === null || content === null){
+     /* if(category === null || title === null || price === null || content === null || this.selectProductFile === null){
         alert('내용을 채워야 저장할 수 있습니다!')
       }else {*/
         /*if(rating > 0) {
@@ -479,26 +479,38 @@ export default defineComponent({
       console.log(this.selectProductFile)
 
       //this.selectProductFile[0].forEach(image => formData.append('productImages', image))
-      for(let i = 0; i < this.selectProductFile[0].length; i++){
-        formData.append('productImages', this.selectProductFile[0][i])
+      if(this.selectProductFile.length !== 0){
+        for(let i = 0; i < this.selectProductFile[0].length; i++){
+          console.log(this.selectProductFile[0][i])
+          formData.append('productImages', this.selectProductFile[0][i])
+        }
       }
 
       console.log(options)
-      axios.post(API_BASE_URL+"/api/v1/seller/product/create", {category, title, price, rating, ratingPrice, deliveryCount, freeCount, options, detailOption, stockQuantity, content, imgUrlLists, allImgUrlList})
+      console.log(category)
+
+      console.log([...formData.entries()]);
+      // {category, title, price, rating, ratingPrice, deliveryCount, freeCount, options, detailOption, stockQuantity, content, imgUrlLists, allImgUrlList}
+      axios.post(API_BASE_URL+"/api/v1/seller/product/create", {sellerId, category, title, price, rating, ratingPrice, deliveryCount, freeCount, options, detailOption, stockQuantity, content, imgUrlLists, allImgUrlList}, {
+
+      })
           .then((res) => {
+            console.log(res.data)
             let id = res.data
 
-            axios.post(API_BASE_URL+`/api/v1/seller/product/${id}/saveProductImage`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            })
-                .then((res) => {
-                  console.log(res)
-                  if(res.status === 200){
-                    //this.$router.push() // 이미지 업로드 되면 어디로 이동
-                  }
-                })
+            if(this.selectProductFile.length !== 0){
+              axios.post(API_BASE_URL+`/api/v1/seller/product/${id}/saveProductImage`, formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+              })
+                  .then((res) => {
+                    console.log(res)
+                    if(res.status === 200){
+                      //this.$router.push() // 이미지 업로드 후 이동
+                    }
+                  })
+            }
           })
           .catch((res) => {
             console.log(res)

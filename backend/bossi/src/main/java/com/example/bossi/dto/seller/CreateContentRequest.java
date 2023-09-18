@@ -3,6 +3,7 @@ package com.example.bossi.dto.seller;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 @Getter
 public class CreateContentRequest {
 
+    private String sellerId;
     private String category;
     private String title;
     private Float price;
@@ -23,4 +25,6 @@ public class CreateContentRequest {
     private String content;
     private List<String> imgUrlLists;
     private List<String> allImgUrlList;
+
+    public CreateContentRequest(){}
 }
