@@ -1,6 +1,8 @@
 export default {
     //manager: waitingListUser
     waitingListUsers: [],
-    productContent: '',
+    productContent: {},
     categoryList: [],
+    liverOrderProduct: [],
+    imgData: '',
 }

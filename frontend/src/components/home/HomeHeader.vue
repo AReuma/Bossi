@@ -323,6 +323,7 @@ export default {
   left: 0;
   width: 100%;
   max-width: 100vw;
+  max-height: 200px;
   /* position: fixed;
   z-index: 999; */
 }

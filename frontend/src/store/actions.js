@@ -1,5 +1,5 @@
 import {
-    FETCH_CATEGORY_LIST,
+    FETCH_CATEGORY_LIST, FETCH_LIVER_ORDER_PRODUCT,
     FETCH_PRODUCT_CONTENT,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
@@ -47,5 +47,15 @@ export default {
             .then((res) => {
                 commit(FETCH_CATEGORY_LIST, res.data)
             })
+    },
+    fetchLiverOrderProduct({commit}) {
+        return axios.get(API_BASE_URL+'/api/v1/product/liverOrderList')
+            .then((res) => {
+                commit(FETCH_LIVER_ORDER_PRODUCT, res.data)
+            })
+    },
+    updateImgStyleData({ commit }, data) {
+        console.log(data)
+        commit('setImgStyleData', data);
     }
 }

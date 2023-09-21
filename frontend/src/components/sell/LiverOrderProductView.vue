@@ -7,25 +7,25 @@
 
     <div id="basic">
       <div style="display: flex;">
-        <v-card flat style="margin: 5px" v-for="i in n" :key="i" outlined height="400" width="225" @click="productClick">
+        <v-card flat style="margin: 5px" v-for="(i, index) in liverOrderProduct" :key="index" outlined height="400" width="225" @click="productClick(i.productId)">
           <div style="position: relative; height: 210px">
-            <v-img class="product-image" style="position: absolute; z-index: 1; border-bottom-left-radius: 0; border-bottom-right-radius: 0" src="../../assets/sellProduct/product_test.jpg"/>
+            <v-img class="product-image" style="position: absolute; z-index: 1; border-bottom-left-radius: 0; border-bottom-right-radius: 0" :src="`https://s3.ap-northeast-2.amazonaws.com/my.example.s3.bucket.bossi/${i.productImg}`"/>
             <v-icon color="white" size="30" style="z-index: 2; position: absolute; right: 15px; top: 15px;">mdi-heart-outline</v-icon>
           </div>
 
           <div style="height: 100%">
             <div style="padding: 10px;">
-              <span style="font-size: 15px; color: #bbbbbb">딥드</span>
-              <p>우리쌀 수제 팝쌀약과 2개 세트 쌀조청으로 만든 수제집청</p>
+              <span style="font-size: 15px; color: #bbbbbb">{{i.storeName}}</span>
+              <p>{{i.productTitle}}</p>
 
             </div>
 
             <div style="border-top: 1px solid rgba(220,220,220,0.72); padding: 2px 10px">
-              <v-rating v-model="starNum" size="18" background-color="gray" dense half-increments color="rgb(255,183,0)" readonly>
+              <v-rating v-model="i.rating" size="18" background-color="gray" dense half-increments color="rgb(255,183,0)" readonly>
               </v-rating>
 
               <div style="margin-top: 2px; font-size: 14px; color: #5f5f5f" >
-                좋아요! 또 시키러 갑니다!
+                {{i.preview}}
               </div>
             </div>
           </div>
@@ -40,6 +40,11 @@ import {defineComponent} from 'vue'
 
 export default defineComponent({
   name: "LiverOrderProductView",
+  props: {
+    liverOrderProduct: {
+      type: Array
+    }
+  },
   data(){
     return {
       starNum: 4,
@@ -47,8 +52,9 @@ export default defineComponent({
     }
   },
   methods: {
-    productClick(){
-      this.$router.push({name: "ProductDetailPage"})
+    productClick(index){
+      console.log(index)
+      this.$router.push({name: "ProductDetailPage", query: {id: index}})
     }
   }
 })

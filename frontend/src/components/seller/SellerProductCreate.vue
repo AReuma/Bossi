@@ -102,7 +102,8 @@
               <v-btn depressed text outlined @click="addDetailOption(index)" style="width: 15%; height: 45px;">상세 옵션 추가</v-btn>
 
               <div v-for="(detail, detailIndex) in detailOption[index]" :key="detailIndex" style="margin-left: 40px; margin-top: 5px">
-                <input v-model="detail.value" type="text" placeholder=" ex) 빨강" class="input-element" style="width: 80%; ">
+                <input v-model="detail.value" type="text" placeholder=" ex) 빨강" class="input-element" style="width: 50%; ">
+                <input v-model="detail.price" type="text" placeholder=" ex) 가격 1000" class="input-element" style="width: 30%; margin-left: 20px">
                 <v-btn depressed icon @click="deleteOptionDetail(index, detailIndex)" style="margin-left: 5px"><v-icon>mdi-window-close</v-icon></v-btn>
               </div>
             </div>
@@ -327,7 +328,7 @@ export default defineComponent({
       if(this.detailOption.length === index){
         this.detailOption.push([]);
       }
-      this.detailOption[index].push({value: ' '})
+      this.detailOption[index].push({})
     },
     deleteOptionDetail(index, detailIndex){
       this.detailOption[index].splice(detailIndex, 1);

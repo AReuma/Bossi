@@ -1,13 +1,13 @@
 <template>
-  <div style=" height: 100%; width: 50%; padding: 10px">
+  <div style="height: 100%; max-width: 50%; padding: 10px;">
     <div style="width: 100%;">
       <swiper
           style="width: 100%; height: 100%"
           class="swiper"
           :options="swiperOption"
       >
-        <swiper-slide v-for="(item, i) in swiperList" :key="i">
-          <img :src="require(`../../../assets/sellProduct/${item}`)" width="100%" height="520"/></swiper-slide>
+        <swiper-slide v-for="(item, i) in productImg" :key="i">
+          <v-img :src="`https://s3.ap-northeast-2.amazonaws.com/my.example.s3.bucket.bossi/${item}`" width="100%" height="520"/></swiper-slide>
 
         <div
             class="swiper-pagination"
@@ -16,72 +16,8 @@
         </div>
       </swiper>
     </div>
-
-    <div>
-<!--      재료불문❗️ 종류불문❗️ 착한가격❗️ <br/>
-
-      떡과 쌀빵 심지어 쿠키랑 과자류등<br/>
-
-      전통부터 퓨전까지😘 뚝떡뚝떡~ 잘 만드는<br/>
-
-      K-푸드 맛집✨ 맛있는~ 떠카나주 💖<br/>
-
-      약과를 만들다 깨지고 남은게 파지다??<br/>
-
-      파지약과에 대한 가장 큰 오해인데요ㅜㅜ<br/>
-
-      점보보다 훨씬 손이 많이가는 파지..<br/>
-
-      그래서 저희도 엄두를 못내다,<br/>
-
-      회원님들의 요청에 시작했습니다<br/>
-
-      🍪 파지약과 🍪<br/>
-      파지라는 이름과는 참~ 안어울리게<br/>
-
-      너무 정성껏 만들다 보니..<br/>
-
-      저희 팀원중엔,<br/>
-
-      "궁금하니 파지좀 챙겨와"라는 남동생 말에?<br/>
-
-      아까워서 넌 못주겠다.. 파지 한팩에 공이 너무 들어가서..ㅜㅜ<br/>
-
-      ㅎㅎ 리얼남매<br/>
-
-      재료불문❗️ 종류불문❗️ 착한가격❗️ <br/>
-
-      떡과 쌀빵 심지어 쿠키랑 과자류등<br/>
-
-      전통부터 퓨전까지😘 뚝떡뚝떡~ 잘 만드는<br/>
-
-      K-푸드 맛집✨ 맛있는~ 떠카나주 💖<br/>
-
-      약과를 만들다 깨지고 남은게 파지다??<br/>
-
-      파지약과에 대한 가장 큰 오해인데요ㅜㅜ<br/>
-
-      점보보다 훨씬 손이 많이가는 파지..<br/>
-
-      그래서 저희도 엄두를 못내다,<br/>
-
-      회원님들의 요청에 시작했습니다<br/>
-
-      🍪 파지약과 🍪<br/>
-      파지라는 이름과는 참~ 안어울리게<br/>
-
-      너무 정성껏 만들다 보니..<br/>
-
-      저희 팀원중엔,<br/>
-
-      "궁금하니 파지좀 챙겨와"라는 남동생 말에?<br/>
-
-      아까워서 넌 못주겠다.. 파지 한팩에 공이 너무 들어가서..ㅜㅜ<br/>
-
-      ㅎㅎ 리얼남매<br/>-->
-
-<!--      <editor-content :editor="editor" :content="productContent.content" />-->
-      <div v-html="productContent.content"></div>
+    <hr style="margin-top: 10px; padding-right: 10px; border: 1px solid rgba(187,187,187,0.18)">
+    <div style="width: 100%; text-align: center; margin-top: 25px" v-html="userData">
     </div>
   </div>
 </template>
@@ -98,8 +34,14 @@ export default defineComponent({
     SwiperSlide,
   },
   props: {
-    productContent: {
+    productImg: {
       type: Array
+    }
+  },
+  computed: {
+    userData() {
+      //console.log(this.$store.getters.getImgData)
+      return this.$store.getters.getImgData;
     }
   },
   data(){
@@ -114,15 +56,18 @@ export default defineComponent({
         },*/
         speed: 2,
         autoHeight: true,
-        loop: true,
+        loop: false,
         pagination: {
           el: '.swiper-pagination',
           clickable: true
         }
-      }
+      },
+      content: '',
+
     }
   },
   created() {
+
 
   }
 })
@@ -134,4 +79,7 @@ export default defineComponent({
   --swiper-theme-color: #fc9899
 }
 
+.content img {
+  width: 50%;
+}
 </style>
