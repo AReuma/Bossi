@@ -25,11 +25,17 @@ public class ProductImg {
 
     private String img;
 
+    public void setProduct(Product product){
+        this.product = product;
+
+    }
+
     public static ProductImg saveProductImg(String img, Product product){
         ProductImg productImg = ProductImg.builder()
                 .img(img)
-                .product(product)
                 .build();
+
+        product.addProductImg(productImg);
 
         return productImg;
     }

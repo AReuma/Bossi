@@ -24,10 +24,13 @@ public class ProductDetailOption {
 
     private String optionValue;
 
-    public static ProductDetailOption createDetailOption(String optionValue, ProductOption productOption){
+    private float price;
+
+    public static ProductDetailOption createDetailOption(String optionValue, Float price, ProductOption productOption){
         ProductDetailOption productDetailOption = ProductDetailOption.builder()
                 .optionValue(optionValue)
                 .productOption(productOption)
+                .price(price)
                 .build();
 
         productOption.addProductDetailOptionList(productDetailOption);

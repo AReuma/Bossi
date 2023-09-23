@@ -1,5 +1,6 @@
 package com.example.bossi.entity.product;
 
+import com.example.bossi.entity.BaseEntity;
 import com.example.bossi.entity.Seller;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Product {
+public class Product extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PRODUCT_ID")
@@ -53,6 +54,10 @@ public class Product {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private ProductContent productContent;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ProductImg> productImgs = new ArrayList<>();
+
     private String name;    // 상품 이름
     private float price;      // 상품 가격
     private int stockQuantity;      // 개수
@@ -62,6 +67,7 @@ public class Product {
     private float ratingSum;      // 할인된 최종 금액
 
     private float deliveryCharge;     // 배송비
+    private float freeDeliverTotalCharge; // 배송 무료인 주문 가격
 
     public void setSeller(Seller sellers){
         this.seller = sellers;
@@ -73,7 +79,7 @@ public class Product {
     }
 
     // === 생성 메서드  ===//
-    public static Product createProduct(Seller seller, Category category, ProductContent productContent, String name, float price, int stockQuantity, int ratingCont, float ratingSum, float deliveryCharge){
+    public static Product createProduct(Seller seller, Category category, ProductContent productContent, String name, float price, int stockQuantity, int ratingCont, float ratingSum, float deliveryCharge, float freeDeliverTotalCharge){
         Product product = Product.builder()
                 .seller(seller)
                 .category(category)
@@ -86,11 +92,17 @@ public class Product {
                 .productOptionList(new ArrayList<>())
                 .deliveryCharge(deliveryCharge)
                 .salesQuantity(0)
+                .freeDeliverTotalCharge(freeDeliverTotalCharge)
                 .build();
 
         product.setProductContent(productContent);
 
         return product;
+    }
+
+    public void addProductImg(ProductImg productImg){
+        productImgs.add(productImg);
+        productImg.setProduct(this);
     }
 
 
