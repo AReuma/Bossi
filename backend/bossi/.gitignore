@@ -38,3 +38,7 @@ out/
 
 *.yaml
 *.properties
+
+**/main/resources/application-API-KEY.properties
+**/main/resources/application-MAIL.properties
+**/main/resources/application.yaml
