@@ -20,6 +20,15 @@ import EnteringStorePage from "@/views/manager/EnteringStorePage.vue";
 import ManagerWaitingListView from "@/components/manager/auth/ManagerWaitingListView.vue";
 import ManagerMainPage from "@/views/manager/auth/ManagerMainPage.vue";
 import ManagerAccessDeniedPage from "@/views/manager/auth/ManagerAccessDeniedPage.vue";
+import LiverOrderProductPage from "@/views/sell/LiverOrderProductPage.vue";
+import ProductDetailPage from "@/views/sell/ProductDetailPage.vue";
+import SellerProductCreatePage from "@/views/seller/SellerProductCreatePage.vue";
+import SellerMainPage from "@/views/seller/SellerMainPage.vue";
+import SellerMainDashboard from "@/components/seller/main/SellerMainDashboard.vue";
+import SellerRegisterPage from "@/views/seller/SellerRegisterPage.vue";
+import SellerLoginPage from "@/views/seller/SellerLoginPage.vue";
+import PurchaseDirectPage from "@/views/sell/purchase/PurchaseDirectPage.vue";
+import PurchaseDeliveryPage from "@/views/sell/purchase/PurchaseDeliveryPage.vue";
 
 Vue.use(VueRouter)
 
@@ -139,6 +148,70 @@ const routes = [
     path: '/manager/denied',
     name: "ManagerAccessDeniedPage",
     component: ManagerAccessDeniedPage
+  },
+  {
+    path: '/sell/liver-order-product',
+    name: "LiverOrderProductPage",
+    component: LiverOrderProductPage
+  },
+  {
+    path: '/sell/product',
+    name: "ProductDetailPage",
+    component: ProductDetailPage
+  },
+  {
+    path: '/seller/product/create',
+    name: "SellerProductCreatePage",
+    component: SellerProductCreatePage
+  },
+  { path: '/seller/main', component: SellerMainPage, name: "SellerMainPage",
+    children: [
+      {
+        path: '1',
+        component: SellerMainDashboard
+      },
+      {
+        path: '2',
+        component: SellerMainDashboard,
+      },
+      {
+        path: '3',
+        component: SellerMainDashboard
+      },
+      {
+        path: '4',
+        component: SellerMainDashboard
+      },
+      {
+        path: '5',
+        component: SellerMainDashboard
+      },
+      {
+        path: '6',
+        component: SellerMainDashboard
+      }
+    ]
+  },
+  {
+    path: '/seller/join',
+    name: "SellerRegisterPage",
+    component: SellerRegisterPage
+  },
+  {
+    path: '/seller/login',
+    name: "SellerLoginPage",
+    component: SellerLoginPage
+  },
+  {
+    path: '/cart/direct_new',
+    name: "PurchaseDirectPage",
+    component: PurchaseDirectPage,
+    props: true
+  },
+  {
+    path: '/cart/payment',
+    name: "PurchaseDeliveryPage",
+    component: PurchaseDeliveryPage
   }
 ]
 

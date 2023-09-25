@@ -6,6 +6,7 @@ import com.example.bossi.dto.UserJoinRequest;
 import com.example.bossi.dto.UserLoginRequest;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
+import com.example.bossi.repository.seller.SellerRepository;
 import com.example.bossi.repository.user.UserRepository;
 import com.example.bossi.repository.manager.WaitingListRepository;
 import com.example.bossi.response.user.FindIdPwResponseDto;
@@ -27,6 +28,8 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    
+    private final SellerRepository sellerRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -117,10 +120,11 @@ public class UserService {
         validService.validEmailCheck(email);
 
         Optional<User> user = userRepository.findByEmail(email);
+        Optional<Seller> seller = sellerRepository.findByEmail(email);
 
-        if(user.isPresent()){
-            return Boolean.FALSE;
-        }else return Boolean.TRUE;
+        if(user.isEmpty() && seller.isEmpty()){
+            return Boolean.TRUE;
+        }else return Boolean.FALSE;
     }
 
 

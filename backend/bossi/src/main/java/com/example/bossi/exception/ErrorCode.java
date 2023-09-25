@@ -13,6 +13,7 @@ public enum ErrorCode {
     INVALID_PHONENUM(HttpStatus.UNAUTHORIZED, ""), // 401
     NULL_REQUEST(HttpStatus.BAD_REQUEST, ""), // 400
     BAD_REQUEST(HttpStatus.BAD_REQUEST, ""), // 400
+    FORBIDDEN(HttpStatus.FORBIDDEN, ""), // 403
     ;
 
     private HttpStatus httpsStatus;

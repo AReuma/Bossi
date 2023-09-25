@@ -12,6 +12,8 @@ public interface WaitingListRepository extends JpaRepository<WaitingList, Long> 
 
     Optional<WaitingList> findByEmail(String email);
 
+    Optional<WaitingList> findBySendEmail(String sendEmail);
+
     List<WaitingList> findWaitingListByStatus(WaitingListStatus status);
 
     void deleteByExpirationTimeBefore(LocalDateTime now);

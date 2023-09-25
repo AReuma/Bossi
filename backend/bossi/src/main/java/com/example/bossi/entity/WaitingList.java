@@ -27,9 +27,10 @@ public class WaitingList {
     private LocalDateTime expirationTime;
 
     public void updateUserWaitingUser(WaitingListStatus status){
-        LocalDateTime newLocalDateTime = LocalDateTime.now();
 
-        if(status == WaitingListStatus.ALLOW){
+        // 가입 완료일 경우
+        if(status == WaitingListStatus.JOIN){
+            LocalDateTime newLocalDateTime = LocalDateTime.now();
             this.expirationTime = newLocalDateTime.plusWeeks(1);
         }
 

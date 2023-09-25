@@ -1,7 +1,10 @@
 package com.example.bossi.initDB;
 
 import com.example.bossi.entity.*;
+import com.example.bossi.entity.product.Category;
 import com.example.bossi.repository.manager.WaitingListRepository;
+import com.example.bossi.repository.seller.CategoryRepository;
+import com.example.bossi.repository.seller.SellerRepository;
 import com.example.bossi.repository.user.UserRepository;
 import com.example.bossi.service.manager.ManagerService;
 import com.example.bossi.service.user.UserService;
@@ -22,8 +25,10 @@ public class UserInitDB {
 
     @PostConstruct
     public void init() {
-        initService.dbInit1();
+        /*initService.dbInit1();
         initService.dbInit2();
+        initService.dbInit3();
+        initService.dbInit4();*/
     }
 
     @Component
@@ -35,6 +40,8 @@ public class UserInitDB {
 
         private final UserRepository userRepository;
         private final WaitingListRepository waitingListRepository;
+        private final CategoryRepository categoryRepository;
+        private final SellerRepository sellerRepository;
 
         public void dbInit1(){
             User user = createUser(1L, "kuuniin@gmail.com", passwordEncoder.encode("dkfma!123"), "유저1", "010-0114-0114", Boolean.TRUE, SocialType.GENERAL, Role.USER, Boolean.TRUE);
@@ -62,6 +69,23 @@ public class UserInitDB {
 
             WaitingList waitingList2 = createWaitingList(2L, "zhzkzhffk35@naver.com", "zhzkzhffk35@gmail.com", WaitingListStatus.WAIT);
             waitingListRepository.save(waitingList2);
+        }
+
+        public void dbInit3(){
+            String[] category = {"디저트/베이커리", "음료", "전통주", "수제 반찬", "수제 먹거리", "의류/홈웨어", "패션 잡화", "시계", "육아/아동", "반지", "귀걸이", "목걸이", "팔찌", "꽃/식물", "캔들/디퓨저", "홈인테리어", "주방/생활", "가구", "인형/장난감", "공예", "폰케이스", "문구/팬시", "도서", "향수", "뷰티", "헤어/바디", "용돈이벤트/기타"};
+
+            for (String s : category) {
+                Category category1 = Category.builder().name(s).build();
+                categoryRepository.save(category1);
+            }
+        }
+
+        public void dbInit4(){
+            Seller seller1 = Seller.builder()
+                    .email("dkfma@naver.com")
+                    .build();
+
+            sellerRepository.save(seller1);
         }
 
         private static WaitingList createWaitingList(Long id, String email, String sendEmail, WaitingListStatus status) {

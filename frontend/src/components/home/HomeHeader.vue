@@ -134,7 +134,9 @@
             </div>-->
 
             <div v-if="i === clickCategory" class="category_item" style="border-bottom: 4px solid #fdcbcc; color: #fc9899; height: 44px; font-size: 13px; font-weight: bold" >{{item.name}}</div>
-            <div v-else class="category_item" :style="{color: item.textColor}">{{item.name}}</div>
+            <div v-else class="category_item" :style="{color: item.textColor}">
+              <router-link class="custom-link" :to="{name: item.routerName}" :style="{color: item.textColor}"> {{item.name}} </router-link>
+            </div>
           </div>
         </div>
       </div>
@@ -152,12 +154,13 @@ import "swiper/css/swiper.css";
 export default {
   name: "HomeHeader",
   components: {},
+  props: ['clickCategory'],
   data() {
     return {
       headerCategory: [
         {name: '', textColor: ''},
-        {name: '홈', textColor: 'black'},
-        {name: '실시간 구매', textColor: 'black'},
+        {name: '홈', textColor: 'black', routerName: "HomePage"},
+        {name: '실시간 구매', textColor: 'black', routerName: "LiverOrderProductPage"},
         {name: '실시간 후기', textColor: 'black'},
         {name: '작가님 추천', textColor: 'black'},
         {name: '실시간 추천', textColor: 'black'},
@@ -171,7 +174,7 @@ export default {
         { name: '쿠폰함', routerName: 'MyCouponListPage', textColor: 'black'},
         { name: '회원 정보관리', routerName: 'PersonalInfoPage', textColor: 'black'},
       ],
-      clickCategory: 1,
+      //clickCategory: 1,
       nickName: useCookies().cookies.get("nickName"),
       mouseoverCheck: false,
       hoverColor: '#fc9899',
@@ -320,6 +323,7 @@ export default {
   left: 0;
   width: 100%;
   max-width: 100vw;
+  max-height: 200px;
   /* position: fixed;
   z-index: 999; */
 }
