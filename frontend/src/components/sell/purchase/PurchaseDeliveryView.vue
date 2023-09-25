@@ -93,7 +93,7 @@
         </div>
       </div>
 
-      <div class="div-deco" style="flex: 1; height: 500px; margin-left: 25px; padding-top: 20px">
+      <div class="div-deco" style="flex: 1; height: 450px; margin-left: 25px; padding-top: 20px">
         <div style="width: 100%; text-align: center; font-weight: bold; font-size: 18px; padding-bottom: 20px; border-bottom: 1px solid black">결제 정보</div>
         <div style="margin-top: 20px">
           <table style="width: 100%; border-collapse: collapse;">
@@ -107,16 +107,29 @@
               <td class="text-right">3,000원</td>
             </tr>
 
-            <tr style="height: 80px">
+            <tr style="height: 50px; vertical-align: top">
               <td>작가님 할인 혜택</td>
               <td class="text-right">0원</td>
             </tr>
 
-            <tr>
-              <td style="height: 60px; font-size: 18px; font-weight: bold; border-top: 1px solid red">최종 결제 금액</td>
-              <td class="text-right" style="height: 60px; font-size: 18px; font-weight: bold; border-top: 1px solid red">48,000원</td>
+            <tr style="border-top: 1px solid rgba(128,127,127,0.64); vertical-align: middle">
+              <td style="font-size: 18px; font-weight: bold;">최종 결제 금액</td>
+              <td class="text-right" style="height: 60px; font-size: 18px; font-weight: bold;">48,000원</td>
             </tr>
           </table>
+        </div>
+
+        <div>
+          결제 시 개인정보 제공에 동의합니다.
+        </div>
+
+        <div style="margin-top: 40px">
+          <v-btn color="DEEP_PINK" depressed height="80" width="100%" style="font-size: 18px; color: white; font-family: GmarketSansBold,sans-serif">
+            <div>
+              <div>48,000원 결제하기</div>
+            <div style="font-family: GmarketSansMedium,sans-serif; margin-top: 8px; font-size: 14px">예상적금:45p</div>
+            </div>
+          </v-btn>
         </div>
       </div>
     </div>
@@ -198,5 +211,10 @@ export default defineComponent({
 input:focus{
   outline: none; /* 포커스 테두리 제거 */
   border: 1px solid #ccc; /* 포커스되지 않은 상태의 테두리 스타일 */
+}
+
+tr{
+  height: 30px;
+  vertical-align: top;
 }
 </style>
