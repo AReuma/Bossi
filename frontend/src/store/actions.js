@@ -1,5 +1,5 @@
 import {
-    FETCH_CATEGORY_LIST, FETCH_LIVER_ORDER_PRODUCT,
+    FETCH_CATEGORY_LIST, FETCH_DIRECT_ORDER_LIST, FETCH_LIVER_ORDER_PRODUCT,
     FETCH_PRODUCT_CONTENT,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
@@ -57,5 +57,12 @@ export default {
     updateImgStyleData({ commit }, data) {
         console.log(data)
         commit('setImgStyleData', data);
+    },
+    fetchDirectOrderList({commit}, {productId, options, optionCount}){
+        console.log(productId +"id:"+"options"+options)
+        return axios.post(API_BASE_URL+'/api/v1/cart/directBuy', {productId, options, optionCount})
+            .then((res) => {
+                commit(FETCH_DIRECT_ORDER_LIST, res.data)
+            })
     }
 }

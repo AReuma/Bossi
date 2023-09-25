@@ -5,4 +5,7 @@ export default {
     categoryList: [],
     liverOrderProduct: [],
     imgData: '',
+    directOrderList: {},
+    directOptionCount: [],
+    directOptionPrice: []
 }

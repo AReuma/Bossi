@@ -19,6 +19,7 @@ public class DirectButOrderItemInfo {
     private List<Integer> optionCount;
     private float optionTotalPrice;
     private String productImg;
+    private List<List<Integer>> option;
     private List<String> optionStr; // 옵션 문자열
     private List<Float> optionPrice; // 옵션당 가격
     private float deliveryCharge;

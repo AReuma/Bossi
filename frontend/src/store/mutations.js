@@ -1,5 +1,10 @@
 import {
-    ACCESS_DENIED, FETCH_CATEGORY_LIST, FETCH_LIVER_ORDER_PRODUCT, FETCH_PRODUCT_CONTENT, FETCH_WAITING_LIST_USERS,
+    ACCESS_DENIED,
+    FETCH_CATEGORY_LIST,
+    FETCH_DIRECT_ORDER_LIST,
+    FETCH_LIVER_ORDER_PRODUCT,
+    FETCH_PRODUCT_CONTENT,
+    FETCH_WAITING_LIST_USERS,
     LOGOUT,
 } from "@/store/mutation-types";
 import {useCookies} from "vue3-cookies";
@@ -42,4 +47,9 @@ export default {
     [FETCH_LIVER_ORDER_PRODUCT](state, liverOrderProduct){
         state.liverOrderProduct = liverOrderProduct
     },
+    [FETCH_DIRECT_ORDER_LIST](state, directOrderList) {
+        state.directOptionCount = directOrderList.optionCount
+        state.directOptionPrice = directOrderList.optionPrice
+        state.directOrderList = directOrderList;
+    }
 }

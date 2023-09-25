@@ -8,4 +8,7 @@ export default {
     getImgData() {
         return states.imgData;
     },
+    getOptionCount() {
+        return states.directOptionCount;
+    }
 }

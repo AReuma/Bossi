@@ -111,7 +111,7 @@ public class CartServiceImpl implements CartService{
                 productOption.add(data1);
             }
 
-            DirectButOrderItemInfo directButOrderItemInfo = new DirectButOrderItemInfo(product.getSeller().getStoreName(), product.getPrice(), product.getRatingCont(), product.getRatingSum(), product.getName(), optionCountList, optionTotalPrice, product.getProductImgs().get(0).getImg(), optionStr, optionPrice, product.getDeliveryCharge(), product.getFreeDeliverTotalCharge(), product.getStockQuantity(), productOption);
+            DirectButOrderItemInfo directButOrderItemInfo = new DirectButOrderItemInfo(product.getSeller().getStoreName(), product.getPrice(), product.getRatingCont(), product.getRatingSum(), product.getName(), optionCountList, optionTotalPrice, product.getProductImgs().get(0).getImg(), optionList, optionStr, optionPrice, product.getDeliveryCharge(), product.getFreeDeliverTotalCharge(), product.getStockQuantity(), productOption);
             return ResponseEntity.ok().body(directButOrderItemInfo);
 
         } catch (Exception e) {
@@ -119,5 +119,11 @@ public class CartServiceImpl implements CartService{
 
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<String> modifyDirectOption(List<String> options) {
+        return null;
     }
 }

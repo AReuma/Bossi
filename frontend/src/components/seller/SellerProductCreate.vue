@@ -420,34 +420,26 @@ export default defineComponent({
       const {sellerId, category, title, rating, options, detailOption} = this;
       let price = parseFloat(this.price.replace(/,/g, ''));
       let ratingPrice = parseFloat(this.ratingPrice.replace(/,/g, ''));
-      let deliveryCount = parseFloat(this.deliveryCount.replace(/,/g, ''));
 
       console.log(price)
       console.log(ratingPrice)
-      console.log(deliveryCount)
       const content = this.editor.getHTML();
 
-     /* if(category === null || title === null || price === null || content === null || this.selectProductFile === null){
+     if(category === null || title === null || price === null || content === null || this.selectProductFile === null){
         alert('내용을 채워야 저장할 수 있습니다!')
-      }else {*/
-        /*if(rating > 0) {
-          let ratingPrice = this.ratingPrice;
-        }
-
-        if(this.checkFreeDelivery){
-          let deliverCount = this.deliveryCount;
-        }
-
-        if(this.checkFreeDeliveryFreePrice){
-          let freeDeliveryCount = this.freeCount;
-        }*/
+     }else {
 
       let freeCount;
       if(this.checkFreeDeliveryFreePrice) {
+
         freeCount = parseFloat(this.freeCount.replace(/,/g, ''));
       }else {
         freeCount = -1
       }
+
+      let deliveryCount;
+      if(this.checkFreeDelivery) deliveryCount = 0;
+      else deliveryCount = parseFloat(this.deliveryCount.replace(/,/g, ''));
 
       console.log(freeCount)
 
@@ -516,8 +508,7 @@ export default defineComponent({
           .catch((res) => {
             console.log(res)
           })
-      //}
-
+      }
     },
     sliceImgUrl(arr){
       for(let i = 0; i < arr.length; i++){
@@ -547,6 +538,11 @@ export default defineComponent({
   beforeUnmount() {
     this.editor.destroy()
   },
+  watch: {
+    checkFreeDelivery() {
+      if(this.checkFreeDelivery) this.deliveryCount = 0;
+    }
+  }
 })
 </script>
 

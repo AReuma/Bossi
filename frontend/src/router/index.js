@@ -27,6 +27,8 @@ import SellerMainPage from "@/views/seller/SellerMainPage.vue";
 import SellerMainDashboard from "@/components/seller/main/SellerMainDashboard.vue";
 import SellerRegisterPage from "@/views/seller/SellerRegisterPage.vue";
 import SellerLoginPage from "@/views/seller/SellerLoginPage.vue";
+import PurchaseDirectPage from "@/views/sell/purchase/PurchaseDirectPage.vue";
+import PurchaseDeliveryPage from "@/views/sell/purchase/PurchaseDeliveryPage.vue";
 
 Vue.use(VueRouter)
 
@@ -199,6 +201,17 @@ const routes = [
     path: '/seller/login',
     name: "SellerLoginPage",
     component: SellerLoginPage
+  },
+  {
+    path: '/cart/direct_new',
+    name: "PurchaseDirectPage",
+    component: PurchaseDirectPage,
+    props: true
+  },
+  {
+    path: '/cart/payment',
+    name: "PurchaseDeliveryPage",
+    component: PurchaseDeliveryPage
   }
 ]
 

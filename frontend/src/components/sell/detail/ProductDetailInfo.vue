@@ -12,9 +12,9 @@
 
       <div style="margin-top: 5px; display: flex;">
         <div style="width: 80%; display: flex; align-items: end">
-          <div class="boldText" style="color: red">{{productContent.rating}}%</div>
-          <div class="boldText" style="">{{productContent.ratingPrice}}원</div>
-          <div style="font-size: 15px; padding-bottom: 5px; color: #bbbbbb"><del>{{productContent.price}}원</del></div>
+          <div class="boldText" style="color: red" v-if="productContent.rating !== 0">{{productContent.rating.toLocaleString()}}%</div>
+          <div class="boldText" style="">{{productContent.ratingPrice.toLocaleString()}}원</div>
+          <div style="font-size: 15px; padding-bottom: 5px; color: #bbbbbb"  v-if="productContent.rating !== 0"><del>{{productContent.price.toLocaleString()}}원</del></div>
         </div>
         <div style="width: 20%; display: flex; justify-content: end; padding-right: 5px">
           <v-icon size="32">mdi-heart</v-icon>
@@ -22,7 +22,7 @@
       </div>
 
       <div style="display: flex; justify-content: end">
-        <span style="font-family: GmarketSansBold, sans-serif">4,454명</span> 구매
+        <span style="font-family: GmarketSansBold, sans-serif">{{productContent.salesQuantity.toLocaleString()}}명</span> 구매
       </div>
 
       <div>
@@ -38,10 +38,14 @@
           </tr>
 
           <tr>
-            <td class="table-name">배송비</td>
-            <td rowspan="2">{{ productContent.deliveryCount }}원 <br/> <span style="font-size: 13px; color: rgba(106,106,106,0.89)">45,000원 이상 무료배송</span></td>
+            <td class="table-name" style="vertical-align: top">배송비</td>
+            <td v-if="productContent.freeDeliverTotalCharge !== -1" style="text-align: start">{{ productContent.deliveryCount.toLocaleString()}}원 <br/>
+              <span style="font-size: 13px; color: rgba(106,106,106,0.89)">{{productContent.freeDeliverTotalCharge.toLocaleString()}}원 이상 무료배송</span>
+            </td>
+            <td v-else style="text-align: start">{{ productContent.deliveryCount.toLocaleString() }}원 <br/>
+            </td>
           </tr>
-          <tr>
+          <tr v-if="productContent.freeDeliverTotalCharge === -1">
             <td class="table-name"></td>
           </tr>
           <tr>
@@ -50,30 +54,50 @@
           </tr>
           <tr>
             <td class="table-name">수량</td>
-            <td>주문시 제작</td>
+            <td v-if="productContent.stockQuantity === -1">주문시 제작</td>
+            <td v-else>{{productContent.stockQuantity}}</td>
           </tr>
-
         </table>
       </div>
 
-      <div style="margin: 15px 0 20px 0; height: 60px; padding: 5px 0">
-        <v-btn @click="optionDialog = true" text width="100%" height="100%" style=" border: 1px solid rgba(187,187,187,0.67);">
-          옵션 선택 <v-spacer></v-spacer><v-icon>mdi-chevron-down</v-icon>
-        </v-btn>
+      <div v-if="!productContent.productOption.every(isEmptyObject)">
+        <div style="margin: 15px 0 20px 0; height: 60px; padding: 5px 0">
+          <v-btn @click="optionDialog = true" text width="100%" height="100%" style=" border: 1px solid rgba(187,187,187,0.67);">
+            옵션 선택 <v-spacer></v-spacer><v-icon>mdi-chevron-down</v-icon>
+          </v-btn>
+        </div>
+
+        <div v-if="orderListView.length !== 0" style="min-height: 150px; max-height: 150px; overflow-y: auto;">
+          <div v-for="(order, index) in orderListView" :key="index" style="background-color: rgba(229,229,229,0.25); border: 1px solid rgba(149,146,146,0.23); border-radius: 7px; padding: 10px">
+            <p style="font-size: 14px">{{order}}</p>
+            <div style="display: flex">
+              <div style="width: 40%; padding-left: 10px;">
+                <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)"  @click="orderListMin(index)">-</v-btn>
+                <input :style="{outline: 'none'}" type="text" v-model="orderCount[index]" style="width: 40%; text-align: center">
+                <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="orderListPlus(index)">+</v-btn>
+              </div>
+
+              <div style="text-align: end; width: 60%; font-weight: bolder;">
+                {{orderOptionTotalPrice[index].toLocaleString()}} <v-btn icon @click="removeOption(index)"><v-icon>mdi-window-close</v-icon></v-btn>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div style="min-height: 150px; max-height: 150px; overflow-y: auto;">
-        <div v-for="(order, index) in orderList" :key="index" style="background-color: rgba(229,229,229,0.25); border: 1px solid rgba(149,146,146,0.23); border-radius: 7px; padding: 10px">
-          <p style="font-size: 14px">{{order}}</p>
+      <div v-else style="min-height: 80px; max-height: 80px; overflow-y: auto; margin-top: 20px">
+        <div style="background-color: rgba(229,229,229,0.25); border: 1px solid rgba(149,146,146,0.23); border-radius: 7px; padding: 10px">
           <div style="display: flex">
             <div style="width: 40%; padding-left: 10px;">
-              <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="orderListPlus(index)">+</v-btn>
-              <input :style="{outline: 'none'}" type="text" v-model="orderCount[index]" style="width: 40%; text-align: center">
-              <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)"  @click="orderListMin(index)">-</v-btn>
+              <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)"  @click="noOptionOrderMin">-</v-btn>
+              <input :style="{outline: 'none'}" type="text" v-model="orderNoOptionCount" style="width: 40%; text-align: center">
+              <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="noOptionOrderPlus">+</v-btn>
             </div>
-
-            <div style="text-align: end; width: 60%; font-weight: bolder;">
-              {{orderOptionTotalPrice[index]}} <v-btn icon @click="removeOption(index)"><v-icon>mdi-window-close</v-icon></v-btn>
+            <div v-if="this.orderNoOptionCount === 1" style="text-align: end; width: 60%; font-weight: bolder; display: flex; align-items: center; justify-content: end; height: auto">
+              {{productContent.ratingPrice.toLocaleString()}} 원
+            </div>
+            <div v-else style="text-align: end; width: 60%; font-weight: bolder; display: flex; align-items: center; justify-content: end; height: auto">
+              {{this.orderNoOptionPrice.toLocaleString()}} 원
             </div>
           </div>
         </div>
@@ -114,15 +138,21 @@
         </v-card>
       </v-dialog>
 
-      <div style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
+      <div v-if="!productContent.productOption.every(isEmptyObject)" style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
         <div style="width: 20%">총 작품금액</div>
-        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;"> {{orderPrice}}원</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;"> {{this.orderPrice.toLocaleString()}} 원</div>
+      </div>
+
+      <div v-else style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
+        <div style="width: 20%">총 작품금액</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-if="this.orderNoOptionCount === 1"> {{this.productContent.ratingPrice.toLocaleString()}} 원</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-else> {{this.orderNoOptionPrice.toLocaleString()}} 원</div>
       </div>
 
       <div style="margin-top: 18px;">
         <v-btn depressed height="50px" text class="buy-button" style="border: 1px solid rgba(187,187,187,0.62)" >장바구니</v-btn>
         <v-btn depressed color="green" height="50px" class="buy-button" style="color: white">NPay</v-btn>
-        <v-btn depressed height="50px" color="DEEP_PINK" class="buy-button" style="color: white">구매하기</v-btn>
+        <v-btn depressed height="50px" color="DEEP_PINK" class="buy-button" style="color: white" @click="purchase">구매하기</v-btn>
         <v-btn depressed height="50px" text width="8%" style="margin: 2px; border: 1px solid #fc9899; color: #fc9899">
           <div class="vertical-text"><v-icon size="22">mdi-gift-outline</v-icon> <div style="font-size: 11px; margin-top: 2px">선물하기</div></div>
         </v-btn>
@@ -146,6 +176,7 @@
 
 <script>
 import {defineComponent} from 'vue'
+import {useCookies} from "vue3-cookies";
 
 export default defineComponent({
   name: "ProductDetailInfo",
@@ -159,10 +190,13 @@ export default defineComponent({
       optionDialog: false,
       selectedOptions: [],
       orderList: [],
+      orderListView: [],
       orderCount: [],
       orderOptionPrice: [],
       orderOptionTotalPrice: [],
-      orderPrice: 0
+      orderPrice: 0,
+      orderNoOptionCount: 1,
+      orderNoOptionPrice: 0,
     }
   },
   methods: {
@@ -170,38 +204,43 @@ export default defineComponent({
       let combinedOptions = [];
 
       for (let key in item.price) {
-        let index = item.optionDetail[key]+'/(+'+item.price[key]+')';
+        let index = item.option+ ": " +item.optionDetail[key]+'/(+'+item.price[key]+')';
         let price = item.price[key];
         let optionDetail = item.optionDetail[key];
         combinedOptions.push({
           label: `${optionDetail} (+ ${price} 원)`,
-          value: index
+          value: `${key}#${index}`
         });
       }
       return combinedOptions;
     },
     checkOption(index){
-      if(index === this.selectedOptions.length){
+      if(index === this.selectedOptions.length){ ///선택된 옵션 개수
         console.log(this.selectedOptions)
         let order = "";
         let orderPrice = 0
+        let option = []
         for (let i = 0; i < this.selectedOptions.length; i++) {
-          console.log(this.selectedOptions[i]+"!")
-          order += this.selectedOptions[i];
+          let values = this.selectedOptions[i].split("#"); // 0#색상: 빨강/(+2000)
+          option.push(Number(values[0]))  // 0
+          order += values[1];   // 색상: 빨강/(+2000)
 
           if(i !== this.selectedOptions.length-1){order+='/'}
 
-          const extractedNumbers = this.selectedOptions[i].match(/\d+/g);
+          const extractedNumbers = values[1].match(/\d+/g);
           if (extractedNumbers) {
             orderPrice += Number(extractedNumbers);
           }
         }
 
-        this.orderList.push(order)
-        if(this.orderPrice === 0){
+        this.orderListView.push(order)
+        this.orderList.push(option)
+
+        /*if(this.orderPrice === 0){
           this.orderPrice = this.productContent.ratingPrice;
-        }
-        this.orderPrice += orderPrice
+        }*/
+
+        this.orderPrice += (orderPrice + this.productContent.ratingPrice);
         this.orderOptionPrice.push(orderPrice + this.productContent.ratingPrice)
         this.orderOptionTotalPrice.push(orderPrice + this.productContent.ratingPrice)
         this.orderCount.push(1)
@@ -224,17 +263,70 @@ export default defineComponent({
       this.$forceUpdate();
     },
     orderListMin(index){
-      this.orderCount[index]--;
-      this.orderOptionTotalPrice[index] = this.orderOptionPrice[index] * this.orderCount[index];
-      this.orderPrice -= this.orderOptionPrice[index];
-      this.$forceUpdate();
+      if(this.orderCount[index] > 1) {
+        this.orderCount[index]--;
+        this.orderOptionTotalPrice[index] = this.orderOptionPrice[index] * this.orderCount[index];
+        this.orderPrice -= this.orderOptionPrice[index];
+        this.$forceUpdate();
+      }else{
+        alert('주문수가 1보다 작을 수 없습니다.')
+      }
     },
     removeOption(index){
-      this.orderPrice -= (this.orderOptionPrice[index] * this.orderCount[index]);
+      console.log(this.orderPrice+"!")
+      console.log(this.orderOptionTotalPrice[index]+"!")
+      this.orderPrice -= this.orderOptionTotalPrice[index];
       this.orderCount.splice(index, 1);
+      this.orderListView.splice(index, 1);
       this.orderOptionTotalPrice.splice(index, 1);
       this.orderOptionPrice.splice(index, 1);
+    },
+    isEmptyObject(obj) {
+      return (
+          Object.keys(obj.price).length === 0 &&
+          Object.keys(obj.optionDetail).length === 0 &&
+          obj.option === ""
+      );
+    },
+    noOptionOrderMin(){
+      if(this.orderNoOptionCount > 1){
+        this.orderNoOptionCount--;
+        this.orderNoOptionPrice = this.productContent.ratingPrice * this.orderNoOptionCount;
+      }else {
+        alert('주문수가 1보다 작을 수 없습니다.')
+      }
+    },
+    noOptionOrderPlus(){
+      this.orderNoOptionCount++;
+      this.orderNoOptionPrice = this.productContent.ratingPrice * this.orderNoOptionCount;
+    },
+    purchase(){
+      // 옵션 정보랑 상품Id 전달
+      let productId = this.productContent.productId;
+      const options = this.orderList.join(',');
+      const optionCount = this.orderCount.join(',');
+      console.log(options)
+
+      const expires = new Date()
+      expires.setMinutes(expires.getMinutes() + 60)
+
+      useCookies().cookies.set('productId', productId,  expires)
+      useCookies().cookies.set('options', options, expires)
+      useCookies().cookies.set('optionCount', optionCount, expires)
+
+      this.$router.push({name: "PurchaseDirectPage"})
+      // 가져가야하는 정보
+      // 작가 이름
+      // 기본 이미지
+      // 옵션 개수
+      // 옵션 선택 (인덱스로 넘기기)
+      // 가격
+      // 배송비
+
     }
+  },
+  computed: {
+
   }
 })
 </script>
