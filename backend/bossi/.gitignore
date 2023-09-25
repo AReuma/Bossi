@@ -43,4 +43,4 @@ out/
 **/main/resources/application-MAIL.properties
 **/main/resources/application.yaml
 
-.DS_Store
+**.DS_Store
