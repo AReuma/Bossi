@@ -126,4 +126,12 @@ public class CartServiceImpl implements CartService{
     public ResponseEntity<String> modifyDirectOption(List<String> options) {
         return null;
     }
+
+    @Override
+    public void orderProduct(String productId, String options, String optionCount) {
+        // 고객 정보 (이름, 전화번호)
+        // 배송 정보 (배송지)
+        // 주문 작품 정보 (작가 이름, 상품 이름, 상품 사진, 옵션, 수량, 전체가격, 배송비)
+
+    }
 }

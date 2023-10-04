@@ -8,6 +8,9 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Builder(toBuilder = true)
 @AllArgsConstructor
@@ -60,6 +63,11 @@ public class User {
 
     @Column(nullable = false)
     private Boolean registerStatus;
+
+    // 한명의 회원은 여러개의 주소를 가질 수 있다.
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Address> addressList = new ArrayList<>();
 
     public void addCoupon(){
 

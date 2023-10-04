@@ -26,7 +26,6 @@ public class CartController {
     private final CartService cartService;
 
     @Operation(summary = "바로 구매 상품 리스트", description = "바로 구매 상품 리스트 보여주는 메서드")
-    @ApiImplicitParam(name = "phoneNum", value = "전화번호")
     @PostMapping("/directBuy")
     public ResponseEntity<DirectButOrderItemInfo> directBuyProduct(@Valid @RequestBody DirectBuyProductRequest directBuyProductRequest){
         log.info("directBuyProduct");
@@ -38,5 +37,12 @@ public class CartController {
     public ResponseEntity<String> optionModify(@RequestBody List<String> options){
         log.info("options: {}", options);
         return cartService.modifyDirectOption(options);
+    }
+
+    @Operation(summary = "주문하기 메서드", description = "옵션을 선택하고 주문 결제할때 정보를 제공하는 메서드")
+    @PostMapping("/order")
+    public void orderProduct(@Valid @RequestBody DirectBuyProductRequest dto){
+        log.info("orderProduct: {}", dto.getProductId());
+        cartService.orderProduct(dto.getProductId(), dto.getOptions(), dto.getOptionCount());
     }
 }

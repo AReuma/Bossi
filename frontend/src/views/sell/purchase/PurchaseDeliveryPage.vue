@@ -7,24 +7,29 @@
 
 <script>
 import {defineComponent} from 'vue'
-import {bus} from "@/constant/EventBus";
 import PurchaseDeliveryView from "@/components/sell/purchase/PurchaseDeliveryView.vue";
 import HomeHeader from "@/components/home/HomeHeader.vue";
+import {mapActions, mapState} from "vuex";
+import {useCookies} from "vue3-cookies";
 
 export default defineComponent({
   name: "PurchaseDeliveryPage",
   components: {HomeHeader, PurchaseDeliveryView},
   data() {
     return {
-      receivedData: ''
+      productId: useCookies().cookies.get('productId'),
+      options: useCookies().cookies.get('options'),
+      optionCount: useCookies().cookies.get('optionCount'),
     }
   },
+  methods: {
+    ...mapActions(['fetchPurchaseInfo']),
+  },
   mounted() {
-    bus.$on('send-data', data => {
-      console.log("!: "+ data)
-      this.receivedData = data;
-      console.log(this.receivedData)
-    });
+    this.fetchPurchaseInfo({productId: this.productId, options: this.options, optionCount: this.optionCount})
+  },
+  computed: {
+    ...mapState(["directOrderList"])
   }
 })
 </script>

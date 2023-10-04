@@ -9,4 +9,6 @@ public interface CartService {
     ResponseEntity<DirectButOrderItemInfo> directBuyOrderList(Long productId, String options, String optionCount);
 
     ResponseEntity<String> modifyDirectOption(List<String> options);
+
+    void orderProduct(String productId, String options, String optionCount);
 }

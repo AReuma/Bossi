@@ -1,6 +1,6 @@
 import {
     FETCH_CATEGORY_LIST, FETCH_DIRECT_ORDER_LIST, FETCH_LIVER_ORDER_PRODUCT,
-    FETCH_PRODUCT_CONTENT,
+    FETCH_PRODUCT_CONTENT, FETCH_PURCHASE_INFO,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
 } from './mutation-types'
@@ -63,6 +63,12 @@ export default {
         return axios.post(API_BASE_URL+'/api/v1/cart/directBuy', {productId, options, optionCount})
             .then((res) => {
                 commit(FETCH_DIRECT_ORDER_LIST, res.data)
+            })
+    },
+    fetchPurchaseInfo({commit}, {productId, options, optionCount}){
+        return axios.post(API_BASE_URL+'/api/v1/cart/order', {productId, options, optionCount})
+            .then((res) => {
+                commit(FETCH_PURCHASE_INFO, res.data)
             })
     }
 }

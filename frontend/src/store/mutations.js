@@ -3,7 +3,7 @@ import {
     FETCH_CATEGORY_LIST,
     FETCH_DIRECT_ORDER_LIST,
     FETCH_LIVER_ORDER_PRODUCT,
-    FETCH_PRODUCT_CONTENT,
+    FETCH_PRODUCT_CONTENT, FETCH_PURCHASE_INFO,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
 } from "@/store/mutation-types";
@@ -51,5 +51,8 @@ export default {
         state.directOptionCount = directOrderList.optionCount
         state.directOptionPrice = directOrderList.optionPrice
         state.directOrderList = directOrderList;
+    },
+    [FETCH_PURCHASE_INFO](state, purchaseInfo){
+        state.purchaseInfo = purchaseInfo;
     }
 }

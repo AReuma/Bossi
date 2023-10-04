@@ -7,5 +7,6 @@ export default {
     imgData: '',
     directOrderList: {},
     directOptionCount: [],
-    directOptionPrice: []
+    directOptionPrice: [],
+    purchaseInfo: [],
 }
