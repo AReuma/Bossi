@@ -23,6 +23,8 @@ public class User {
     @Column(name = "USER_ID")
     private Long id;
 
+    private String name;
+
     @NotBlank
     @Email(message = "이메일 형식이 아닙니다.")
     private String email;

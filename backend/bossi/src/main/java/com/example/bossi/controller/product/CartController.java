@@ -2,6 +2,7 @@ package com.example.bossi.controller.product;
 
 import com.example.bossi.dto.product.cart.DirectBuyProductRequest;
 import com.example.bossi.response.product.cart.DirectButOrderItemInfo;
+import com.example.bossi.response.product.cart.OrderProductInfo;
 import com.example.bossi.service.product.cart.CartService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,8 +42,8 @@ public class CartController {
 
     @Operation(summary = "주문하기 메서드", description = "옵션을 선택하고 주문 결제할때 정보를 제공하는 메서드")
     @PostMapping("/order")
-    public void orderProduct(@Valid @RequestBody DirectBuyProductRequest dto){
+    public ResponseEntity<OrderProductInfo> orderProduct(@Valid @RequestBody DirectBuyProductRequest dto){
         log.info("orderProduct: {}", dto.getProductId());
-        cartService.orderProduct(dto.getProductId(), dto.getOptions(), dto.getOptionCount());
+        return cartService.orderProduct(Long.valueOf(dto.getProductId()), dto.getOptions(), dto.getOptionCount(), dto.getEmail());
     }
 }

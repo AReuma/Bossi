@@ -65,8 +65,8 @@ export default {
                 commit(FETCH_DIRECT_ORDER_LIST, res.data)
             })
     },
-    fetchPurchaseInfo({commit}, {productId, options, optionCount}){
-        return axios.post(API_BASE_URL+'/api/v1/cart/order', {productId, options, optionCount})
+    fetchPurchaseInfo({commit}, {productId, options, optionCount, email}){
+        return axios.post(API_BASE_URL+'/api/v1/cart/order', {productId, options, optionCount, email})
             .then((res) => {
                 commit(FETCH_PURCHASE_INFO, res.data)
             })

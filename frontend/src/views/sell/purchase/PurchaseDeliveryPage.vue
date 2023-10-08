@@ -1,7 +1,7 @@
 <template>
   <div>
     <home-header></home-header>
-    <purchase-delivery-view></purchase-delivery-view>
+    <purchase-delivery-view :purchaseInfo="purchaseInfo"></purchase-delivery-view>
   </div>
 </template>
 
@@ -20,16 +20,17 @@ export default defineComponent({
       productId: useCookies().cookies.get('productId'),
       options: useCookies().cookies.get('options'),
       optionCount: useCookies().cookies.get('optionCount'),
+      email: useCookies().cookies.get('email'),
     }
   },
   methods: {
     ...mapActions(['fetchPurchaseInfo']),
   },
   mounted() {
-    this.fetchPurchaseInfo({productId: this.productId, options: this.options, optionCount: this.optionCount})
+    this.fetchPurchaseInfo({productId: this.productId, options: this.options, optionCount: this.optionCount, email: this.email})
   },
   computed: {
-    ...mapState(["directOrderList"])
+    ...mapState(["purchaseInfo"])
   }
 })
 </script>

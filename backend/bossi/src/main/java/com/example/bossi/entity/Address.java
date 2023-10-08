@@ -22,6 +22,10 @@ public class Address {
     private String street;
     private String zipcode;
 
+    private String addrName;    // 배송지명
+    private String recipient;   // 수령인
+    private String poneNum;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;

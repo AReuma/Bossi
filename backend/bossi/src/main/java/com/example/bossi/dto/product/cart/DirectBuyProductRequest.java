@@ -20,4 +20,7 @@ public class DirectBuyProductRequest {
     @Schema(description = "주문 상품 옵션 개수")
     private String optionCount;
 
+    @Schema(description = "주문자")
+    private String email;
+
 }

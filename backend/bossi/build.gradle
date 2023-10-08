@@ -61,7 +61,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
-	implementation 'com.github.iamport:iamport-rest-client-java:Tag' // iamport
+	implementation 'com.github.iamport:iamport-rest-client-java:0.2.21' // iamport
 
 // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core
 	implementation 'com.amazonaws:aws-java-sdk-core:1.12.547'
