@@ -149,7 +149,6 @@
             style="width: 100%; text-align: start; font-size: 16px; margin-top: 20px"
             class="expanding-box"
             :style="{ height: 'auto'}"
-            @click="expandOrderBox"
         >
           <div style="display: flex; padding: 15px;">
             <div style="width: 30%; font-weight: bold">주문 작품 정보</div>
@@ -158,7 +157,7 @@
               <div style="width: 90%" class="text-container">
                 이거 다른 작가의 상품일 경우 외 1건 으로 나오도록 구현
               </div>
-              <div style="width: 10%">
+              <div style="width: 10%;" @click="expandOrderBox">
                 <v-icon v-if="!isActiveOrder">mdi-chevron-down</v-icon>
                 <v-icon v-else>mdi-chevron-up</v-icon>
               </div>
@@ -193,6 +192,10 @@
                   <div> <span style="font-size: 15px">•</span> 수량 : {{purchaseInfo.orderCount[index]}} 개</div>
                 </div>
               </div>
+
+              <div v-if="orderMsg !== null">
+                <textarea v-model="orderMsg" placeholder="주문 요청사항을 입력해주세요"></textarea>
+              </div>
             </div>
           </div>
 
@@ -206,13 +209,29 @@
 
         </div>
 
-        <div class="div-deco" style="margin-top: 20px; height: auto; ">
+        <div v-if="purchaseInfo.point > 0" class="div-deco" style="margin-top: 20px; height: auto; ">
           <div style="width: 50%; font-weight: bold">Bossi 할인 혜택</div>
           <div style="margin-top: 15px; font-size: 14px">
             <div>Bossi 적립금</div>
-            <div>
-              <input :readonly="purchaseInfo.point === 0" type="text" style="border: 1px solid #626262; width: 80%; border-radius: 4px; height: 28px; background-color: rgba(236, 235, 235, 0.15); color: #fc9899; padding-left: 4px" value="0">
-              <v-btn height="28" style="font-size: 11px; color: white; margin-left: 5px; width: 18%" color="DEEP_PINK" depressed>전부 사용</v-btn>
+            <div style="display: flex">
+              <input :readonly="usePointCheck" v-model="usePoint" min="0" type="text" style="border: 1px solid #626262; width: 80%; border-radius: 4px; height: 28px; background-color: rgba(236, 235, 235, 0.15); color: #fc9899; padding-left: 4px">
+
+              <div v-if="!usePointCheck">
+                <v-btn v-if="usePoint === 0 || usePoint === ''" @click="useAllPointBtn" height="28" style="font-size: 11px; color: white; margin-left: 5px; width: 18%" color="DEEP_PINK" depressed>
+                  전부 사용
+                </v-btn>
+
+                <v-btn v-else @click="usePointBtn" height="28" style="font-size: 11px; color: white; margin-left: 5px; width: 18%" color="DEEP_PINK" depressed>
+                  사용
+                </v-btn>
+              </div>
+
+              <div v-else>
+                <v-btn @click="delPoint" height="28" style="font-size: 11px; color: black; margin-left: 5px; width: 18%" depressed>
+                  취소
+                </v-btn>
+              </div>
+
             </div>
             <div style="margin-top: 5px">
               보유중인 적립금 <span style="color: #fc9899"> {{purchaseInfo.point}}p</span>
@@ -239,6 +258,12 @@
               <td class="text-right">{{purchaseInfo.deliveryPrice.toLocaleString()}}원</td>
             </tr>
 
+            <tr>
+              <td>적립금</td>
+              <td class="text-right" v-if="!usePointCheck">0원</td>
+              <td class="text-right" v-else>{{usePoint.toLocaleString()}}원</td>
+            </tr>
+
             <tr style="height: 50px; vertical-align: top">
               <td>작가님 할인 혜택</td>
               <td class="text-right">0원</td>
@@ -246,7 +271,7 @@
 
             <tr style="border-top: 1px solid rgba(128,127,127,0.64); vertical-align: middle">
               <td style="font-size: 18px; font-weight: bold;">최종 결제 금액</td>
-              <td class="text-right" style="height: 60px; font-size: 18px; font-weight: bold;">{{purchaseInfo.totalPrice.toLocaleString()}}원</td>
+              <td class="text-right" style="height: 60px; font-size: 18px; font-weight: bold;">{{totalPrice.toLocaleString()}}원</td>
             </tr>
           </table>
         </div>
@@ -258,7 +283,7 @@
         <div style="margin-top: 40px">
           <v-btn @click="payment" color="DEEP_PINK" depressed height="80" width="100%" style="font-size: 18px; color: white; font-family: GmarketSansBold,sans-serif">
             <div>
-              <div>{{purchaseInfo.totalPrice.toLocaleString()}}원 결제하기</div>
+              <div>{{totalPrice.toLocaleString()}}원 결제하기</div>
             <div style="font-family: GmarketSansMedium,sans-serif; margin-top: 8px; font-size: 14px">예상적금: {{purchaseInfo.expectPoint}}p</div>
             </div>
           </v-btn>
@@ -272,6 +297,7 @@
 import {defineComponent} from 'vue'
 import axios from "axios";
 import {API_BASE_URL} from "@/constant/basic";
+import {useCookies} from "vue3-cookies";
 export default defineComponent({
   name: "PurchaseDeliveryView",
   props: ['purchaseInfo'],
@@ -290,9 +316,18 @@ export default defineComponent({
       detailAddr: '',
       zipcode: '',
       phoneNum: '',
+      phoneNumPatternCheck: false,
       deliveryName: '',
       selectedChip: null,
-      phoneNumberError: ''
+      phoneNumberError: '',
+      orderMsg: useCookies().cookies.get('orderMsg'),
+      productId: useCookies().cookies.get('productId'),
+      options: useCookies().cookies.get('options'),
+      optionCount: useCookies().cookies.get('optionCount'),
+      email: useCookies().cookies.get('email'),
+      usePoint: 0,
+      usePointCheck: false,
+      totalPrice: 0,
     };
   },
   methods: {
@@ -348,6 +383,7 @@ export default defineComponent({
         this.phoneNumberError = '올바른 전화번호 형식이 아닙니다.';
       } else {
         this.phoneNumberError = '';
+        this.phoneNumPatternCheck = true;
         this.phoneNum = this.phoneNum.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
       }
     },
@@ -357,57 +393,128 @@ export default defineComponent({
       const randomDigits = Math.floor(Math.random() * 9000) + 1000; // 4자리 랜덤 숫자 생성
       return `ORD${timestamp}${randomDigits}`;
     },
+    readyPayment(){
+      // 결제하기전 배송지가 제대로 작성된지 확인.
+      // 1. 기존 배송지인지, 신규 입력인지 체크
+      // 2. 기존 배송지 일경우 delivdryCheck === true 일 경우 결제
+      // 3. 신규 입력일 일 경우 수령인, 주소, 휴대폰, 배송지명 체크
+      // 4. 비워 있을 경우 alert 창 띄우기
+
+      let paymentCheck = false;
+
+      if(this.existDelivery === true){
+        if (this.purchaseInfo.deliveryCheck === true) {
+          paymentCheck = true;
+        }
+      }else {
+        if(this.receiver !== '' && this.address !== '' && this.phoneNum !== '' && this.deliveryName !== '' && this.phoneNumPatternCheck === true){
+          paymentCheck = true;
+        }
+      }
+
+      return paymentCheck;
+    },
     payment(){
-      let IMP = window.IMP;
-      IMP.init("imp73123883");
+      let check = this.readyPayment();
 
-      let price = this.purchaseInfo.totalPrice;
-      IMP.request_pay(
-          {
-            pg: "kakaopay",
-            pay_method: "card",
-            merchant_uid: this.createOrderNum(),// 주문번호
-            name: this.purchaseInfo.productTitle,
-            amount: this.purchaseInfo.totalPrice,
-            //buyer_email: "gildong@gmail.com",
-            buyer_name: this.purchaseInfo.name,
-            //buyer_tel: "010-4242-4242",
-            //buyer_addr: "서울특별시 강남구 신사동",
-            //buyer_postcode: "01181"
-          },
-          function (rsp) {
-            //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
-            let imp_uid = rsp.imp_uid;
-            console.log("imp_uid"+imp_uid)
+      if(check === true) {
+        let IMP = window.IMP;
+        IMP.init("imp73123883");
 
-            if (rsp.success) { // 결제가 성공했을때
-              //서버 검증 요청 부분
-              axios.post(API_BASE_URL+'/api/v1/payment/verify/'+rsp.imp_uid)
-                  .then((res) => {
-                    console.log(res)
+        let price = this.purchaseInfo.totalPrice;
 
-                    if(res.data.response.amount === price){ // 결제 금액이랑 상품 금액이 같을 경우
-                      console.log('결제')
-                      // 주문 고객 이름, 전화번호
-                      // 기존 배송지일 경우/ 신규 배송지일 경우 배송지 db에 저장
-                      // 적립금, 상품, 옵션, 수량
+        let orderUser = this.purchaseInfo.name;
+        let orderPhoneNum = this.purchaseInfo.phoneNum;
+        IMP.request_pay(
+            {
+              pg: "kakaopay",
+              pay_method: "card",
+              merchant_uid: this.createOrderNum(),// 주문번호
+              name: this.purchaseInfo.productTitle,
+              amount: this.purchaseInfo.totalPrice,
+              //buyer_email: "gildong@gmail.com",
+              buyer_name: this.purchaseInfo.name,
+              //buyer_tel: "010-4242-4242",
+              //buyer_addr: "서울특별시 강남구 신사동",
+              //buyer_postcode: "01181"
+            },
+            function (rsp) {
+              //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
+              let imp_uid = rsp.imp_uid;
+              console.log("imp_uid" + imp_uid)
 
-                    }else { // 결제 금액이 달라 실패한 경우
-                      alert('결제 실패')
-                    }
-                  })
-                  .catch((res) => {console.log(res)})
-            } else {
-              alert("결제에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+              if (rsp.success) { // 결제가 성공했을때
+                //서버 검증 요청 부분
+                axios.post(API_BASE_URL + '/api/v1/payment/verify/' + rsp.imp_uid)
+                    .then((res) => {
+                      console.log(res)
+
+                      if (res.data.response.amount === price) { // 결제 금액이랑 상품 금액이 같을 경우
+                        console.log('결제')
+                        // 주문 고객 이름, 전화번호
+                        // 기존 배송지일 경우/ 신규 배송지일 경우 배송지 db에 저장
+                        // 적립금, 상품, 옵션, 수량
+
+                        if(this.existDelivery === false){
+                          // 저장된 배송지가 아닐 경우
+                          const {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint} = this;
+
+                          axios.post(API_BASE_URL+"/api/v1/payment/order/complete", {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum})
+                        }
+
+                      } else { // 결제 금액이 달라 실패한 경우
+                        alert('결제 실패')
+                      }
+                    })
+                    .catch((res) => {
+                      console.log(res)
+                    })
+              } else {
+                alert("결제에 실패하였습니다. 에러 내용: " + rsp.error_msg);
+              }
             }
-          }
-      )
+        )
+      }else {
+        alert('결제 실패')
+      }
+    },
+    usePointBtn(){
+      this.usePoint = Math.floor(this.usePoint / 10) * 10;
+      let maximumPrice = Math.floor(Number(this.purchaseInfo.point) / 10) * 10
+
+      if (this.usePoint > maximumPrice) {
+        this.usePoint = maximumPrice;
+        alert('보유하는 포인트보다 더 사용할 수 없습니다')
+      }
+
+      this.totalPrice -= this.usePoint;
+      this.usePointCheck = true;
+    },
+    useAllPointBtn(){
+      let maximumPrice = Math.floor(Number(this.purchaseInfo.point) / 10) * 10
+      this.usePoint = maximumPrice;
+
+      this.totalPrice -= this.usePoint;
+      this.usePointCheck = true;
+    },
+    delPoint(){
+      this.usePointCheck = false;
+      this.totalPrice += this.usePoint;
+      this.usePoint = 0;
     }
   },
   mounted() {
 
   },
-  created() {
+  watch: {
+    purchaseInfo: {
+      handler(newVal){
+        if (newVal) {
+          this.totalPrice = newVal.totalPrice;
+        }
+      },
+      deep: true
+    }
 
   }
 })
@@ -456,5 +563,17 @@ tr{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+textarea {
+  margin-right: 10px;
+  height: 150px;
+  width: 100%;
+  border: 1px solid rgba(106,106,106,0.5);
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
 }
 </style>

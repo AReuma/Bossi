@@ -11,15 +11,19 @@ import lombok.*;
 @Getter
 public class Delivery {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "delivery_id")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "DELIVERY_ID")
     private Long id;
 
-    /*@JsonIgnore
+    @JsonIgnore
     @OneToOne(mappedBy = "delivery", fetch = FetchType.LAZY)
-    private Order order;*/
+    private Order order;
 
     @Enumerated(EnumType.STRING)
     private DeliveryStatus status;
+
+    private String city;
+    private String street;
+    private String zipcode;
+
 }

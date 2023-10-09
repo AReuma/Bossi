@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 public class Seller {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SELLER_ID")
     private Long id;
 
