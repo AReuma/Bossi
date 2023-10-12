@@ -1,4 +1,5 @@
 import {
+    FETCH_CART_COUNT,
     FETCH_CATEGORY_LIST, FETCH_DIRECT_ORDER_LIST, FETCH_LIVER_ORDER_PRODUCT,
     FETCH_PRODUCT_CONTENT, FETCH_PURCHASE_INFO,
     FETCH_WAITING_LIST_USERS,
@@ -69,6 +70,16 @@ export default {
         return axios.post(API_BASE_URL+'/api/v1/cart/order', {productId, options, optionCount, email})
             .then((res) => {
                 commit(FETCH_PURCHASE_INFO, res.data)
+            })
+    },
+    fetchCartCount({commit}, email){
+        return axios.post(API_BASE_URL+"/api/v1/cart/cartCount", {email})
+            .then((res) => {
+                commit(FETCH_CART_COUNT, res.data)
+            })
+            .catch(() => {
+                console.log("에러")
+                commit(FETCH_CART_COUNT, 0)
             })
     }
 }

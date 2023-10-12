@@ -11,6 +11,7 @@ import com.example.bossi.repository.user.UserRepository;
 import com.example.bossi.response.product.cart.AddrInfo;
 import com.example.bossi.response.product.cart.DirectButOrderItemInfo;
 import com.example.bossi.response.product.cart.OrderProductInfo;
+import com.example.bossi.service.product.ProductCheck;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,7 @@ public class CartServiceImpl implements CartService{
 
             // 옵션 주문 수 count.length
             String[] count = optionCount.split(",");
-            List<Integer> optionCountList = new ArrayList<>();
+            List<Integer> optionCountList = new ArrayList<>();  // 수량 개수
 
             for (String c : count) {
                 optionCountList.add(Integer.parseInt(c));
@@ -53,18 +54,20 @@ public class CartServiceImpl implements CartService{
 
             // 옵션 개수 optionSize
             int optionSize = product.getProductOptionList().size(); // 2개
-            String[] part = options.split(","); //
-            List<List<Integer>> optionList = new ArrayList<>();// [[1,2], [2,3]].. n개
+            String[] part = options.split(","); // 프론트에서 전달된 옵션의 개수
+            //List<List<Integer>> optionList = new ArrayList<>();// [[1,2], [2,3]].. n개
+            ProductCheck productCheck = new ProductCheck();
+            List<List<Integer>> optionList = productCheck.getOption(optionSize, part);// [[1,2], [2,3]].. n개
 
             // 6개
-            for (int i = 0; i < part.length;) { // optionCount만큼 n개씩
+           /* for (int i = 0; i < part.length;) { // optionCount만큼 n개씩
                 List<Integer> pair = new ArrayList<>();
                 for (int j = 0; j < optionSize; j++) {
                     pair.add(Integer.parseInt(part[i]));
                     i++;
                 }
                 optionList.add(pair);
-            }
+            }*/
 
             List<Float> optionPrice = new ArrayList<>();    // 옵션마다 가격
             List<ProductOption> productOptionList = product.getProductOptionList(); // 색상, 포장
@@ -98,9 +101,10 @@ public class CartServiceImpl implements CartService{
                 optionTotalPrice += price;
             }
 
-            List<Map<String, Object>> productOption = new ArrayList<>();
+            //List<Map<String, Object>> productOption = new ArrayList<>();
+            List<Map<String, Object>> productOption = productCheck.getOptionAndOptionValue(productOptionList);
 
-            for (ProductOption option : productOptionList) {
+            /*for (ProductOption option : productOptionList) {
                 Map<String, Object> data1 = new HashMap<>();
                 Map<String, String> detail1 = new HashMap<>();
                 Map<String, Float> price = new HashMap<>();
@@ -115,7 +119,7 @@ public class CartServiceImpl implements CartService{
                 data1.put("optionDetail", detail1);
                 data1.put("price", price);
                 productOption.add(data1);
-            }
+            }*/
 
             DirectButOrderItemInfo directButOrderItemInfo = new DirectButOrderItemInfo(product.getSeller().getStoreName(), product.getPrice(), product.getRatingCont(), product.getRatingSum(), product.getName(), optionCountList, optionTotalPrice, product.getProductImgs().get(0).getImg(), optionList, optionStr, optionPrice, product.getDeliveryCharge(), product.getFreeDeliverTotalCharge(), product.getStockQuantity(), productOption);
             return ResponseEntity.ok().body(directButOrderItemInfo);
@@ -161,7 +165,7 @@ public class CartServiceImpl implements CartService{
         // 옵션 개수 optionSize
         int optionSize = product.getProductOptionList().size(); // 2개
         String[] part = options.split(","); //
-        List<List<Integer>> optionList = new ArrayList<>();// [[1,2], [2,3]].. n개
+        /*List<List<Integer>> optionList = new ArrayList<>();// [[1,2], [2,3]].. n개
 
         for (int i = 0; i < part.length;) { // optionCount만큼 n개씩
             List<Integer> pair = new ArrayList<>();
@@ -170,7 +174,9 @@ public class CartServiceImpl implements CartService{
                 i++;
             }
             optionList.add(pair);
-        }
+        }*/
+        ProductCheck productCheck = new ProductCheck();
+        List<List<Integer>> optionList = productCheck.getOption(optionSize, part);// [[1,2], [2,3]].. n개
 
         List<ProductOption> productOptionList = product.getProductOptionList();
         float totalProductPrice = 0;
@@ -225,6 +231,5 @@ public class CartServiceImpl implements CartService{
         return ResponseEntity.ok().body(
                 new OrderProductInfo(user.getName(), user.getPhoneNum(), checkDelivery, deliveryAddr, product.getSeller().getStoreName(), product.getName(), product.getProductImgs().get(0).getImg(), optionCountList, totalProductPrice, totalPrice, deliveryCharge, optionInfo, optionPrice, user.getPoint(), productSum));
     }
-
 
 }

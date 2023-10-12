@@ -23,15 +23,15 @@ public class OrderProduct {
     private int count; // 주문 수량
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "ORDER_ID")
     private Order order;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "PRODUCT_DETAIL_OPTION_ID")
     private ProductDetailOption productDetailOption;
 
 }

@@ -56,7 +56,7 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail' // 이메일
 
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis' // redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'	//redis
 
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-aws
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'

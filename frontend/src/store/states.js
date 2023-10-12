@@ -9,4 +9,5 @@ export default {
     directOptionCount: [],
     directOptionPrice: [],
     purchaseInfo: [],
+    cartCount: 0,
 }

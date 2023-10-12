@@ -1,5 +1,5 @@
 import {
-    ACCESS_DENIED,
+    ACCESS_DENIED, FETCH_CART_COUNT,
     FETCH_CATEGORY_LIST,
     FETCH_DIRECT_ORDER_LIST,
     FETCH_LIVER_ORDER_PRODUCT,
@@ -54,5 +54,12 @@ export default {
     },
     [FETCH_PURCHASE_INFO](state, purchaseInfo){
         state.purchaseInfo = purchaseInfo;
-    }
+    },
+    [FETCH_CART_COUNT](state, cartCount){
+        console.log("에러: "+cartCount)
+        state.cartCount = cartCount;
+    }/*,
+    [FETCH_CART_COUNT_N](state, cartCount){
+        state.cartCount = 0
+    }*/
 }

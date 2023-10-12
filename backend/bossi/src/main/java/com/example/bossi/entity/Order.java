@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Member;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "ORDERS")
 @Builder
@@ -39,6 +41,8 @@ public class Order {
 
     private String orderMsg;    // 추가 메모
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderProduct> orderProducts = new ArrayList<>();
     //private
 
 

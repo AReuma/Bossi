@@ -1,9 +1,11 @@
 package com.example.bossi.controller.product;
 
+import com.example.bossi.dto.product.cart.AddToCartRequest;
 import com.example.bossi.dto.product.cart.DirectBuyProductRequest;
 import com.example.bossi.response.product.cart.DirectButOrderItemInfo;
 import com.example.bossi.response.product.cart.OrderProductInfo;
 import com.example.bossi.service.product.cart.CartService;
+import com.example.bossi.service.product.cart.RedisCartService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -25,6 +28,7 @@ import java.util.List;
 public class CartController {
 
     private final CartService cartService;
+    private final RedisCartService redisCartService;
 
     @Operation(summary = "바로 구매 상품 리스트", description = "바로 구매 상품 리스트 보여주는 메서드")
     @PostMapping("/directBuy")
@@ -45,5 +49,18 @@ public class CartController {
     public ResponseEntity<OrderProductInfo> orderProduct(@Valid @RequestBody DirectBuyProductRequest dto){
         log.info("orderProduct: {}", dto.getProductId());
         return cartService.orderProduct(Long.valueOf(dto.getProductId()), dto.getOptions(), dto.getOptionCount(), dto.getEmail());
+    }
+
+    @PostMapping("/addCart")
+    public void addCart(@RequestBody AddToCartRequest dto){
+        log.info("addCart{}", dto.getProductId());
+        log.info("addCart{}", dto.getOptions());
+        redisCartService.addToCart(dto.getEmail(), dto.getProductId(), dto.getOptions(), dto.getOptionCount());
+    }
+
+    @PostMapping("/cartCount")
+    public Integer checkCartCount(@RequestBody Map<String, String> email){
+        log.info("checkCartCount: {}", email);
+        return redisCartService.checkCartCount(email.get("email"));
     }
 }
