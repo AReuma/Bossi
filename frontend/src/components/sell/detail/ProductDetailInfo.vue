@@ -188,6 +188,7 @@ export default defineComponent({
   data() {
     return {
       optionDialog: false,
+      userEmail: useCookies().cookies.get('email'),
       selectedOptions: [],
       orderList: [],
       orderListView: [],
@@ -302,19 +303,32 @@ export default defineComponent({
     },
     purchase(){
       // 옵션 정보랑 상품Id 전달
-      let productId = this.productContent.productId;
-      const options = this.orderList.join(',');
-      const optionCount = this.orderCount.join(',');
-      console.log(options)
+      console.log("userEmail" +this.userEmail)
+      console.log("options" +this.orderList.length)
 
-      const expires = new Date()
-      expires.setMinutes(expires.getMinutes() + 60)
+      if(this.orderList.length === 0 && this.orderListView.length !== 0){
+        alert('옵션을 선택해주세요')
+      }else {
+        if(this.userEmail !== null){
+          let productId = this.productContent.productId;
+          const options = this.orderList.join(',');
+          const optionCount = this.orderCount.join(',');
+          console.log(options)
 
-      useCookies().cookies.set('productId', productId,  expires)
-      useCookies().cookies.set('options', options, expires)
-      useCookies().cookies.set('optionCount', optionCount, expires)
+          const expires = new Date()
+          expires.setMinutes(expires.getMinutes() + 60)
 
-      this.$router.push({name: "PurchaseDirectPage"})
+          useCookies().cookies.set('productId', productId, expires)
+          useCookies().cookies.set('options', options, expires)
+          useCookies().cookies.set('optionCount', optionCount, expires)
+
+          this.$router.push({name: "PurchaseDirectPage"})
+        }else {
+          alert('회원만 가입할 수 있습니다.\n로그인 부탁드려요.')
+          this.$router.push({name: "LoginPage"})
+        }
+
+      }
       // 가져가야하는 정보
       // 작가 이름
       // 기본 이미지
