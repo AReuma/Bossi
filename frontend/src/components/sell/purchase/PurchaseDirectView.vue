@@ -27,7 +27,7 @@
           </div>
         </div>
 
-        <div style="margin-top: 30px; padding: 0 10px 0 155px">
+        <div style="margin-top: 30px; padding: 0 10px 0 155px; height: auto; margin-bottom: 20px">
           <div v-for="(option, index) in optionStr" :key="index" style="border-bottom: #848484 1px solid; height: 50px; padding: 0 10px; display: flex; align-items: center; font-size: 15px">
             <div style="max-width: 50%; min-width: 50%">
               {{option}}
@@ -48,24 +48,17 @@
         </div>
 
         <div>
-          <div style="display: flex;  align-items: center; height: 200px">
-          <v-textarea v-model="orderMsg" label="주문 요청사항을 입력해주세요" outlined style="margin-top: 45px; margin-right: 10px" auto-grow @input="checkTextLength">
+          <div style="display: flex; height: 170px">
+            <textarea v-model="orderMsg" placeholder="주문 요청사항을 입력해주세요" @input="checkTextLength"></textarea>
 
-          </v-textarea>
-          <v-btn depressed v-if="showSave" style="width: 150px; height: 120px; margin-top: 8px; outline: rgba(132,132,132,0.27) 1px solid" @click="saveOrderMsg">
-            저장
-          </v-btn>
+            <v-btn depressed v-if="showSave" style="width: 150px; height: 150px; outline: rgba(132,132,132,0.27) 1px solid" @click="saveOrderMsg">
+              저장
+            </v-btn>
           </div>
-         <p v-if="showWarning">
+
+          <p v-if="showWarning">
             <v-icon>mdi-alert-circle</v-icon>  입력 후 저장버튼을 눌러주세요
           </p>
-<!--          <v-alert
-              v-if="showWarning"
-              type="error"
-              dismissible
-          >
-            Please type something before submitting.
-          </v-alert>-->
         </div>
 
       </div>
@@ -419,5 +412,17 @@ export default defineComponent({
   font-size: 20px;
   font-family: GmarketSansBold, sans-serif;
   margin-right: 4px;
+}
+
+textarea {
+  margin-right: 10px;
+  height: 150px;
+  width: 100%;
+  border: 1px solid rgba(106,106,106,0.5);
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
 }
 </style>

@@ -47,7 +47,9 @@ public class ProductServiceImpl implements ProductService{
         Product product = productRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST, "해당 상품이 없습니다."));
         List<ProductOption> productOptionList = productOptionRepository.findByProductId(product.getId());
 
-        List<Map<String, Object>> productOption = new ArrayList<>();
+        ProductCheck productCheck = new ProductCheck();
+        List<Map<String, Object>> productOption = productCheck.getOptionAndOptionValue(productOptionList);
+        /*List<Map<String, Object>> productOption = new ArrayList<>();
 
         for (ProductOption option : productOptionList) {
             Map<String, Object> data1 = new HashMap<>();
@@ -64,7 +66,7 @@ public class ProductServiceImpl implements ProductService{
             data1.put("optionDetail", detail1);
             data1.put("price", price);
             productOption.add(data1);
-        }
+        }*/
 
         List<String> productImage = new ArrayList<>();
 

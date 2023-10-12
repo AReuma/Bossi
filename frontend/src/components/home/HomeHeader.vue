@@ -84,8 +84,13 @@
             </div>
 
             <div @click="cart()" style="display: block; padding-left: 35px">
-              <div>
+              <div v-if="cartCount === 0">
                 <v-badge color="DEEP_PINK" content="0" overlap>
+                  <v-icon large style="height: 30px">mdi-cart-outline</v-icon>
+                </v-badge>
+              </div>
+              <div v-else>
+                <v-badge color="DEEP_PINK" :content="cartCount" overlap>
                   <v-icon large style="height: 30px">mdi-cart-outline</v-icon>
                 </v-badge>
               </div>
@@ -147,7 +152,7 @@
 </template>
 
 <script>
-import index, {mapActions} from "vuex";
+import index, {mapActions, mapState} from "vuex";
 import {useCookies} from "vue3-cookies";
 import "swiper/css/swiper.css";
 
@@ -176,6 +181,7 @@ export default {
       ],
       //clickCategory: 1,
       nickName: useCookies().cookies.get("nickName"),
+      email: useCookies().cookies.get("email"),
       mouseoverCheck: false,
       hoverColor: '#fc9899',
       hoverBackColor: 'rgba(255,207,210,0.56)',
@@ -275,9 +281,14 @@ export default {
     },
     enteringStore(){
       this.$router.push({name: "EnteringStorePage"})
-    }
+    },
+    ...mapActions(['fetchCartCount'])
+  },
+  mounted() {
+    this.fetchCartCount(this.email)
   },
   computed: {
+    ...mapState(['cartCount']),
     index() {
       return index
     },
