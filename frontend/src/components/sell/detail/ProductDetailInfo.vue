@@ -150,7 +150,7 @@
       </div>
 
       <div style="margin-top: 18px;">
-        <v-btn depressed height="50px" text class="buy-button" style="border: 1px solid rgba(187,187,187,0.62)" >장바구니</v-btn>
+        <v-btn depressed height="50px" text class="buy-button" style="border: 1px solid rgba(187,187,187,0.62)" @click="addCart">장바구니</v-btn>
         <v-btn depressed color="green" height="50px" class="buy-button" style="color: white">NPay</v-btn>
         <v-btn depressed height="50px" color="DEEP_PINK" class="buy-button" style="color: white" @click="purchase">구매하기</v-btn>
         <v-btn depressed height="50px" text width="8%" style="margin: 2px; border: 1px solid #fc9899; color: #fc9899">
@@ -228,9 +228,11 @@ export default defineComponent({
 
           if(i !== this.selectedOptions.length-1){order+='/'}
 
-          const extractedNumbers = values[1].match(/\d+/g);
+          let extractedNumbers = values[1].match(/\(\+(\d+)\)/g);
           if (extractedNumbers) {
-            orderPrice += Number(extractedNumbers);
+            const numbers = extractedNumbers.map(match => match.match(/\d+/)[0]);
+
+            orderPrice += Number(numbers[0]);
           }
         }
 
@@ -240,12 +242,15 @@ export default defineComponent({
         /*if(this.orderPrice === 0){
           this.orderPrice = this.productContent.ratingPrice;
         }*/
-
+        console.log(this.productContent.ratingPrice)
+        //orderPrice = Number(orderPrice)
+        console.log(Number(orderPrice))
         this.orderPrice += (orderPrice + this.productContent.ratingPrice);
         this.orderOptionPrice.push(orderPrice + this.productContent.ratingPrice)
         this.orderOptionTotalPrice.push(orderPrice + this.productContent.ratingPrice)
         this.orderCount.push(1)
 
+        console.log(this.orderPrice)
         console.log(this.orderCount)
         this.optionDialog = false;
         this.selectedOptions =[];
@@ -279,6 +284,7 @@ export default defineComponent({
       this.orderPrice -= this.orderOptionTotalPrice[index];
       this.orderCount.splice(index, 1);
       this.orderListView.splice(index, 1);
+      this.orderList.splice(index, 1);
       this.orderOptionTotalPrice.splice(index, 1);
       this.orderOptionPrice.splice(index, 1);
     },
@@ -337,6 +343,36 @@ export default defineComponent({
       // 가격
       // 배송비
 
+    },
+    addCart(){
+      // String email, Long productId, String options, String optionCount
+      console.log("orderList: "+this.orderList.length)
+      console.log("orderListView: "+this.orderListView.length)
+      if(this.orderList.length === 0){
+        alert('옵션을 선택해주세요')
+        console.log("optin")
+      }else {
+        if(this.userEmail !== null){
+          let email = this.userEmail;
+          let productId = this.productContent.productId;
+          const options = this.orderList.join(',');
+          const optionCount = this.orderCount.join(',');
+          console.log(options)
+
+          /*const expires = new Date()
+          expires.setMinutes(expires.getMinutes() + 60)
+
+          useCookies().cookies.set('productId', productId, expires)
+          useCookies().cookies.set('options', options, expires)
+          useCookies().cookies.set('optionCount', optionCount, expires)*/
+
+          this.$emit('addCart', {email, productId, options, optionCount})
+        }else {
+          alert('회원만 가능합니다.\n로그인 부탁드려요.')
+          this.$router.push({name: "LoginPage"})
+        }
+
+      }
     }
   },
   computed: {

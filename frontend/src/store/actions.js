@@ -1,6 +1,6 @@
 import {
     FETCH_CART_COUNT,
-    FETCH_CATEGORY_LIST, FETCH_DIRECT_ORDER_LIST, FETCH_LIVER_ORDER_PRODUCT,
+    FETCH_CATEGORY_LIST, FETCH_DIRECT_ORDER_LIST, FETCH_LIVER_ORDER_PRODUCT, FETCH_MY_CART_INFO,
     FETCH_PRODUCT_CONTENT, FETCH_PURCHASE_INFO,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
@@ -78,8 +78,13 @@ export default {
                 commit(FETCH_CART_COUNT, res.data)
             })
             .catch(() => {
-                console.log("에러")
                 commit(FETCH_CART_COUNT, 0)
+            })
+    },
+    fetchMyCartInfo({commit}, email){
+        return axios.post(API_BASE_URL+"/api/v1/cart/showCart", {email})
+            .then((res) => {
+                commit(FETCH_MY_CART_INFO, res.data)
             })
     }
 }

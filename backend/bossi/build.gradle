@@ -66,8 +66,6 @@ dependencies {
 // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-core
 	implementation 'com.amazonaws:aws-java-sdk-core:1.12.547'
     testImplementation 'junit:junit:4.13.1'
-	testImplementation 'junit:junit:4.13.1'
-	testImplementation 'junit:junit:4.13.1'
     testImplementation 'org.projectlombok:lombok:1.18.26'
 
 

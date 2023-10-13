@@ -1,15 +1,40 @@
-<template>
+      <template>
   <div>
-    Cart Page
+    <cart-multi-view :myCartInfo="myCartInfo" @order="order"></cart-multi-view>
   </div>
 </template>
 
 <script>
 import {defineComponent} from 'vue'
+import CartMultiView from "@/components/order/CartMultiView.vue";
+import {mapActions, mapState} from "vuex";
+import {useCookies} from "vue3-cookies";
 
 export default defineComponent({
-  name: "MyCartPage"
-})
+  name: "MyCartPage",
+  components: {CartMultiView},
+  data() {
+    return {
+      email: useCookies().cookies.get("email")
+    }
+  },
+  methods: {
+    ...mapActions(['fetchMyCartInfo']),
+    order(payload){
+      console.log(payload)
+      let orderData = JSON.stringify(payload);
+      console.log(orderData)
+
+
+    }
+  },
+  mounted() {
+    this.fetchMyCartInfo(this.email)
+  },
+  computed: {
+    ...mapState(['myCartInfo']),
+  }
+  })
 </script>
 
 <style scoped>

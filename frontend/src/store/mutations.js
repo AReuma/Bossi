@@ -2,7 +2,7 @@ import {
     ACCESS_DENIED, FETCH_CART_COUNT,
     FETCH_CATEGORY_LIST,
     FETCH_DIRECT_ORDER_LIST,
-    FETCH_LIVER_ORDER_PRODUCT,
+    FETCH_LIVER_ORDER_PRODUCT, FETCH_MY_CART_INFO,
     FETCH_PRODUCT_CONTENT, FETCH_PURCHASE_INFO,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
@@ -56,10 +56,9 @@ export default {
         state.purchaseInfo = purchaseInfo;
     },
     [FETCH_CART_COUNT](state, cartCount){
-        console.log("에러: "+cartCount)
         state.cartCount = cartCount;
-    }/*,
-    [FETCH_CART_COUNT_N](state, cartCount){
-        state.cartCount = 0
-    }*/
+    },
+    [FETCH_MY_CART_INFO](state, myCartInfo){
+        state.myCartInfo = myCartInfo;
+    }
 }
