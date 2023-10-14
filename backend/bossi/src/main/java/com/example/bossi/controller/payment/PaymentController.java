@@ -3,6 +3,7 @@ package com.example.bossi.controller.payment;
 import com.example.bossi.dto.order.CompleteOrderRequest;
 import com.example.bossi.service.order.OrderService;
 import com.example.bossi.service.payment.PaymentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
@@ -31,7 +32,23 @@ public class PaymentController{
 
     @PostMapping("/order/complete")
     public void orderComplete(@RequestBody CompleteOrderRequest completeOrderRequest){
+        log.info("orderComplete: {}",completeOrderRequest.getEmail());
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String json = objectMapper.writeValueAsString(completeOrderRequest);
+            System.out.println("============");
+            System.out.println(json);
+            System.out.println("============");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        orderService.orderComplete(completeOrderRequest);
+    }
+
+    @PostMapping("/order/multi/complete")
+    public void orderCompleteMultiProduct(@RequestBody CompleteOrderRequest completeOrderRequest){
         log.info("orderComplete");
+
         orderService.orderComplete(completeOrderRequest);
     }
 }

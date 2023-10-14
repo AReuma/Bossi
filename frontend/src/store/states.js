@@ -11,4 +11,5 @@ export default {
     purchaseInfo: [],
     cartCount: 0,
     myCartInfo: [],
+    multiOrderProduct: []
 }

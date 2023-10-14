@@ -1,6 +1,6 @@
       <template>
   <div>
-    <cart-multi-view :myCartInfo="myCartInfo" @order="order"></cart-multi-view>
+    <cart-multi-view :myCartInfo="myCartInfo"></cart-multi-view>
   </div>
 </template>
 
@@ -20,13 +20,6 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(['fetchMyCartInfo']),
-    order(payload){
-      console.log(payload)
-      let orderData = JSON.stringify(payload);
-      console.log(orderData)
-
-
-    }
   },
   mounted() {
     this.fetchMyCartInfo(this.email)

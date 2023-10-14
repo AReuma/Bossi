@@ -26,5 +26,14 @@ public class OrderProductDetailOption {
     @JoinColumn(name = "ORDER_PRODUCT")
     private OrderProduct orderProduct;
 
+    public static OrderProductDetailOption createOrderProductDetailOption(ProductDetailOption productDetailOption, OrderProduct orderProduct){
+        OrderProductDetailOption orderProductDetailOption = OrderProductDetailOption.builder()
+                .productDetailOption(productDetailOption)
+                .orderProduct(orderProduct)
+                .build();
 
+        orderProduct.setOrderProductDetailOption(orderProductDetailOption);
+
+        return orderProductDetailOption;
+    }
 }

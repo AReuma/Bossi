@@ -1,13 +1,13 @@
 package com.example.bossi.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Member;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,8 @@ public class Order {
     @Column(name = "ORDER_ID")
     private Long id;
 
-    @NotBlank
+    @NotNull
+    @Min(1)
     private Long orderNum;
 
     private LocalDateTime orderDate;    // 주문 시간
@@ -35,16 +36,42 @@ public class Order {
     @JoinColumn(name = "USER_ID")
     private User user;  // 주문 회원
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "DELIVERY_ID")
     private Delivery delivery;  // 배송 정보
 
     private String orderMsg;    // 추가 메모
 
+    @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderProduct> orderProducts = new ArrayList<>();
-    //private
 
+    public static Order createOrder(User user, Delivery delivery, List<OrderProduct> orderProducts, Long orderNum){
+        Order order = Order.builder()
+                .user(user)
+                .orderNum(orderNum)
+                .orderStatus(OrderStatus.READY_PRODUCT)
+                .orderDate(LocalDateTime.now())
+                .build();
+
+        order.setDelivery(delivery);
+        for (OrderProduct orderProduct : orderProducts) {
+            order.addOrderProduct(orderProduct);
+        }
+
+
+        return order;
+    }
+
+    public void setDelivery(Delivery delivery){
+        this.delivery = delivery;
+        delivery.setOrder(this);
+    }
+
+    public void addOrderProduct(OrderProduct orderProduct){
+        orderProducts.add(orderProduct);
+        orderProduct.setOrder(this);
+    }
 
     //== 비즈니스 로직 ==//
     /**

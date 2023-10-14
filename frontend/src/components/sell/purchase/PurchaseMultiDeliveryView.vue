@@ -8,7 +8,7 @@
         <div style="color: #848484">3. 주문완료</div>
       </div>
     </div>
-{{purchaseInfo}}
+
     <div style="display: flex; height: 100%; width: 100%; margin-top: 40px">
       <div style="flex: 1.2;">
         <div
@@ -22,7 +22,7 @@
             <div style="width: 30%; font-weight: bold">주문고객</div>
 
             <div style="width: 70%; text-align: end">
-              {{ purchaseInfo.name }} ({{purchaseInfo.phoneNum}})
+              {{ multiOrderProduct.name }} ({{multiOrderProduct.phoneNum}})
               <v-icon v-if="!isActive">mdi-chevron-down</v-icon>
               <v-icon v-else>mdi-chevron-up</v-icon>
             </div>
@@ -30,8 +30,8 @@
 
           <div v-if="isActive" style="margin-top: 15px">
             <div style="font-size: 14px">
-              <p>이름 : {{ purchaseInfo.name }}</p>
-              <p>전화번호 : {{purchaseInfo.phoneNum}} <v-btn style="margin-left: 20px" depressed text outlined small @click="changePhoneNum">변경하기</v-btn></p>
+              <p>이름 : {{ multiOrderProduct.name }}</p>
+              <p>전화번호 : {{multiOrderProduct.phoneNum}} <v-btn style="margin-left: 20px" depressed text outlined small @click="changePhoneNum">변경하기</v-btn></p>
             </div>
           </div>
         </div>
@@ -39,7 +39,7 @@
         <div class="div-deco" style="margin-top: 20px; height: auto">
           <div style="display: flex;">
             <div style="width: 50%; font-weight: bold">배송 정보</div>
-            <div v-if="existDelivery !== true && purchaseInfo.deliveryCheck" style="display: flex; justify-content: end; width: 50%; color: #fc9899">배송지 변경 <v-icon color="DEEP_PINK">mdi-chevron-right</v-icon></div>
+            <div v-if="existDelivery !== true && multiOrderProduct.deliveryCheck" style="display: flex; justify-content: end; width: 50%; color: #fc9899">배송지 변경 <v-icon color="DEEP_PINK">mdi-chevron-right</v-icon></div>
           </div>
 
           <div style="margin-top: 15px; width: 100%" v-if="existDelivery">
@@ -53,7 +53,7 @@
           </div>
 
           <div v-if="existDelivery" style="margin-top: 10px; font-size: 15px; padding: 5px">
-            <div v-if="!purchaseInfo.deliveryCheck" style="height: 100px; text-align: center; display: flex; justify-content: center; align-items: center">
+            <div v-if="!multiOrderProduct.deliveryCheck" style="height: 100px; text-align: center; display: flex; justify-content: center; align-items: center">
               배송지가 없습니다.<br/>
               ' 신규 입력 '을 눌러 배송지를 추가해주세요.
             </div>
@@ -125,10 +125,10 @@
                 </td>
               </tr>
 
-               <tr style="height: 45px; width: 100%; vertical-align: middle;">
-                 <td></td>
-                 <td style="padding-left: 5%; width: 80%">
-                  <v-chip-group active-class="text--pink lighten-5 DEEP_PINK--text" v-model="selectedChip" @change="handleChipChange">
+              <tr style="height: 45px; width: 100%; vertical-align: middle;">
+                <td></td>
+                <td style="padding-left: 5%; width: 80%">
+                  <v-chip-group active-class="text&#45;&#45;pink lighten-5 DEEP_PINK&#45;&#45;text" v-model="selectedChip" @change="handleChipChange">
                     <v-chip value="집" small>집</v-chip>
                     <v-chip value="회사" small>회사</v-chip>
                     <v-chip value="가족" small>가족</v-chip>
@@ -140,11 +140,8 @@
               </tr>
             </table>
 
-            <v-checkbox v-if="!purchaseInfo.deliveryCheck" readonly v-model="isBasic" color="DEEP_PINK" label="기본 배송지로 설정" hide-details></v-checkbox>
-            <div v-else style="height: 70px;">
-              <v-checkbox color="DEEP_PINK" v-model="isBasic" label="기본 배송지로 설정" hide-details style="height: 15px"></v-checkbox>
-              <v-checkbox color="DEEP_PINK" v-model="isSave" label="배송지 저장" hide-details></v-checkbox>
-            </div>
+            <v-checkbox v-if="!multiOrderProduct.deliveryCheck" readonly v-model="basicAddr" color="DEEP_PINK" label="기본 배송지로 설정" hide-details></v-checkbox>
+            <v-checkbox v-else color="DEEP_PINK" v-model="basicAddr" label="기본 배송지로 설정" hide-details></v-checkbox>
           </div>
         </div>
 
@@ -168,51 +165,55 @@
           </div>
 
           <div v-if="isActiveOrder">
-            <div style="padding-left: 2%; display: flex; align-items: center; background-color: rgba(187,187,187,0.15); height: 60px">
-              <div style="padding-left: 15px">{{purchaseInfo.storeName}} 작가님</div>
-            </div>
-
-            <div style="padding: 0 15px 15px 15px;">
-              <div style="margin-top: 15px; display: flex">
-                <div>
-                  <v-img :src="`https://s3.ap-northeast-2.amazonaws.com/my.example.s3.bucket.bossi/${purchaseInfo.productImg}`" width="100" height="100" style="border-radius: 4px"/>
-                </div>
-                <div style="display: flex; align-items: center; height: 100px; padding-left: 8px; font-weight: bold">
-                  {{purchaseInfo.productTitle}}
-                </div>
+            <div v-for="(product, index) in multiOrderProduct.orderProduct" :key="index">
+              <div style="padding-left: 2%; display: flex; align-items: center; background-color: rgba(187,187,187,0.15); height: 60px">
+                <div style="padding-left: 15px">{{product.storeName}} 작가님</div>
               </div>
 
-              <div style="margin-top: 10px; font-size: 12px">
-                <div v-for="(options, index) in purchaseInfo.optionInfo" :key="index" style="margin-top: 5px;">
-                  <div style="display: flex;">
-                    <div style="width: 70%">
-                      <div v-for="(option, index) in options" :key="index">
-                        <span style="font-size: 15px">•</span> {{option}}
-                      </div>
-                    </div>
-                    <div style="width: 30%; text-align: end">{{purchaseInfo.optionPrice[index].toLocaleString()}}원</div>
+              <div style="padding: 0 15px 15px 15px;">
+                <div style="margin-top: 15px; display: flex">
+                  <div>
+                    <v-img :src="`https://s3.ap-northeast-2.amazonaws.com/my.example.s3.bucket.bossi/${product.productImg}`" width="100" height="100" style="border-radius: 4px"/>
                   </div>
-                  <div> <span style="font-size: 15px">•</span> 수량 : {{purchaseInfo.orderCount[index]}} 개</div>
+                  <div style="display: flex; align-items: center; height: 100px; padding-left: 8px; font-weight: bold">
+                    {{product.productTitle}}
+                  </div>
+                </div>
+
+                <div style="margin-top: 10px; font-size: 12px">
+                  <div v-for="(options, index) in product.optionInfo" :key="index" style="margin-top: 5px;">
+                    <div style="display: flex;">
+                      <div style="width: 70%">
+                        <div v-for="(option, index) in options" :key="index">
+                          <span style="font-size: 15px">•</span> {{option}}
+                        </div>
+                      </div>
+                      <div style="width: 30%; text-align: end">{{product.optionPrice[index]}}원</div>
+                    </div>
+                    <div> <span style="font-size: 15px">•</span> 수량 : {{product.orderCount[index]}} 개</div>
+                  </div>
+                </div>
+
+  <!--              <div v-if="orderMsg !== null">
+                  <textarea v-model="orderMsg" placeholder="주문 요청사항을 입력해주세요"></textarea>
+                </div>-->
+              </div>
+
+              <div v-if="isActiveOrder" style="height: 55px;">
+                <hr/>
+                <div style="display: flex; font-size: 14px; padding: 15px">
+                  <div style="width: 70%">배송비</div>
+
+                  <div v-if="product.deliveryPrice === 0" style="width: 30%; text-align: end">무료배송</div>
+                  <div v-else style="width: 30%; text-align: end">{{product.deliveryPrice.toLocaleString()}}원</div>
                 </div>
               </div>
 
-              <div v-if="orderMsg !== null">
-                <textarea v-model="orderMsg" placeholder="주문 요청사항을 입력해주세요"></textarea>
-              </div>
             </div>
           </div>
-
-          <div v-if="isActiveOrder" style="height: 55px;">
-            <hr/>
-            <div style="display: flex; font-size: 14px; padding: 15px">
-              <div style="width: 70%">배송비</div>
-              <div style="width: 30%; text-align: end">{{purchaseInfo.deliveryPrice.toLocaleString()}}원</div>
-            </div>
-          </div>
-
         </div>
 
-        <div v-if="purchaseInfo.point > 0" class="div-deco" style="margin-top: 20px; height: auto; ">
+        <div v-if="multiOrderProduct.point > 0" class="div-deco" style="margin-top: 20px; height: auto; ">
           <div style="width: 50%; font-weight: bold">Bossi 할인 혜택</div>
           <div style="margin-top: 15px; font-size: 14px">
             <div>Bossi 적립금</div>
@@ -237,7 +238,7 @@
 
             </div>
             <div style="margin-top: 5px">
-              보유중인 적립금 <span style="color: #fc9899"> {{purchaseInfo.point}}p</span>
+              보유중인 적립금 <span style="color: #fc9899"> {{multiOrderProduct.point}}p</span>
             </div>
           </div>
         </div>
@@ -250,15 +251,15 @@
       <div class="div-deco" style="flex: 0.8; height: 450px; margin-left: 25px; padding-top: 20px">
         <div style="width: 100%; text-align: center; font-weight: bold; font-size: 18px; padding-bottom: 20px; border-bottom: 1px solid black">결제 정보</div>
         <div style="margin-top: 20px">
-          <table style="width: 100%; border-collapse: collapse;">
+         <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td>작품 금액</td>
-              <td class="text-right">{{purchaseInfo.totalProductPrice.toLocaleString()}}원</td>
+              <td class="text-right">{{totalOptionPrice.toLocaleString()}}원</td>
             </tr>
 
             <tr>
               <td>배송비</td>
-              <td class="text-right">{{purchaseInfo.deliveryPrice.toLocaleString()}}원</td>
+              <td class="text-right">{{ totalDeliveryPrice.toLocaleString() }}원</td>
             </tr>
 
             <tr>
@@ -287,10 +288,11 @@
           <v-btn @click="payment" color="DEEP_PINK" depressed height="80" width="100%" style="font-size: 18px; color: white; font-family: GmarketSansBold,sans-serif">
             <div>
               <div>{{totalPrice.toLocaleString()}}원 결제하기</div>
-            <div style="font-family: GmarketSansMedium,sans-serif; margin-top: 8px; font-size: 14px">예상적금: {{purchaseInfo.expectPoint}}p</div>
+              <div style="font-family: GmarketSansMedium,sans-serif; margin-top: 8px; font-size: 14px">예상적금: {{expectPoint.toLocaleString()}}p</div>
             </div>
           </v-btn>
         </div>
+
       </div>
     </div>
   </div>
@@ -302,16 +304,17 @@ import axios from "axios";
 import {API_BASE_URL} from "@/constant/basic";
 import {useCookies} from "vue3-cookies";
 export default defineComponent({
-  name: "PurchaseDeliveryView",
-  props: ['purchaseInfo'],
+  name: "PurchaseMultiDeliveryView",
+  props: ['multiOrderProduct'],
   data() {
     return {
+      purchaseInfo: '',
       boxHeight: 55,
       boxOrderHeight: 'auto',
       isActive: false,
       isActiveOrder: false,
       existDelivery: true,
-      //basicAddr: true,
+      basicAddr: true,
       addApiShow: false,
       receiver: '',
       address: '',
@@ -331,8 +334,9 @@ export default defineComponent({
       usePoint: 0,
       usePointCheck: false,
       totalPrice: 0,
-      isSave: true,
-      isBasic: true,
+      expectPoint: 0,
+      totalOptionPrice: 0,
+      totalDeliveryPrice: 0
     };
   },
   methods: {
@@ -346,11 +350,6 @@ export default defineComponent({
     },
     expandOrderBox(){
       this.isActiveOrder = !this.isActiveOrder;
-      /*if(this.isActiveOrder){
-        this.boxOrderHeight += 250;
-      }else{
-        this.boxOrderHeight -= 250;
-      }*/
     },
     existBtn(){
       this.existDelivery = true
@@ -406,7 +405,6 @@ export default defineComponent({
       // 4. 비워 있을 경우 alert 창 띄우기
 
       let paymentCheck = false;
-      console.log(this.existDelivery)
 
       if(this.existDelivery === true){
         if (this.purchaseInfo.deliveryCheck === true) {
@@ -431,23 +429,14 @@ export default defineComponent({
 
         let orderUser = this.purchaseInfo.name;
         let orderPhoneNum = this.purchaseInfo.phoneNum;
-        let existDelivery = this.existDelivery
-
-        let orderNum = this.createOrderNum();
-
-        const {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, isBasic, isSave} = this;
         IMP.request_pay(
             {
               pg: "kakaopay",
               pay_method: "card",
-              merchant_uid: orderNum,// 주문번호
+              merchant_uid: this.createOrderNum(),// 주문번호
               name: this.purchaseInfo.productTitle,
               amount: this.purchaseInfo.totalPrice,
-              //buyer_email: "gildong@gmail.com",
               buyer_name: this.purchaseInfo.name,
-              //buyer_tel: "010-4242-4242",
-              //buyer_addr: "서울특별시 강남구 신사동",
-              //buyer_postcode: "01181"
             },
             function (rsp) {
               //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
@@ -462,15 +451,15 @@ export default defineComponent({
 
                       if (res.data.response.amount === price) { // 결제 금액이랑 상품 금액이 같을 경우
                         console.log('결제')
-                        console.log('existDelivery: '+ existDelivery)
                         // 주문 고객 이름, 전화번호
                         // 기존 배송지일 경우/ 신규 배송지일 경우 배송지 db에 저장
                         // 적립금, 상품, 옵션, 수량
 
-                        if(existDelivery === false){
+                        if(this.existDelivery === false){
                           // 저장된 배송지가 아닐 경우
+                          const {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint} = this;
 
-                          axios.post(API_BASE_URL+"/api/v1/payment/order/complete", {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum, isSave, isBasic, orderNum})
+                          axios.post(API_BASE_URL+"/api/v1/payment/order/complete", {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum})
                         }
 
                       } else { // 결제 금액이 달라 실패한 경우
@@ -518,18 +507,22 @@ export default defineComponent({
 
   },
   watch: {
-    purchaseInfo: {
-      handler(newVal){
-        if (newVal) {
-          this.totalPrice = newVal.totalPrice;
+    multiOrderProduct: {
+      handler(newVal) {
+        if (newVal && newVal.orderProduct) {
+          for (const newValElement of newVal.orderProduct) {
+            this.totalPrice += newValElement.totalPrice;
+            this.expectPoint += newValElement.expectPoint;
+            this.totalDeliveryPrice += newValElement.deliveryPrice;
+
+            for(const el of newValElement.optionPrice){
+              console.log(el)
+              this.totalOptionPrice += el;
+            }
+          }
         }
       },
       deep: true
-    },
-    isBasic(newVal) {
-      if (newVal) {
-        this.isSave = true;
-      }
     }
   }
 })

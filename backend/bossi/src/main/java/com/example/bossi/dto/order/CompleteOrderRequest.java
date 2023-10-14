@@ -3,9 +3,10 @@ package com.example.bossi.dto.order;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@NoArgsConstructor
 @Schema(description = "주문 정보")
 public class CompleteOrderRequest {
 
@@ -34,6 +35,9 @@ public class CompleteOrderRequest {
 
     @Schema(description = "배송정보 - 배송지이름")
     private String deliveryName;
+
+    @Schema(description = "상품 주문 번호")
+    private String orderNum;
 
     @Schema(description = "배송정보 - 이름")
     private String receiver;

@@ -14,6 +14,8 @@ public enum ErrorCode {
     NULL_REQUEST(HttpStatus.BAD_REQUEST, ""), // 400
     BAD_REQUEST(HttpStatus.BAD_REQUEST, ""), // 400
     FORBIDDEN(HttpStatus.FORBIDDEN, ""), // 403
+    NOT_ENOUGH_STOCK(HttpStatus.CONFLICT, ""),  // 400
+    NOT_ENOUGH_POINT(HttpStatus.CONFLICT, ""),  // 400
     ;
 
     private HttpStatus httpsStatus;

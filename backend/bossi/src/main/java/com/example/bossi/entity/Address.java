@@ -24,9 +24,30 @@ public class Address {
 
     private String addrName;    // 배송지명
     private String recipient;   // 수령인
-    private String poneNum;
+    private String phoneNum;
+    private boolean isBasic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
     private User user;
+
+    public static Address createAddress(String city, String street, String zipcode, String addrName, String recipient, String phoneNum, boolean isBasic, User user){
+        Address address = Address.builder()
+                .city(city)
+                .street(street)
+                .zipcode(zipcode)
+                .addrName(addrName)
+                .recipient(recipient)
+                .phoneNum(phoneNum)
+                .isBasic(isBasic)
+                .user(user)
+                .build();
+
+        user.addAddress(address);
+        return address;
+    }
+
+    public void changeBasicAddress(boolean isBasic){
+        this.isBasic = isBasic;
+    }
 }

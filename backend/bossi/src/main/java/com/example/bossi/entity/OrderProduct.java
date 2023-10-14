@@ -19,7 +19,7 @@ public class OrderProduct {
     @Column(name = "ORDER_PRODUCT")
     private Long OrderProduct;
 
-    private int orderPrice;     // 주문 가격
+    private float orderPrice;     // 주문 가격
     private int count; // 주문 수량
 
     @ManyToOne
@@ -31,7 +31,27 @@ public class OrderProduct {
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "PRODUCT_DETAIL_OPTION_ID")
-    private ProductDetailOption productDetailOption;
+    @JoinColumn(name = "ORDER_PRODUCT_DETAIL_OTION_ID")
+    private OrderProductDetailOption orderProductDetailOption;
+
+    public void setOrder(Order order){
+        this.order = order;
+    }
+
+    public void setOrderProductDetailOption(OrderProductDetailOption orderProductDetailOption){this.orderProductDetailOption = orderProductDetailOption;}
+
+    public static OrderProduct createOrderProduct(Product product, float orderPrice, int count){
+        OrderProduct orderProduct = com.example.bossi.entity.OrderProduct.builder()
+                .product(product)
+                .orderPrice(orderPrice)
+                .count(count)
+                .build();
+
+        product.removeStock(count);
+
+        return orderProduct;
+    }
+
+
 
 }

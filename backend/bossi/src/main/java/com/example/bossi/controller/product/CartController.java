@@ -2,16 +2,15 @@ package com.example.bossi.controller.product;
 
 import com.example.bossi.dto.product.cart.AddToCartRequest;
 import com.example.bossi.dto.product.cart.DirectBuyProductRequest;
+import com.example.bossi.dto.product.cart.OrderProductInfoRequest;
 import com.example.bossi.response.product.cart.CartProductResponse;
 import com.example.bossi.response.product.cart.DirectButOrderItemInfo;
+import com.example.bossi.response.product.cart.OrderMultiProductInfo;
 import com.example.bossi.response.product.cart.OrderProductInfo;
 import com.example.bossi.service.product.cart.CartService;
 import com.example.bossi.service.product.cart.RedisCartService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -70,5 +69,12 @@ public class CartController {
     public List<CartProductResponse>  showCart(@RequestBody Map<String, String> email) throws JsonProcessingException {
         log.info("showCart: {}", email);
         return redisCartService.showCartProduct(email.get("email"));
+    }
+
+    @PostMapping("/multi/order/{email}")
+    public ResponseEntity<OrderMultiProductInfo> orderMultiProduct(@Valid @RequestBody List<OrderProductInfoRequest> orderData, @PathVariable String email){
+        log.info("orderMulti {}, {}", email, orderData.get(0).getProductId());
+
+        return cartService.multiOrderProduct(email, orderData);
     }
 }

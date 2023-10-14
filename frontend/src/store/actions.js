@@ -1,7 +1,12 @@
 import {
     FETCH_CART_COUNT,
-    FETCH_CATEGORY_LIST, FETCH_DIRECT_ORDER_LIST, FETCH_LIVER_ORDER_PRODUCT, FETCH_MY_CART_INFO,
-    FETCH_PRODUCT_CONTENT, FETCH_PURCHASE_INFO,
+    FETCH_CATEGORY_LIST,
+    FETCH_DIRECT_ORDER_LIST,
+    FETCH_LIVER_ORDER_PRODUCT,
+    FETCH_MULTI_PRODUCT_INFO,
+    FETCH_MY_CART_INFO,
+    FETCH_PRODUCT_CONTENT,
+    FETCH_PURCHASE_INFO,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
 } from './mutation-types'
@@ -86,5 +91,19 @@ export default {
             .then((res) => {
                 commit(FETCH_MY_CART_INFO, res.data)
             })
+    },
+    fetchMultiProductInfo({commit}, {email, orderData}){
+        console.log("email: "+ email)
+        orderData.forEach(data => {
+            console.log("orderData: ", data);
+        });
+        return axios.post(API_BASE_URL+"/api/v1/cart/multi/order/"+email, orderData, { headers: {
+            'Content-Type': 'application/json'
+        }})
+            .then((res) => {
+                console.log(JSON.stringify(res.data))
+                commit(FETCH_MULTI_PRODUCT_INFO, res.data)
+            })
+        ///multi/order/{email}
     }
 }

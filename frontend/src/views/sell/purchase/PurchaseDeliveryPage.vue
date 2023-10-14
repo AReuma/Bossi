@@ -30,7 +30,7 @@ export default defineComponent({
     this.fetchPurchaseInfo({productId: this.productId, options: this.options, optionCount: this.optionCount, email: this.email})
   },
   computed: {
-    ...mapState(["purchaseInfo"])
+    ...mapState(['purchaseInfo'])
   }
 })
 </script>

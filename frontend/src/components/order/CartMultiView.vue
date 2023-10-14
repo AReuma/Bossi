@@ -216,7 +216,10 @@ export default defineComponent({
             this.selectedProduct.push(true);
             this.orderMsg.push("");
             const clonedElement = { ...newValElement };
-            clonedElement.optionTotalPrice = [...newValElement.optionTotalPrice]; // 내부 배열 복제
+
+            clonedElement.optionTotalPrice = newValElement.optionTotalPrice.map((price, index) => {
+              return price * newValElement.optionCount[index];
+            });
             clonedElement.optionCount = [...newValElement.optionCount]; // 내부 배열 복제
 
             this.productInfo.push(clonedElement);
@@ -242,7 +245,7 @@ export default defineComponent({
         console.log("dk")
         this.productInfo[index].optionCount[optionIndex]--;
 
-        console.log("1: "+this.productInfo[index].optionTotalPrice[optionIndex] +" 2: "+ this.myCartInfo[index].optionTotalPrice[optionIndex])
+        console.log("1: "+this.productInfo[index].optionTotalPrice[optionIndex] +" 2: "+ this.myCartInfo[index].optionTotalPrice[optionIndex]+" 3: "+ this.productInfo[index].optionCount[optionIndex])
         this.productInfo[index].optionTotalPrice[optionIndex] -= this.myCartInfo[index].optionTotalPrice[optionIndex];
 
         // 전체 가격 변경
@@ -305,8 +308,9 @@ export default defineComponent({
         }
       }
 
-      console.log(this.orderData)
-      this.$emit('order', this.orderData)
+      console.log(JSON.stringify(this.orderData))
+      useCookies().cookies.set('orderData', JSON.stringify(this.orderData))
+      this.$router.push({name: 'PurchaseMultiDeliveryPage'})
     },
     gHome(){
 

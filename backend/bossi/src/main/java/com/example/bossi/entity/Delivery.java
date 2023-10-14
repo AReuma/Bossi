@@ -26,4 +26,7 @@ public class Delivery {
     private String street;
     private String zipcode;
 
+    public void setOrder(Order order){
+        this.order = order;
+    }
 }
