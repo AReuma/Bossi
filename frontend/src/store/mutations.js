@@ -2,7 +2,7 @@ import {
     ACCESS_DENIED, FETCH_CART_COUNT,
     FETCH_CATEGORY_LIST,
     FETCH_DIRECT_ORDER_LIST,
-    FETCH_LIVER_ORDER_PRODUCT, FETCH_MULTI_PRODUCT_INFO, FETCH_MY_CART_INFO,
+    FETCH_LIVER_ORDER_PRODUCT, FETCH_MULTI_PRODUCT_INFO, FETCH_MY_CART_INFO, FETCH_ORDER_COMPLETE_INFO,
     FETCH_PRODUCT_CONTENT, FETCH_PURCHASE_INFO,
     FETCH_WAITING_LIST_USERS,
     LOGOUT,
@@ -64,5 +64,8 @@ export default {
     [FETCH_MULTI_PRODUCT_INFO](state, multiOrderProduct){
         state.multiOrderProduct = multiOrderProduct;
         console.log(multiOrderProduct)
+    },
+    [FETCH_ORDER_COMPLETE_INFO](state, orderCompleteInfo){
+        state.orderCompleteInfo = orderCompleteInfo;
     }
 }

@@ -30,6 +30,7 @@ import SellerLoginPage from "@/views/seller/SellerLoginPage.vue";
 import PurchaseDirectPage from "@/views/sell/purchase/PurchaseDirectPage.vue";
 import PurchaseDeliveryPage from "@/views/sell/purchase/PurchaseDeliveryPage.vue";
 import PurchaseMultiDeliveryPage from "@/views/sell/purchase/PurchaseMultiDeliveryPage.vue";
+import PurchaseCompletePage from "@/views/sell/purchase/PurchaseCompletePage.vue";
 
 Vue.use(VueRouter)
 
@@ -219,6 +220,11 @@ const routes = [
     name: "PurchaseMultiDeliveryPage",
     component: PurchaseMultiDeliveryPage
   },
+  {
+    path: '/cart/payment/complete',
+    name: "PurchaseCompletePage",
+    component: PurchaseCompletePage
+  }
 ]
 
 

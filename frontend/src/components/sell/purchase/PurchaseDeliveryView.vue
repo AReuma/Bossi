@@ -279,6 +279,12 @@
           </table>
         </div>
 
+        <router-link
+            :to="{ name: 'PurchaseCompletePage', query: {orderNum: orderNum} }"
+        >
+          Query 선언적 방식
+        </router-link>
+
         <div>
           결제 시 개인정보 제공에 동의합니다.
         </div>
@@ -333,6 +339,7 @@ export default defineComponent({
       totalPrice: 0,
       isSave: true,
       isBasic: true,
+      orderNum: "ORD16973799120143309",
     };
   },
   methods: {
@@ -427,7 +434,7 @@ export default defineComponent({
         let IMP = window.IMP;
         IMP.init("imp73123883");
 
-        let price = this.purchaseInfo.totalPrice;
+        let price = this.totalPrice;
 
         let orderUser = this.purchaseInfo.name;
         let orderPhoneNum = this.purchaseInfo.phoneNum;
@@ -435,14 +442,15 @@ export default defineComponent({
 
         let orderNum = this.createOrderNum();
 
-        const {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, isBasic, isSave} = this;
+        const {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, isBasic, isSave, totalPrice} = this;
+
         IMP.request_pay(
             {
               pg: "kakaopay",
               pay_method: "card",
               merchant_uid: orderNum,// 주문번호
               name: this.purchaseInfo.productTitle,
-              amount: this.purchaseInfo.totalPrice,
+              amount: this.totalPrice,
               //buyer_email: "gildong@gmail.com",
               buyer_name: this.purchaseInfo.name,
               //buyer_tel: "010-4242-4242",
@@ -469,8 +477,13 @@ export default defineComponent({
 
                         if(existDelivery === false){
                           // 저장된 배송지가 아닐 경우
-
-                          axios.post(API_BASE_URL+"/api/v1/payment/order/complete", {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum, isSave, isBasic, orderNum})
+                          console.log("isBasic: "+isBasic)
+                          console.log("isSave: "+isSave)
+                          axios.post(API_BASE_URL+"/api/v1/payment/order/complete", {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum, isSave, isBasic, orderNum, totalPrice})
+                              .then((res) => {
+                                console.log(res)
+                                this.$router.push({name: 'PurchaseCompletePage', query: {orderNum: orderNum}});
+                              })
                         }
 
                       } else { // 결제 금액이 달라 실패한 경우

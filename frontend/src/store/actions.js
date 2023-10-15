@@ -4,7 +4,7 @@ import {
     FETCH_DIRECT_ORDER_LIST,
     FETCH_LIVER_ORDER_PRODUCT,
     FETCH_MULTI_PRODUCT_INFO,
-    FETCH_MY_CART_INFO,
+    FETCH_MY_CART_INFO, FETCH_ORDER_COMPLETE_INFO,
     FETCH_PRODUCT_CONTENT,
     FETCH_PURCHASE_INFO,
     FETCH_WAITING_LIST_USERS,
@@ -104,6 +104,11 @@ export default {
                 console.log(JSON.stringify(res.data))
                 commit(FETCH_MULTI_PRODUCT_INFO, res.data)
             })
-        ///multi/order/{email}
+    },
+    fetchOrderCompleteInfo({commit}, orderNum){
+        return axios.post(API_BASE_URL+"/api/v1/payment/order/complete/showOrderInfo", {orderNum})
+            .then((res) => {
+                commit(FETCH_ORDER_COMPLETE_INFO, res.data)
+            })
     }
 }

@@ -7,6 +7,7 @@ import com.example.bossi.response.product.cart.CartProductResponse;
 import com.example.bossi.response.product.cart.DirectButOrderItemInfo;
 import com.example.bossi.response.product.cart.OrderMultiProductInfo;
 import com.example.bossi.response.product.cart.OrderProductInfo;
+import com.example.bossi.service.order.RedisOrderService;
 import com.example.bossi.service.product.cart.CartService;
 import com.example.bossi.service.product.cart.RedisCartService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -66,7 +67,7 @@ public class CartController {
     }
 
     @PostMapping("/showCart")
-    public List<CartProductResponse>  showCart(@RequestBody Map<String, String> email) throws JsonProcessingException {
+    public List<CartProductResponse> showCart(@RequestBody Map<String, String> email) throws JsonProcessingException {
         log.info("showCart: {}", email);
         return redisCartService.showCartProduct(email.get("email"));
     }

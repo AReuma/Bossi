@@ -61,8 +61,11 @@ public class CompleteOrderRequest {
     private Integer usePoint;
 
     @Schema(description = "배송정보 - 배송 저장 여부")
-    private boolean isSave;
+    private Boolean isSave;
 
     @Schema(description = "배송정보 - 기본배송지 설정 여부")
-    private boolean isBasic;
+    private Boolean isBasic;
+
+    @Schema(description = "주문 금액")
+    private String totalPrice;
 }

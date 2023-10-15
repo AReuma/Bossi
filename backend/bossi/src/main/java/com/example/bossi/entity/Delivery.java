@@ -22,9 +22,11 @@ public class Delivery {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus status;
 
+    private String recipient;
     private String city;
     private String street;
     private String zipcode;
+    private String phoneNum;
 
     public void setOrder(Order order){
         this.order = order;

@@ -25,7 +25,7 @@ public class Address {
     private String addrName;    // 배송지명
     private String recipient;   // 수령인
     private String phoneNum;
-    private boolean isBasic;
+    private boolean basic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
@@ -39,7 +39,7 @@ public class Address {
                 .addrName(addrName)
                 .recipient(recipient)
                 .phoneNum(phoneNum)
-                .isBasic(isBasic)
+                .basic(isBasic)
                 .user(user)
                 .build();
 
@@ -48,6 +48,6 @@ public class Address {
     }
 
     public void changeBasicAddress(boolean isBasic){
-        this.isBasic = isBasic;
+        this.basic = isBasic;
     }
 }
