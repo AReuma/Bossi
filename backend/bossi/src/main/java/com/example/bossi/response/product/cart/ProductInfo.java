@@ -12,6 +12,9 @@ import java.util.List;
 @Schema(description = "주문 상품 정보")
 public class ProductInfo {
 
+    @Schema(description = "상품 아이디")
+    private Long productId;
+
     @Schema(description = "상품 판매자")
     private String storeName;
 

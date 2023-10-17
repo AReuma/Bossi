@@ -22,7 +22,7 @@ public class OrderProductInfo {
     private boolean deliveryCheck;
 
     @Schema(description = "배송지 정보")
-    private List<AddrInfo> delivery;
+    private AddrInfo delivery;
 
     @Schema(description = "상품 판매자")
     private String storeName;

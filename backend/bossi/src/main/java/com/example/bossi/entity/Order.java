@@ -43,18 +43,21 @@ public class Order {
 
     private Float totalPrice;   // 상품 전체 가격
 
+    private Float totalDeliveryPrice;   // 상품 전체 배송비
+
     private Integer usePoint; // 사용한 포인트
 
     @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
-    public static Order createOrder(User user, Delivery delivery, List<OrderProduct> orderProducts, String orderNum, float totalPrice, Integer userPoint){
+    public static Order createOrder(User user, Delivery delivery, List<OrderProduct> orderProducts, String orderNum, float totalPrice, Integer userPoint, float totalDeliveryPrice){
         Order order = Order.builder()
                 .user(user)
                 .orderNum(orderNum)
                 .orderStatus(OrderStatus.READY_PRODUCT)
                 .totalPrice(totalPrice)
+                .totalDeliveryPrice(totalDeliveryPrice)
                 .usePoint(userPoint)
                 .orderDate(LocalDateTime.now())
                 .build();

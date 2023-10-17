@@ -102,6 +102,10 @@ public class CartServiceImpl implements CartService{
             //List<Map<String, Object>> productOption = new ArrayList<>();
             List<Map<String, Object>> productOption = productCheck.getOptionAndOptionValue(productOptionList);
 
+            float deliveryCharge = product.getDeliveryCharge();
+            if(product.getFreeDeliverTotalCharge() <= optionTotalPrice){
+                deliveryCharge = 0;
+            }
             /*for (ProductOption option : productOptionList) {
                 Map<String, Object> data1 = new HashMap<>();
                 Map<String, String> detail1 = new HashMap<>();
@@ -119,7 +123,7 @@ public class CartServiceImpl implements CartService{
                 productOption.add(data1);
             }*/
 
-            DirectButOrderItemInfo directButOrderItemInfo = new DirectButOrderItemInfo(product.getSeller().getStoreName(), product.getPrice(), product.getRatingCont(), product.getRatingSum(), product.getName(), optionCountList, optionTotalPrice, product.getProductImgs().get(0).getImg(), optionList, optionStr, optionPrice, product.getDeliveryCharge(), product.getFreeDeliverTotalCharge(), product.getStockQuantity(), productOption);
+            DirectButOrderItemInfo directButOrderItemInfo = new DirectButOrderItemInfo(product.getSeller().getStoreName(), product.getPrice(), product.getRatingCont(), product.getRatingSum(), product.getName(), optionCountList, optionTotalPrice, product.getProductImgs().get(0).getImg(), optionList, optionStr, optionPrice, deliveryCharge, product.getFreeDeliverTotalCharge(), product.getStockQuantity(), productOption);
             return ResponseEntity.ok().body(directButOrderItemInfo);
 
         } catch (Exception e) {
@@ -210,13 +214,13 @@ public class CartServiceImpl implements CartService{
         // 주소
         boolean checkDelivery = false;
 
-        List<AddrInfo> deliveryAddr = new ArrayList<>();
+        AddrInfo deliveryAddr = null;
         if(user.getAddressList().size() > 0){ // 배송지가 있을 경우
             checkDelivery = true;
 
             Address address = user.getAddressList().get(0);
 
-            deliveryAddr.add(new AddrInfo(address.getCity() + address.getStreet(), address.getZipcode(), address.getAddrName(), address.getRecipient(), address.getPhoneNum()));
+            deliveryAddr = new AddrInfo(address.getCity() +" "+ address.getStreet(), address.getZipcode(), address.getAddrName(), address.getRecipient(), address.getPhoneNum());
         }
 
         float totalPrice = totalProductPrice + deliveryCharge;
@@ -300,18 +304,18 @@ public class CartServiceImpl implements CartService{
             float productSum = totalPrice * pointPercentage;
             productSum = Math.round(productSum * 100.0f) / 100.0f;
 
-            productInfoList.add(new ProductInfo(product.getSeller().getStoreName(), product.getName(), product.getProductImgs().get(0).getImg(), optionCountList, totalProductPrice, totalPrice, deliveryCharge, optionInfo, optionPrice, productSum));
+            productInfoList.add(new ProductInfo(product.getId(), product.getSeller().getStoreName(), product.getName(), product.getProductImgs().get(0).getImg(), optionCountList, totalProductPrice, totalPrice, deliveryCharge, optionInfo, optionPrice, productSum));
         }
 
         boolean checkDelivery = false;
 
-        List<AddrInfo> deliveryAddr = new ArrayList<>();
+        AddrInfo deliveryAddr = null;
         if(user.getAddressList().size() > 0){ // 배송지가 있을 경우
             checkDelivery = true;
 
             Address address = user.getAddressList().get(0);
 
-            deliveryAddr.add(new AddrInfo(address.getCity() + address.getStreet(), address.getZipcode(), address.getAddrName(), address.getRecipient(), address.getPhoneNum()));
+            deliveryAddr = new AddrInfo(address.getCity() +" "+ address.getStreet(), address.getZipcode(), address.getAddrName(), address.getRecipient(), address.getPhoneNum());
         }
 
         return ResponseEntity.ok().body(new OrderMultiProductInfo(user.getName(), user.getPhoneNum(), user.getPoint(), checkDelivery, deliveryAddr, productInfoList));

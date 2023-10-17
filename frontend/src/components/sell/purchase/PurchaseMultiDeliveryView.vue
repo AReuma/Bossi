@@ -8,7 +8,8 @@
         <div style="color: #848484">3. 주문완료</div>
       </div>
     </div>
-
+    {{selectProductId}}
+{{multiOrderProduct}}
     <div style="display: flex; height: 100%; width: 100%; margin-top: 40px">
       <div style="flex: 1.2;">
         <div
@@ -140,8 +141,11 @@
               </tr>
             </table>
 
-            <v-checkbox v-if="!multiOrderProduct.deliveryCheck" readonly v-model="basicAddr" color="DEEP_PINK" label="기본 배송지로 설정" hide-details></v-checkbox>
-            <v-checkbox v-else color="DEEP_PINK" v-model="basicAddr" label="기본 배송지로 설정" hide-details></v-checkbox>
+            <v-checkbox v-if="!purchaseInfo.deliveryCheck" readonly v-model="isBasic" color="DEEP_PINK" label="기본 배송지로 설정" hide-details></v-checkbox>
+            <div v-else style="height: 70px;">
+              <v-checkbox color="DEEP_PINK" v-model="isBasic" label="기본 배송지로 설정" hide-details style="height: 15px"></v-checkbox>
+              <v-checkbox color="DEEP_PINK" v-model="isSave" label="배송지 저장" hide-details></v-checkbox>
+            </div>
           </div>
         </div>
 
@@ -327,16 +331,17 @@ export default defineComponent({
       selectedChip: null,
       phoneNumberError: '',
       orderMsg: useCookies().cookies.get('orderMsg'),
-      productId: useCookies().cookies.get('productId'),
-      options: useCookies().cookies.get('options'),
-      optionCount: useCookies().cookies.get('optionCount'),
       email: useCookies().cookies.get('email'),
       usePoint: 0,
       usePointCheck: false,
       totalPrice: 0,
       expectPoint: 0,
       totalOptionPrice: 0,
-      totalDeliveryPrice: 0
+      totalDeliveryPrice: 0,
+      orderTitle: "",
+      selectProductId: "",
+      isSave: true,
+      isBasic: true,
     };
   },
   methods: {
@@ -397,6 +402,16 @@ export default defineComponent({
       const randomDigits = Math.floor(Math.random() * 9000) + 1000; // 4자리 랜덤 숫자 생성
       return `ORD${timestamp}${randomDigits}`;
     },
+    checkNumberInOrderTitle(orderTitle) {
+      // 정규식을 사용하여 주어진 문자열에서 숫자를 추출합니다
+      const match = orderTitle.match(/\d+/);
+
+      if (match) {
+        const number = parseInt(match[0], 10); // 추출한 숫자를 정수로 변환합니다
+        console.log("number: "+number)
+        return number !== 0;
+      }
+    },
     readyPayment(){
       // 결제하기전 배송지가 제대로 작성된지 확인.
       // 1. 기존 배송지인지, 신규 입력인지 체크
@@ -406,8 +421,10 @@ export default defineComponent({
 
       let paymentCheck = false;
 
+      console.log(this.existDelivery)
       if(this.existDelivery === true){
-        if (this.purchaseInfo.deliveryCheck === true) {
+        //multiOrderProduct
+        if (this.multiOrderProduct.deliveryCheck === true) {
           paymentCheck = true;
         }
       }else {
@@ -425,20 +442,33 @@ export default defineComponent({
         let IMP = window.IMP;
         IMP.init("imp73123883");
 
-        let price = this.purchaseInfo.totalPrice;
+        let price = this.totalPrice;
 
-        let orderUser = this.purchaseInfo.name;
-        let orderPhoneNum = this.purchaseInfo.phoneNum;
+        let orderUser = this.multiOrderProduct.name;
+        let orderPhoneNum = this.multiOrderProduct.phoneNum;
+        let existDelivery = this.existDelivery
+        let orderNum = this.createOrderNum();
+
+        let orderTitle;
+        if (this.checkNumberInOrderTitle(this.orderTitle)){
+          orderTitle = this.orderTitle;
+        }else {
+          // 작품이 하나일경우
+          alert("작품 1개")
+        }
+
+        const {selectProductId, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, totalDeliveryPrice, totalPrice} = this;
+
         IMP.request_pay(
             {
               pg: "kakaopay",
               pay_method: "card",
               merchant_uid: this.createOrderNum(),// 주문번호
-              name: this.purchaseInfo.productTitle,
-              amount: this.purchaseInfo.totalPrice,
-              buyer_name: this.purchaseInfo.name,
+              name: orderTitle,
+              amount: this.totalPrice,
+              buyer_name: this.multiOrderProduct.name,
             },
-            function (rsp) {
+            (rsp) => {
               //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
               let imp_uid = rsp.imp_uid;
               console.log("imp_uid" + imp_uid)
@@ -455,12 +485,30 @@ export default defineComponent({
                         // 기존 배송지일 경우/ 신규 배송지일 경우 배송지 db에 저장
                         // 적립금, 상품, 옵션, 수량
 
-                        if(this.existDelivery === false){
-                          // 저장된 배송지가 아닐 경우
-                          const {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint} = this;
+                        let isSave;
+                        let isBasic;
 
-                          axios.post(API_BASE_URL+"/api/v1/payment/order/complete", {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum})
+                        if(existDelivery === true){
+                          isSave = false;
+                          isBasic = false;
+                        }else {
+                          isSave = this.isSave;
+                          isBasic = this.isBasic;
                         }
+
+                        //if(this.existDelivery === false){
+                          // 저장된 배송지가 아닐 경우
+
+                          axios.post(API_BASE_URL+"/api/v1/payment/order/multi/complete", {selectProductId, email, receiver, address, detailAddr, orderNum, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum, isSave, isBasic, totalDeliveryPrice, totalPrice})
+                              .then((res) => {
+                                console.log(res)
+                                //this.move(res.data.orderNum);
+                                let orderNum = res.data;
+                                console.log(this.$router)
+                                console.log(orderNum)
+                                this.$router.push({name: 'PurchaseCompletePage', query: {orderNum: orderNum}});
+                              })
+                        //}
 
                       } else { // 결제 금액이 달라 실패한 경우
                         alert('결제 실패')
@@ -480,7 +528,7 @@ export default defineComponent({
     },
     usePointBtn(){
       this.usePoint = Math.floor(this.usePoint / 10) * 10;
-      let maximumPrice = Math.floor(Number(this.purchaseInfo.point) / 10) * 10
+      let maximumPrice = Math.floor(Number(this.multiOrderProduct.point) / 10) * 10
 
       if (this.usePoint > maximumPrice) {
         this.usePoint = maximumPrice;
@@ -491,7 +539,7 @@ export default defineComponent({
       this.usePointCheck = true;
     },
     useAllPointBtn(){
-      let maximumPrice = Math.floor(Number(this.purchaseInfo.point) / 10) * 10
+      let maximumPrice = Math.floor(Number(this.multiOrderProduct.point) / 10) * 10
       this.usePoint = maximumPrice;
 
       this.totalPrice -= this.usePoint;
@@ -510,19 +558,31 @@ export default defineComponent({
     multiOrderProduct: {
       handler(newVal) {
         if (newVal && newVal.orderProduct) {
+          let number = 0;
+          let selectProduct = []
           for (const newValElement of newVal.orderProduct) {
+            number++;
             this.totalPrice += newValElement.totalPrice;
             this.expectPoint += newValElement.expectPoint;
             this.totalDeliveryPrice += newValElement.deliveryPrice;
+            selectProduct.push(newValElement.productId);
 
             for(const el of newValElement.optionPrice){
               console.log(el)
               this.totalOptionPrice += el;
             }
           }
+
+          this.orderTitle = "외 " + (number-1) +"개";
+          this.selectProductId = selectProduct.join(",")
         }
       },
       deep: true
+    },
+    isBasic(newVal) {
+      if (newVal) {
+        this.isSave = true;
+      }
     }
   }
 })

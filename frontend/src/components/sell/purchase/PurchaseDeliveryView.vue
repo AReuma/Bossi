@@ -8,7 +8,7 @@
         <div style="color: #848484">3. 주문완료</div>
       </div>
     </div>
-{{purchaseInfo}}
+
     <div style="display: flex; height: 100%; width: 100%; margin-top: 40px">
       <div style="flex: 1.2;">
         <div
@@ -61,10 +61,10 @@
             <div v-else>
               <div><v-chip small color="rgba(251,191,191,0.2)" style="color: #fc9899; margin-right: 5px">기본 배송지</v-chip>신니니</div>
               <div style="margin-top: 8px">
-                010-1234-1234
+                {{purchaseInfo.delivery.phoneNum}}
               </div>
               <div style="margin-top: 8px">
-                (12345) 서울시 강남구 한강 어디어디 104동
+                ({{purchaseInfo.delivery.zipcode}}) {{ purchaseInfo.delivery.addr }}
               </div>
               <div style="margin-top: 8px; font-size: 12px">
                 <v-icon small>mdi-pencil-outline</v-icon>
@@ -285,6 +285,8 @@
           Query 선언적 방식
         </router-link>
 
+        <v-btn @click="move">dd</v-btn>
+
         <div>
           결제 시 개인정보 제공에 동의합니다.
         </div>
@@ -427,7 +429,7 @@ export default defineComponent({
 
       return paymentCheck;
     },
-    payment(){
+    payment: function () {
       let check = this.readyPayment();
 
       if(check === true) {
@@ -438,11 +440,12 @@ export default defineComponent({
 
         let orderUser = this.purchaseInfo.name;
         let orderPhoneNum = this.purchaseInfo.phoneNum;
+        let deliveryPrice = this.purchaseInfo.deliveryPrice;
         let existDelivery = this.existDelivery
 
         let orderNum = this.createOrderNum();
 
-        const {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, isBasic, isSave, totalPrice} = this;
+        const {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, totalPrice} = this;
 
         IMP.request_pay(
             {
@@ -457,7 +460,7 @@ export default defineComponent({
               //buyer_addr: "서울특별시 강남구 신사동",
               //buyer_postcode: "01181"
             },
-            function (rsp) {
+            (rsp) => {
               //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
               let imp_uid = rsp.imp_uid;
               console.log("imp_uid" + imp_uid)
@@ -475,16 +478,30 @@ export default defineComponent({
                         // 기존 배송지일 경우/ 신규 배송지일 경우 배송지 db에 저장
                         // 적립금, 상품, 옵션, 수량
 
-                        if(existDelivery === false){
+                        let isSave;
+                        let isBasic;
+
+                        if(existDelivery === true){
+                          isSave = false;
+                          isBasic = false;
+                        }else {
+                          isSave = this.isSave;
+                          isBasic = this.isBasic;
+                        }
+
+                        //if(existDelivery === false){
                           // 저장된 배송지가 아닐 경우
                           console.log("isBasic: "+isBasic)
                           console.log("isSave: "+isSave)
-                          axios.post(API_BASE_URL+"/api/v1/payment/order/complete", {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum, isSave, isBasic, orderNum, totalPrice})
+                          axios.post(API_BASE_URL+"/api/v1/payment/order/complete", {productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint, orderUser, orderPhoneNum, isSave, isBasic, orderNum, totalPrice, deliveryPrice})
                               .then((res) => {
                                 console.log(res)
+                                //this.move(res.data.orderNum);
+                                let orderNum = res.data;
+                                console.log(this.$router)
                                 this.$router.push({name: 'PurchaseCompletePage', query: {orderNum: orderNum}});
                               })
-                        }
+                        //}
 
                       } else { // 결제 금액이 달라 실패한 경우
                         alert('결제 실패')
@@ -501,6 +518,11 @@ export default defineComponent({
       }else {
         alert('결제 실패')
       }
+    },
+    move(orderNum){
+      let orderNums = orderNum;
+      this.$router.push({name: 'PurchaseCompletePage', query: {orderNum: orderNums}});
+    //"ORD16974510302035467"
     },
     usePointBtn(){
       this.usePoint = Math.floor(this.usePoint / 10) * 10;

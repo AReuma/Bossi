@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Builder
 @NoArgsConstructor
@@ -32,7 +34,7 @@ public class OrderProductDetailOption {
                 .orderProduct(orderProduct)
                 .build();
 
-        orderProduct.setOrderProductDetailOption(orderProductDetailOption);
+        //orderProduct.addOrderProductDetailOption(orderProductDetailOption);
 
         return orderProductDetailOption;
     }

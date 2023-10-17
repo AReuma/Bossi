@@ -24,7 +24,7 @@ public class OrderMultiProductInfo {
     private boolean deliveryCheck;
 
     @Schema(description = "배송지 정보")
-    private List<AddrInfo> delivery;
+    private AddrInfo delivery;
 
     @Schema(description = "주문 상품 정보")
     private List<ProductInfo> orderProduct;

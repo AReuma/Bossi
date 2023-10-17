@@ -8,10 +8,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Builder
-@NoArgsConstructor
+@Builder(toBuilder = true)
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class OrderProduct {
 
@@ -19,6 +22,7 @@ public class OrderProduct {
     @Column(name = "ORDER_PRODUCT")
     private Long OrderProduct;
 
+    private float deliveryCharge;   // 배송비
     private float orderPrice;     // 주문 가격
     private int count; // 주문 수량
 
@@ -30,21 +34,24 @@ public class OrderProduct {
     @JoinColumn(name = "PRODUCT_ID")
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "ORDER_PRODUCT_DETAIL_OTION_ID")
-    private OrderProductDetailOption orderProductDetailOption;
+    @OneToMany(mappedBy = "orderProduct", cascade = CascadeType.ALL)
+    private List<OrderProductDetailOption> orderProductDetailOptions = new ArrayList<>();
 
     public void setOrder(Order order){
         this.order = order;
     }
 
-    public void setOrderProductDetailOption(OrderProductDetailOption orderProductDetailOption){this.orderProductDetailOption = orderProductDetailOption;}
+    public void addOrderProductDetailOption(OrderProductDetailOption orderProductDetailOption){
+        orderProductDetailOptions.add(orderProductDetailOption);
+    }
 
-    public static OrderProduct createOrderProduct(Product product, float orderPrice, int count){
+    public static OrderProduct createOrderProduct(Product product, float orderPrice, int count, float deliveryCharge){
         OrderProduct orderProduct = com.example.bossi.entity.OrderProduct.builder()
                 .product(product)
                 .orderPrice(orderPrice)
                 .count(count)
+                .deliveryCharge(deliveryCharge)
+                .orderProductDetailOptions(new ArrayList<>())
                 .build();
 
         product.removeStock(count);

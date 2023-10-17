@@ -16,6 +16,7 @@ public enum ErrorCode {
     FORBIDDEN(HttpStatus.FORBIDDEN, ""), // 403
     NOT_ENOUGH_STOCK(HttpStatus.CONFLICT, ""),  // 400
     NOT_ENOUGH_POINT(HttpStatus.CONFLICT, ""),  // 400
+    HAVE_NOT_DELIVERY(HttpStatus.CONFLICT, ""),  // 400
     ;
 
     private HttpStatus httpsStatus;

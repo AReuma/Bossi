@@ -1,10 +1,12 @@
 package com.example.bossi.controller.payment;
 
+import com.example.bossi.dto.order.CompleteOrderMultiProductRequest;
 import com.example.bossi.dto.order.CompleteOrderRequest;
 import com.example.bossi.response.order.OrderProductInfoResponse;
 import com.example.bossi.service.order.OrderService;
 import com.example.bossi.service.order.RedisOrderService;
 import com.example.bossi.service.payment.PaymentService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -36,7 +38,7 @@ public class PaymentController{
     }
 
     @PostMapping("/order/complete")
-    public void orderComplete(@RequestBody CompleteOrderRequest completeOrderRequest){
+    public String orderComplete(@RequestBody CompleteOrderRequest completeOrderRequest){
         log.info("orderComplete: {}",completeOrderRequest.getEmail());
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -48,13 +50,24 @@ public class PaymentController{
             e.printStackTrace();
         }
         orderService.orderComplete(completeOrderRequest);
+
+        return completeOrderRequest.getOrderNum();
     }
 
     @PostMapping("/order/multi/complete")
-    public void orderCompleteMultiProduct(@RequestBody CompleteOrderRequest completeOrderRequest){
+    public String orderCompleteMultiProduct(@RequestBody CompleteOrderMultiProductRequest completeOrderMultiRequest) throws JsonProcessingException {
         log.info("orderComplete");
 
-        orderService.orderComplete(completeOrderRequest);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String json = objectMapper.writeValueAsString(completeOrderMultiRequest);
+            System.out.println("======1. completeOrderMultiRequest ======");
+            System.out.println(json);
+            System.out.println("============");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return orderService.multiOrderComplete(completeOrderMultiRequest);
     }
 
     @PostMapping("/order/complete/showOrderInfo")
@@ -62,4 +75,5 @@ public class PaymentController{
         log.info("getOrderCompleteNum: "+ orderNum.get("orderNum"));
         return orderService.showOrderComplete(orderNum.get("orderNum"));
     }
+
 }

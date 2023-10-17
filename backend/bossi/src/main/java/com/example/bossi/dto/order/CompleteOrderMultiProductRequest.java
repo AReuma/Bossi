@@ -1,32 +1,22 @@
 package com.example.bossi.dto.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 @Schema(description = "주문 정보")
-public class CompleteOrderRequest {
+public class CompleteOrderMultiProductRequest {
 
-    // 주문 고객 이름, 전화번호
-    // 기존 배송지일 경우/ 신규 배송지일 경우 배송지 db에 저장
-    // 적립금, 상품, 옵션, 수량
-    // 쿠폰... (나중에 구현)
-    // 배송 완료 후 적립금 저장.
+    //{selectProductId, email, orderUser, orderPhoneNum, deliveryName, orderNum, receiver, phoneNum, address, detailAddr, zipcode, orderMsg, usePoint, isSave, isBasic, totalPrice, deliveryPrice}
+
     @Schema(description = "상품 아이디")
-    private Long productId;
-
-    @Schema(description = "주문 상품 옵션")
-    private String options;
-
-    @Schema(description = "주문 상품 옵션 개수")
-    private String optionCount;
+    private String selectProductId;
 
     @Schema(description = "주문자")
     private String email;
-//{productId, options, optionCount, email, receiver, address, detailAddr, zipcode, phoneNum, deliveryName, orderMsg, usePoint}
+
     @Schema(description = "주문정보 - 이름")
     private String orderUser;
 
@@ -70,5 +60,5 @@ public class CompleteOrderRequest {
     private String totalPrice;
 
     @Schema(description = "배송비")
-    private String deliveryPrice;
+    private String totalDeliveryPrice;
 }

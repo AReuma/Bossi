@@ -1,5 +1,5 @@
 <template>
-  <div class="basic" v-if="productInfo">
+  <div class="basic" v-if="productInfo.length !== 0">
   <div style="width: 100%; display: flex;">
     <div style="width: 50%; font-size: 28px; font-family: GmarketSansBold, sans-serif">장바구니</div>
     <div style="display: flex; width: 50%; justify-content: end; align-items: center; font-size: 20px">
@@ -8,7 +8,7 @@
       <div style="color: #848484">3. 주문완료</div>
     </div>
   </div>
-{{productInfo[1]}}
+
   <div v-for="(cartInfo, index) in productInfo" :key="index" style="border: 1px solid #626262; width: 100%; height: 100%; margin-top: 40px; border-radius: 4px">
     <div style="padding-left: 2%; display: flex; align-items: center; background-color: rgba(187,187,187,0.15); height: 60px">
       <v-checkbox v-model="selectedProduct[index]" color="DEEP_PINK"></v-checkbox><div style="margin-left: 5px; font-size: 18px" @click="test(index)">{{cartInfo.storeName}}</div>
@@ -73,7 +73,8 @@
         <tr>
           <td v-if="cartInfo.freeDeliverTotalCharge !== -1" class="table-padding" rowspan="2" style="height: 80px;">배송비</td>
           <td v-else class="table-padding" style="height: 40px; vertical-align: center">배송비</td>
-          <td class="table-padding" style="font-weight: bold; text-align: end; vertical-align: bottom">{{cartInfo.deliveryCharge.toLocaleString()}}원</td>
+          <td class="table-padding" style="font-weight: bold; text-align: end; vertical-align: bottom" v-if="!deliveryFreeCheck[index]">{{cartInfo.deliveryCharge.toLocaleString()}}원</td>
+          <td class="table-padding" style="font-weight: bold; text-align: end; vertical-align: bottom" v-else>무료배송</td>
         </tr>
 
         <tr>
@@ -203,7 +204,8 @@ export default defineComponent({
       showWarning: [],
       selectedProduct: [],
       selectAllProduct: false,
-      orderData: []
+      orderData: [],
+      deliveryFreeCheck: []
     }
   },
   watch: {
@@ -214,6 +216,7 @@ export default defineComponent({
             this.showSave.push(false);
             this.showWarning.push(false);
             this.selectedProduct.push(true);
+
             this.orderMsg.push("");
             const clonedElement = { ...newValElement };
 
@@ -224,7 +227,15 @@ export default defineComponent({
 
             this.productInfo.push(clonedElement);
             this.totalPrice += clonedElement.totalPrice;
-            this.totalDelivery += clonedElement.deliveryCharge;
+
+
+            if(clonedElement.totalPrice >= clonedElement.freeDeliverTotalCharge) {
+              this.deliveryFreeCheck.push(true)
+            }else{
+              this.totalDelivery += clonedElement.deliveryCharge;
+              this.deliveryFreeCheck.push(false)
+            }
+
           }
         }
       },
@@ -236,7 +247,13 @@ export default defineComponent({
       } else {
         this.selectAllProduct = false;
       }
-    }
+    },
+    totalPrice: {
+      handler() {
+        this.updateTotalPriceAndDelivery(this);
+      },
+      immediate: true, // 컴포넌트가 마운트될 때도 호출
+    },
   },
   methods: {
     orderListMin(index, optionIndex){
@@ -267,6 +284,7 @@ export default defineComponent({
       // 전체 가격 변경
       this.productInfo[index].totalPrice += this.myCartInfo[index].optionTotalPrice[optionIndex];
       this.totalPrice += this.myCartInfo[index].optionTotalPrice[optionIndex];
+      this.updateTotalPriceAndDelivery.call(this)
       this.$forceUpdate();
     },
     saveOrderMsg(index){
@@ -322,6 +340,27 @@ export default defineComponent({
     test(index){
       console.log("index: "+ index)
       console.log(this.selectedProduct)
+    },
+    updateTotalPriceAndDelivery(){
+      this.totalPrice = this.productInfo.reduce((acc, product) => {
+        return acc + product.totalPrice;
+      }, 0);
+
+      let newTotalDeliveryCharge = 0;
+      for (let i = 0; i < this.productInfo.length; i++) {
+        const product = this.productInfo[i];
+        const deliveryFreeCheck = product.totalPrice >= product.freeDeliverTotalCharge;
+
+        this.deliveryFreeCheck[i] = deliveryFreeCheck;
+
+        if(product.totalPrice < product.freeDeliverTotalCharge){
+          console.log(product.deliveryCharge)
+          newTotalDeliveryCharge += product.deliveryCharge;
+        }
+
+        console.log("newTotalDeliveryCharge: "+newTotalDeliveryCharge)
+      }
+      this.totalDelivery = newTotalDeliveryCharge;
     }
   },
   computed: {

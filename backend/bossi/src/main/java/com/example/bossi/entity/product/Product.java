@@ -123,7 +123,10 @@ public class Product extends BaseEntity {
     }
 
     public void removeStock(int quantity){
-        if(this.salesQuantity != -1) {
+        System.out.println("========");
+        System.out.println(this.stockQuantity);
+        System.out.println("========");
+        if(this.stockQuantity != -1) {
             int resetStock = this.stockQuantity - quantity;
 
             if (resetStock < 0) {
