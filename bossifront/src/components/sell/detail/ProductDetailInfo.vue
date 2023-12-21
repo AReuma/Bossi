@@ -37,17 +37,17 @@
             <td><v-rating readonly color="yellow"></v-rating></td>
           </tr>
 
-<!--          <tr>
+          <tr>
             <td class="table-name" style="vertical-align: top">배송비</td>
             <td v-if="productContent.freeDeliverTotalCharge !== -1" style="text-align: start">{{ numberWithCommas(productContent.deliveryCount)}}원 <br/>
-              <span style="font-size: 13px; color: rgba(106,106,106,0.89)">{{pnumberWithCommas(roductContent.freeDeliverTotalCharge)}}원 이상 무료배송</span>
+              <span style="font-size: 13px; color: rgba(106,106,106,0.89)">{{numberWithCommas(productContent.freeDeliverTotalCharge)}}원 이상 무료배송</span>
             </td>
             <td v-else style="text-align: start">{{ numberWithCommas(productContent.deliveryCount) }}원 <br/>
             </td>
           </tr>
           <tr v-if="productContent.freeDeliverTotalCharge === -1">
             <td class="table-name"></td>
-          </tr>-->
+          </tr>
           <tr>
             <td class="table-name">배송 시작</td>
             <td>평균 1일, 최대 7일 이내</td>
@@ -60,7 +60,7 @@
         </table>
       </div>
 
-<!--      <div v-if="!productContent.productOption.every(isEmptyObject)">
+      <div v-if="!productContent.productOption.every(isEmptyObject)">
         <div style="margin: 15px 0 20px 0; height: 60px; padding: 5px 0">
           <v-btn @click="optionDialog = true" text width="100%" height="100%" style=" border: 1px solid rgba(187,187,187,0.67);">
             옵션 선택 <v-spacer></v-spacer><v-icon>mdi-chevron-down</v-icon>
@@ -101,7 +101,7 @@
             </div>
           </div>
         </div>
-      </div>-->
+      </div>
 
       <v-dialog v-model="optionDialog" persistent height="auto" width="500px">
         <v-card>
@@ -111,9 +111,9 @@
 
           <v-card-actions>
             <div style="height: 200px; width: 100%; display: flex; flex-direction: column">
-              <div v-for="(item, index) in productContent.productOption" :key="index">
-                <v-select :style="{outline: 'none'}" color="DEEP_PINK" v-model="selectedOptions[index]" :items="getOptionDetails(item)" item-text="label"
-                          item-value="value" :label="(index+1)+'.  '+item.option" style="padding-bottom: 2px"></v-select>
+              <div v-for="(items, index) in productContent.productOption" :key="index">
+                <v-select :style="{outline: 'none'}" color="DEEP_PINK" v-model="selectedOptions[index]" :items="getOptionDetails(items)" :item-props="itemProps" variant="outlined"
+                         :label="(index+1)+'.  '+items.option" style="padding-bottom: 2px"></v-select>
               </div>
             </div>
           </v-card-actions>
@@ -138,7 +138,6 @@
         </v-card>
       </v-dialog>
 
-<!--
       <div v-if="!productContent.productOption.every(isEmptyObject)" style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
         <div style="width: 20%">총 작품금액</div>
         <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;"> {{ numberWithCommas(this.orderPrice)}} 원</div>
@@ -149,7 +148,7 @@
         <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-if="this.orderNoOptionCount === 1"> {{numberWithCommas(this.productContent.ratingPrice)}} 원</div>
         <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-else> {{numberWithCommas(this.orderNoOptionPrice)}} 원</div>
       </div>
--->
+
 
       <div style="margin-top: 18px;">
         <v-btn depressed height="50px" text class="buy-button" style="border: 1px solid rgba(187,187,187,0.62)" @click="addCart">장바구니</v-btn>
@@ -179,6 +178,8 @@
 <script>
 import {defineComponent} from 'vue'
 import {useCookies} from "vue3-cookies";
+import SockJS from "sockjs-client";
+import * as Stomp from "webstomp-client";
 
 export default defineComponent({
   name: "ProductDetailInfo",
@@ -200,22 +201,31 @@ export default defineComponent({
       orderPrice: 0,
       orderNoOptionCount: 1,
       orderNoOptionPrice: 0,
+      combinedOptions: [],
     }
   },
   methods: {
     getOptionDetails(item) {
       let combinedOptions = [];
-
+      //this.combinedOptions = [];
       for (let key in item.price) {
         let index = item.option+ ": " +item.optionDetail[key]+'/(+'+item.price[key]+')';
         let price = item.price[key];
         let optionDetail = item.optionDetail[key];
         combinedOptions.push({
-          label: `${optionDetail} (+ ${price} 원)`,
-          value: `${key}#${index}`
+          title: `${optionDetail} (+ ${price} 원)`,
+          props: `${key}#${index}`
         });
       }
+
+      //console.log(combinedOptions)
       return combinedOptions;
+    },
+    itemProps(item){
+      return {
+        title: item.title,
+        value: item.props
+      }
     },
     checkOption(index){
       if(index === this.selectedOptions.length){ ///선택된 옵션 개수
@@ -225,12 +235,15 @@ export default defineComponent({
         let option = []
         for (let i = 0; i < this.selectedOptions.length; i++) {
           let values = this.selectedOptions[i].split("#"); // 0#색상: 빨강/(+2000)
+          console.log("value: ", values)
           option.push(Number(values[0]))  // 0
           order += values[1];   // 색상: 빨강/(+2000)
 
           if(i !== this.selectedOptions.length-1){order+='/'}
-
-          let extractedNumbers = values[1].match(/\(\+(\d+)\)/g);
+          let extractedNumbers = null;
+          if(values[1]) {
+            extractedNumbers = values[1].match(/\(\+(\d+)\)/g);
+          }
           if (extractedNumbers) {
             const numbers = extractedNumbers.map(match => match.match(/\d+/)[0]);
 
@@ -377,7 +390,52 @@ export default defineComponent({
       }
     },
     moveMessage(){
+
+      this.connect()
       this.$router.push({name: "ChattingPage"})
+    },
+    connect(){
+
+      const serverURL = "http://localhost:7777/ws-stomp"
+      let socket = new SockJS(serverURL);
+      let stompClient = Stomp.over(socket);
+      console.log(`소켓 연결을 시도합니다. 서버 주소: ${serverURL}`)
+
+      stompClient.connect(
+          {},//frame
+          frame => {
+            console.log('소켓 연결 성공', frame);
+
+            console.log("=====")
+            // 구독
+            stompClient.subscribe("/topic/greetings", res => {
+              console.log(res)
+              try {
+                // 메세지 수신
+                let message = JSON.parse(res.body);
+                console.log("msg: ", message.message)
+              } catch (error) {
+                console.error("메시지 파싱 오류:", error);
+              }
+            });
+
+            console.log("=====")
+            // 접속되었다는 메세지
+            let chatMessages = {
+              message: "아름",
+              test: "test"
+            }
+
+            let chatMessage = JSON.stringify(chatMessages)
+            // 사용자 -> 브로커 메세지 전송
+            stompClient.send("/send/firstChat", chatMessage
+            )
+          },
+          error => {
+            // 소켓 연결 실패
+            console.log('소켓 연결 실패', error);
+          }
+      );
     }
   },
   computed: {
