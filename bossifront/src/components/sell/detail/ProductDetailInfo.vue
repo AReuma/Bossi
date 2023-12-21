@@ -2,7 +2,7 @@
   <div style="height: 100%; max-width: 50%; padding: 10px;">
     <v-card height="auto" width="100%" style="padding: 10px; border: 1px solid rgba(234,234,234,0.2)" elevation="2">
       <div style="display: flex; align-items: center;">
-        <img style="border-radius: 80%; border: 1px solid rgba(187,187,187,0.43); margin-right: 10px" src="../../../assets/logo/Bossi_logo_1.png" height="50" width="50"/>
+        <v-img style="border-radius: 80%; border: 1px solid rgba(187,187,187,0.43); margin-right: 10px" src="../../../assets/logo/Bossi_logo_1.png" max-height="50" max-width="50" height="50" width="50"/>
         <div style="font-family: GmarketSansBold, sans-serif">{{productContent.storeName}}</div>
       </div>
 
@@ -12,9 +12,9 @@
 
       <div style="margin-top: 5px; display: flex;">
         <div style="width: 80%; display: flex; align-items: end">
-          <div class="boldText" style="color: red" v-if="productContent.rating !== 0">{{productContent.rating.toLocaleString()}}%</div>
-          <div class="boldText" style="">{{productContent.ratingPrice.toLocaleString()}}원</div>
-          <div style="font-size: 15px; padding-bottom: 5px; color: #bbbbbb"  v-if="productContent.rating !== 0"><del>{{productContent.price.toLocaleString()}}원</del></div>
+          <div class="boldText" style="color: red" v-if="productContent.rating !== 0">{{numberWithCommas(productContent.rating)}}%</div>
+          <div class="boldText" style="">{{numberWithCommas(productContent.ratingPrice)}}원</div>
+          <div style="font-size: 15px; padding-bottom: 5px; color: #bbbbbb"  v-if="productContent.rating !== 0"><del>{{numberWithCommas(productContent.price)}}원</del></div>
         </div>
         <div style="width: 20%; display: flex; justify-content: end; padding-right: 5px">
           <v-icon size="32">mdi-heart</v-icon>
@@ -22,7 +22,7 @@
       </div>
 
       <div style="display: flex; justify-content: end">
-        <span style="font-family: GmarketSansBold, sans-serif">{{productContent.salesQuantity.toLocaleString()}}명</span> 구매
+        <span style="font-family: GmarketSansBold, sans-serif">{{numberWithCommas(productContent.salesQuantity)}}명</span> 구매
       </div>
 
       <div>
@@ -39,10 +39,10 @@
 
           <tr>
             <td class="table-name" style="vertical-align: top">배송비</td>
-            <td v-if="productContent.freeDeliverTotalCharge !== -1" style="text-align: start">{{ productContent.deliveryCount.toLocaleString()}}원 <br/>
-              <span style="font-size: 13px; color: rgba(106,106,106,0.89)">{{productContent.freeDeliverTotalCharge.toLocaleString()}}원 이상 무료배송</span>
+            <td v-if="productContent.freeDeliverTotalCharge !== -1" style="text-align: start">{{ numberWithCommas(productContent.deliveryCount)}}원 <br/>
+              <span style="font-size: 13px; color: rgba(106,106,106,0.89)">{{numberWithCommas(productContent.freeDeliverTotalCharge)}}원 이상 무료배송</span>
             </td>
-            <td v-else style="text-align: start">{{ productContent.deliveryCount.toLocaleString() }}원 <br/>
+            <td v-else style="text-align: start">{{ numberWithCommas(productContent.deliveryCount) }}원 <br/>
             </td>
           </tr>
           <tr v-if="productContent.freeDeliverTotalCharge === -1">
@@ -78,7 +78,7 @@
               </div>
 
               <div style="text-align: end; width: 60%; font-weight: bolder;">
-                {{orderOptionTotalPrice[index].toLocaleString()}} <v-btn icon @click="removeOption(index)"><v-icon>mdi-window-close</v-icon></v-btn>
+                {{numberWithCommas(orderOptionTotalPrice[index])}} <v-btn icon @click="removeOption(index)"><v-icon>mdi-window-close</v-icon></v-btn>
               </div>
             </div>
           </div>
@@ -94,10 +94,10 @@
               <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="noOptionOrderPlus">+</v-btn>
             </div>
             <div v-if="this.orderNoOptionCount === 1" style="text-align: end; width: 60%; font-weight: bolder; display: flex; align-items: center; justify-content: end; height: auto">
-              {{productContent.ratingPrice.toLocaleString()}} 원
+              {{numberWithCommas(productContent.ratingPrice)}} 원
             </div>
             <div v-else style="text-align: end; width: 60%; font-weight: bolder; display: flex; align-items: center; justify-content: end; height: auto">
-              {{this.orderNoOptionPrice.toLocaleString()}} 원
+              {{numberWithCommas(this.orderNoOptionPrice)}} 원
             </div>
           </div>
         </div>
@@ -111,9 +111,9 @@
 
           <v-card-actions>
             <div style="height: 200px; width: 100%; display: flex; flex-direction: column">
-              <div v-for="(item, index) in productContent.productOption" :key="index">
-                <v-select :style="{outline: 'none'}" color="DEEP_PINK" v-model="selectedOptions[index]" :items="getOptionDetails(item)" item-text="label"
-                          item-value="value" :label="(index+1)+'.  '+item.option" style="padding-bottom: 2px"></v-select>
+              <div v-for="(items, index) in productContent.productOption" :key="index">
+                <v-select :style="{outline: 'none'}" color="DEEP_PINK" v-model="selectedOptions[index]" :items="getOptionDetails(items)" :item-props="itemProps" variant="outlined"
+                         :label="(index+1)+'.  '+items.option" style="padding-bottom: 2px"></v-select>
               </div>
             </div>
           </v-card-actions>
@@ -140,14 +140,15 @@
 
       <div v-if="!productContent.productOption.every(isEmptyObject)" style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
         <div style="width: 20%">총 작품금액</div>
-        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;"> {{this.orderPrice.toLocaleString()}} 원</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;"> {{ numberWithCommas(this.orderPrice)}} 원</div>
       </div>
 
       <div v-else style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
         <div style="width: 20%">총 작품금액</div>
-        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-if="this.orderNoOptionCount === 1"> {{this.productContent.ratingPrice.toLocaleString()}} 원</div>
-        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-else> {{this.orderNoOptionPrice.toLocaleString()}} 원</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-if="this.orderNoOptionCount === 1"> {{numberWithCommas(this.productContent.ratingPrice)}} 원</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-else> {{numberWithCommas(this.orderNoOptionPrice)}} 원</div>
       </div>
+
 
       <div style="margin-top: 18px;">
         <v-btn depressed height="50px" text class="buy-button" style="border: 1px solid rgba(187,187,187,0.62)" @click="addCart">장바구니</v-btn>
@@ -177,6 +178,8 @@
 <script>
 import {defineComponent} from 'vue'
 import {useCookies} from "vue3-cookies";
+import SockJS from "sockjs-client";
+import * as Stomp from "webstomp-client";
 
 export default defineComponent({
   name: "ProductDetailInfo",
@@ -198,22 +201,31 @@ export default defineComponent({
       orderPrice: 0,
       orderNoOptionCount: 1,
       orderNoOptionPrice: 0,
+      combinedOptions: [],
     }
   },
   methods: {
     getOptionDetails(item) {
       let combinedOptions = [];
-
+      //this.combinedOptions = [];
       for (let key in item.price) {
         let index = item.option+ ": " +item.optionDetail[key]+'/(+'+item.price[key]+')';
         let price = item.price[key];
         let optionDetail = item.optionDetail[key];
         combinedOptions.push({
-          label: `${optionDetail} (+ ${price} 원)`,
-          value: `${key}#${index}`
+          title: `${optionDetail} (+ ${price} 원)`,
+          props: `${key}#${index}`
         });
       }
+
+      //console.log(combinedOptions)
       return combinedOptions;
+    },
+    itemProps(item){
+      return {
+        title: item.title,
+        value: item.props
+      }
     },
     checkOption(index){
       if(index === this.selectedOptions.length){ ///선택된 옵션 개수
@@ -223,12 +235,15 @@ export default defineComponent({
         let option = []
         for (let i = 0; i < this.selectedOptions.length; i++) {
           let values = this.selectedOptions[i].split("#"); // 0#색상: 빨강/(+2000)
+          console.log("value: ", values)
           option.push(Number(values[0]))  // 0
           order += values[1];   // 색상: 빨강/(+2000)
 
           if(i !== this.selectedOptions.length-1){order+='/'}
-
-          let extractedNumbers = values[1].match(/\(\+(\d+)\)/g);
+          let extractedNumbers = null;
+          if(values[1]) {
+            extractedNumbers = values[1].match(/\(\+(\d+)\)/g);
+          }
           if (extractedNumbers) {
             const numbers = extractedNumbers.map(match => match.match(/\d+/)[0]);
 
@@ -375,11 +390,63 @@ export default defineComponent({
       }
     },
     moveMessage(){
+
+      this.connect()
       this.$router.push({name: "ChattingPage"})
+    },
+    connect(){
+
+      const serverURL = "http://localhost:7777/ws-stomp"
+      let socket = new SockJS(serverURL);
+      let stompClient = Stomp.over(socket);
+      console.log(`소켓 연결을 시도합니다. 서버 주소: ${serverURL}`)
+
+      stompClient.connect(
+          {},//frame
+          frame => {
+            console.log('소켓 연결 성공', frame);
+
+            console.log("=====")
+            // 구독
+            stompClient.subscribe("/topic/greetings", res => {
+              console.log(res)
+              try {
+                // 메세지 수신
+                let message = JSON.parse(res.body);
+                console.log("msg: ", message.message)
+              } catch (error) {
+                console.error("메시지 파싱 오류:", error);
+              }
+            });
+
+            console.log("=====")
+            // 접속되었다는 메세지
+            let chatMessages = {
+              message: "아름",
+              test: "test"
+            }
+
+            let chatMessage = JSON.stringify(chatMessages)
+            // 사용자 -> 브로커 메세지 전송
+            stompClient.send("/send/firstChat", chatMessage
+            )
+          },
+          error => {
+            // 소켓 연결 실패
+            console.log('소켓 연결 실패', error);
+          }
+      );
     }
   },
   computed: {
-
+    numberWithCommas() {
+      return function(value) {
+        if (value && typeof value.toString === 'function') {
+          return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        return value;
+      };
+    }
   }
 })
 </script>

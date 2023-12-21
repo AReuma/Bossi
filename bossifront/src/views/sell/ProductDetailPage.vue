@@ -2,8 +2,9 @@
   <div>
     <home-header></home-header>
     <div class="content-wrapper">
+      {{userData}}
       <product-detail-content class="left-component" :productImg="productContent.productImg"></product-detail-content>
-      <product-detail-info class="right-component" :productContent="productContent" @addCart="addCart"></product-detail-info>
+      <product-detail-info v-if="productContent && productContent.productOption && !isEmptyObject(productContent.productOption)" class="right-component" :productContent="productContent" @addCart="addCart"></product-detail-info>
     </div>
   </div>
 </template>
@@ -16,11 +17,13 @@ import ProductDetailContent from "@/components/sell/detail/ProductDetailContent.
 import {mapActions, mapState} from "vuex";
 import axios from "axios";
 import {API_BASE_URL} from "@/constant/basic";
+import {isEmptyObject} from "@tiptap/vue-3";
 
 export default defineComponent({
   name: "ProductDetailPage",
   components: {ProductDetailContent, ProductDetailInfo, HomeHeader},
   methods: {
+    isEmptyObject,
     ...mapActions(['fetchProductContent', 'updateImgStyleData']),
     addCart(payload){
       const {email, productId, options, optionCount} = payload;
