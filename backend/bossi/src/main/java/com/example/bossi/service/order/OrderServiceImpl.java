@@ -169,59 +169,89 @@ public class OrderServiceImpl implements OrderService{
 
         Integer readyPoint = 10;
 
-        // 주문한 옵션
-        int orderProductCount = findOrder.getOrderProducts().size();// 주문한 상품의 개수(옵션이 달라도 다른 상품으로 인식)
-
         //======
         //List<String> optionList = new ArrayList<>();
         //List<Float> totalPrice = new ArrayList<>();
         //=====
-
+        float totalPrice = 0;
         List<OrderProductInfo> orderProductInfoList = new ArrayList<>();
         List<OrderProduct> orderProducts = findOrder.getOrderProducts();
-        for(OrderProduct orderProduct : orderProducts){
+
+        for(OrderProduct orderProduct : orderProducts){ // 주문한 상품 찾기
             Long productId = orderProduct.getProduct().getId();
 
             List<String> optionList = new ArrayList<>();
             List<Float> totalPriceList = new ArrayList<>();
 
             List<OrderProductDetailOption> orderProductDetailOptions = orderProduct.getOrderProductDetailOptions();
-            float totalPrice = 0;
             StringBuilder optionStr = new StringBuilder();
-            for (OrderProductDetailOption orderProductDetailOption : orderProductDetailOptions) {
-                ProductDetailOption productDetailOption = orderProductDetailOption.getProductDetailOption();
-                log.info("productId: {}", productId);
+            log.info("orderProductDetailOptions.size: {}", orderProductDetailOptions.size());
+
+            //for (OrderProductDetailOption orderProductDetailOption : orderProductDetailOptions) {   // 상품의 디테일 옵션
+            for(int i = 0; i < orderProductDetailOptions.size(); i++){
+                ProductDetailOption productDetailOption = orderProductDetailOptions.get(i).getProductDetailOption();
+                log.info("productId: {}, {}", productId, i);
                 log.info("check productId: {}", orderProduct.getProduct().getId());
                 log.info("check option: {}", productDetailOption.getOptionValue());
 
                 optionStr.append(productDetailOption.getOptionValue()).append("/");
                 //totalPriceList.add(orderProductDetailOption.getOrderProduct().getOrderPrice());
-                totalPrice += orderProductDetailOption.getOrderProduct().getOrderPrice();
+
+                //totalPrice += orderProductDetailOptions.get(i).getOrderProduct().getOrderPrice();
+                //log.info("{}: 1. !!!!!!!totalPrice: {}",i,  orderProductDetailOptions.get(i).getOrderProduct().getOrderPrice());
             }
 
+            //totalPrice += orderProduct.getOrderProduct();
             totalPriceList.add(orderProduct.getOrderPrice());
             optionList.add(optionStr.toString());
 
-            log.info("totalPrice: {}", totalPrice);
-            if(totalPrice < orderProduct.getProduct().getFreeDeliverTotalCharge()){
-                totalPrice += orderProduct.getProduct().getDeliveryCharge();
-            }
+            //log.info("2. !!!!!!!totalPrice: {}", totalPrice);
 
             boolean existingProduct = false;
+
             for (OrderProductInfo existingInfo : orderProductInfoList) {
                 if (existingInfo.getProductId().equals(productId)) {    // productId와 일치한지 확인
                     existingInfo.getOptionList().addAll(optionList);
                     existingInfo.getTotalPrice().addAll(totalPriceList);
+                    log.info("productId: {}", productId);
+                    log.info("totalPriceList: {}", totalPriceList);
+
+                    /*for (Float price : totalPriceList) {
+                        totalPrice += price;
+                    }
+                    existingInfo.setTotalProductPrice(totalPrice);*/
                     existingProduct = true;
                     break;
                 }
             }
 
+            /*if(totalPrice < orderProduct.getProduct().getFreeDeliverTotalCharge()){
+                totalPrice += orderProduct.getProduct().getDeliveryCharge();
+                log.info("3. !!!!!!!totalPrice: {}", totalPrice);
+            }*/
+
             if (!existingProduct) {
                 orderProductInfoList.add(
-                        new OrderProductInfo(productId, orderProduct.getProduct().getSeller().getStoreName(), orderProduct.getProduct().getName(), orderProduct.getProduct().getProductImgs().get(0).getImg(), optionList, totalPriceList, totalPrice));
+                        new OrderProductInfo(productId, orderProduct.getProduct().getSeller().getStoreName(), orderProduct.getProduct().getName(), orderProduct.getProduct().getProductImgs().get(0).getImg(), optionList, totalPriceList, totalPrice, orderProduct.getProduct().getDeliveryCharge()));
             }
 
+        }
+
+        for (OrderProductInfo existingInfo : orderProductInfoList) {
+            List<Float> totalPriceList = existingInfo.getTotalPrice();
+            Float totalProductPrice = 0f;
+
+            for (Float price : totalPriceList) {
+                totalProductPrice += price;
+            }
+
+            if(totalPrice < existingInfo.getDeliveryCharge()){
+                totalPrice += existingInfo.getDeliveryCharge();
+            }else {
+                existingInfo.setDeliveryCharge(0f);
+            }
+
+            existingInfo.setTotalProductPrice(totalProductPrice);
         }
 
         // 가격

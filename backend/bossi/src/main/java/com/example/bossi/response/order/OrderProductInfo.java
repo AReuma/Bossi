@@ -3,10 +3,11 @@ package com.example.bossi.response.order;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Getter
+@Getter @Setter
 @AllArgsConstructor
 @Schema(description = "주문 상품의 정보")
 public class OrderProductInfo {
@@ -34,7 +35,8 @@ public class OrderProductInfo {
     private List<Float> totalPrice;
 
     private Float totalProductPrice;
-    /*@Schema(description = "배송비")
-    private Float deliveryCharge;*/
+
+    @Schema(description = "배송비")
+    private Float deliveryCharge;
 
 }
