@@ -1,5 +1,6 @@
 package com.example.bossi.service.product.cart;
 
+import com.example.bossi.dto.product.cart.OrderProductInfoRequest;
 import com.example.bossi.entity.Address;
 import com.example.bossi.entity.User;
 import com.example.bossi.entity.product.Product;
@@ -8,9 +9,7 @@ import com.example.bossi.exception.AppException;
 import com.example.bossi.exception.ErrorCode;
 import com.example.bossi.repository.seller.ProductRepository;
 import com.example.bossi.repository.user.UserRepository;
-import com.example.bossi.response.product.cart.AddrInfo;
-import com.example.bossi.response.product.cart.DirectButOrderItemInfo;
-import com.example.bossi.response.product.cart.OrderProductInfo;
+import com.example.bossi.response.product.cart.*;
 import com.example.bossi.service.product.ProductCheck;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -104,6 +102,10 @@ public class CartServiceImpl implements CartService{
             //List<Map<String, Object>> productOption = new ArrayList<>();
             List<Map<String, Object>> productOption = productCheck.getOptionAndOptionValue(productOptionList);
 
+            float deliveryCharge = product.getDeliveryCharge();
+            if(product.getFreeDeliverTotalCharge() <= optionTotalPrice){
+                deliveryCharge = 0;
+            }
             /*for (ProductOption option : productOptionList) {
                 Map<String, Object> data1 = new HashMap<>();
                 Map<String, String> detail1 = new HashMap<>();
@@ -121,7 +123,7 @@ public class CartServiceImpl implements CartService{
                 productOption.add(data1);
             }*/
 
-            DirectButOrderItemInfo directButOrderItemInfo = new DirectButOrderItemInfo(product.getSeller().getStoreName(), product.getPrice(), product.getRatingCont(), product.getRatingSum(), product.getName(), optionCountList, optionTotalPrice, product.getProductImgs().get(0).getImg(), optionList, optionStr, optionPrice, product.getDeliveryCharge(), product.getFreeDeliverTotalCharge(), product.getStockQuantity(), productOption);
+            DirectButOrderItemInfo directButOrderItemInfo = new DirectButOrderItemInfo(product.getSeller().getStoreName(), product.getPrice(), product.getRatingCont(), product.getRatingSum(), product.getName(), optionCountList, optionTotalPrice, product.getProductImgs().get(0).getImg(), optionList, optionStr, optionPrice, deliveryCharge, product.getFreeDeliverTotalCharge(), product.getStockQuantity(), productOption);
             return ResponseEntity.ok().body(directButOrderItemInfo);
 
         } catch (Exception e) {
@@ -212,13 +214,13 @@ public class CartServiceImpl implements CartService{
         // 주소
         boolean checkDelivery = false;
 
-        List<AddrInfo> deliveryAddr = new ArrayList<>();
+        AddrInfo deliveryAddr = null;
         if(user.getAddressList().size() > 0){ // 배송지가 있을 경우
             checkDelivery = true;
 
             Address address = user.getAddressList().get(0);
 
-            deliveryAddr.add(new AddrInfo(address.getCity() + address.getStreet(), address.getZipcode(), address.getAddrName(), address.getRecipient(), address.getPoneNum()));
+            deliveryAddr = new AddrInfo(address.getCity() +" "+ address.getStreet(), address.getZipcode(), address.getAddrName(), address.getRecipient(), address.getPhoneNum());
         }
 
         float totalPrice = totalProductPrice + deliveryCharge;
@@ -230,6 +232,93 @@ public class CartServiceImpl implements CartService{
 
         return ResponseEntity.ok().body(
                 new OrderProductInfo(user.getName(), user.getPhoneNum(), checkDelivery, deliveryAddr, product.getSeller().getStoreName(), product.getName(), product.getProductImgs().get(0).getImg(), optionCountList, totalProductPrice, totalPrice, deliveryCharge, optionInfo, optionPrice, user.getPoint(), productSum));
+    }
+
+    @Override
+    public ResponseEntity<OrderMultiProductInfo> multiOrderProduct(String email, List<OrderProductInfoRequest> orderData) {
+        // 고객 정보 (이름, 전화번호)
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUNT, "사용자를 찾을 수 없습니다."));
+
+        // 주문 작품 정보 (작가 이름, 상품 이름, 상품 사진, 옵션, 수량, 전체가격, 배송비)
+        List<ProductInfo> productInfoList = new ArrayList<>();
+        //for (int i = 0; i < orderData.size(); i++) {
+        for (OrderProductInfoRequest orderProduct : orderData) {  // 주문할 상품
+            //orderData: {"productId":"1","option":"0,0","optionCount":"2"}
+            Product product = productRepository.findById(Long.valueOf(orderProduct.getProductId())).orElseThrow(() -> new AppException(ErrorCode.BAD_REQUEST, "주문하려는 상품이 없습니다."));
+
+            List<List<String>> optionInfo = new ArrayList<>();
+            List<Float> optionPrice = new ArrayList<>();
+
+            String[] count = orderProduct.getOptionCount().split(",");
+            List<Integer> optionCountList = new ArrayList<>();
+
+            for (String c : count) {
+                optionCountList.add(Integer.parseInt(c));
+            }
+
+            // 옵션 개수 optionSize
+            int optionSize = product.getProductOptionList().size(); // 2개
+            String[] part = orderProduct.getOption().split(","); //
+
+            ProductCheck productCheck = new ProductCheck();
+            List<List<Integer>> optionList = productCheck.getOption(optionSize, part);// [[1,2], [2,3]]... n개
+
+            List<ProductOption> productOptionList = product.getProductOptionList();
+            float totalProductPrice = 0;
+            for (int i = 0; i < optionList.size(); i++) { // 3개
+                float price = product.getRatingSum();   // 옵션 총 가격
+                List<String> optionString = new ArrayList<>();
+
+                for(int j = 0; j < optionSize; j++) {    //2개
+                    Integer index = optionList.get(i).get(j);
+                    optionString.add(productOptionList.get(j).getOptionsName()+" : "+productOptionList.get(j).getProductDetailOptionList().get(index).getOptionValue());
+                    price += productOptionList.get(j).getProductDetailOptionList().get(index).getPrice();
+                }
+
+                optionInfo.add(optionString);
+                float tmpPrice = price * optionCountList.get(i);
+                optionPrice.add(tmpPrice);
+                totalProductPrice += tmpPrice;
+            }
+
+            float deliveryCharge = product.getDeliveryCharge();
+
+            if(product.getFreeDeliverTotalCharge() != -1) { // 무료 배송이 있을 경우
+                if (totalProductPrice >= product.getFreeDeliverTotalCharge()) {
+                    deliveryCharge = 0;
+                }
+            }
+
+            // 배송 정보 (배송지)
+            // 수령인
+            // 배송지명
+            // 전화번호
+            // 우편번호
+            // 주소
+
+
+            float totalPrice = totalProductPrice + deliveryCharge;
+
+            // 포인트 게산하기
+            float pointPercentage = 0.001f;
+            float productSum = totalPrice * pointPercentage;
+            productSum = Math.round(productSum * 100.0f) / 100.0f;
+
+            productInfoList.add(new ProductInfo(product.getId(), product.getSeller().getStoreName(), product.getName(), product.getProductImgs().get(0).getImg(), optionCountList, totalProductPrice, totalPrice, deliveryCharge, optionInfo, optionPrice, productSum));
+        }
+
+        boolean checkDelivery = false;
+
+        AddrInfo deliveryAddr = null;
+        if(user.getAddressList().size() > 0){ // 배송지가 있을 경우
+            checkDelivery = true;
+
+            Address address = user.getAddressList().get(0);
+
+            deliveryAddr = new AddrInfo(address.getCity() +" "+ address.getStreet(), address.getZipcode(), address.getAddrName(), address.getRecipient(), address.getPhoneNum());
+        }
+
+        return ResponseEntity.ok().body(new OrderMultiProductInfo(user.getName(), user.getPhoneNum(), user.getPoint(), checkDelivery, deliveryAddr, productInfoList));
     }
 
 }

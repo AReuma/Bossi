@@ -1,5 +1,7 @@
 package com.example.bossi.entity;
 
+import com.example.bossi.exception.AppException;
+import com.example.bossi.exception.ErrorCode;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -75,6 +77,9 @@ public class User {
 
     }
 
+    public void addAddress(Address address){
+        this.addressList.add(address);
+    }
     public void changePassword(String password){
         this.password = password;
     }
@@ -85,5 +90,15 @@ public class User {
 
     public void updateRefreshToken(String updateRefreshToken) {
         this.refreshToken = updateRefreshToken;
+    }
+
+    public void subPoint(Integer point){
+        int resetPoint = this.point - point;
+
+        if (resetPoint < 0) {
+            throw new AppException(ErrorCode.NOT_ENOUGH_POINT, "포인트 부족");
+        }
+
+        this.point = resetPoint;
     }
 }

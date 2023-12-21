@@ -111,10 +111,11 @@ public class RedisCartServiceImpl implements RedisCartService{
 
         String getProductId = "";
         List<String> productIdList = new ArrayList<>();
-        if(redisTemplate.opsForHash().hasKey(cartKey, "productId")){
+        if(redisTemplate.opsForHash().hasKey(cartKey, "productId")){// 상품 1개 이상이 담겨 있을때
             getProductId = (String) redisTemplate.opsForHash().get(cartKey, "productId");
             productIdList = new ObjectMapper().readValue(getProductId, new TypeReference<List<String>>() {});
         }
+
         log.info("getProductId: {}", getProductId);
 
         if(productIdList.contains(productId.toString())){// 이미 장바구니에 해당 상품이 있을 경우
@@ -164,7 +165,7 @@ public class RedisCartServiceImpl implements RedisCartService{
                 }
             }
 
-        }else {
+        }else { // 추가한 상품이 productId에 없을 경우
 
             if (redisTemplate.opsForHash().hasKey(cartKey, "cartCount")) {
                 String n = (String) redisTemplate.opsForHash().get(cartKey, "cartCount");
@@ -176,14 +177,14 @@ public class RedisCartServiceImpl implements RedisCartService{
             }
 
 
-            if(redisTemplate.opsForHash().hasKey(cartKey, "productId")){
+            if(redisTemplate.opsForHash().hasKey(cartKey, "productId")){    // 다른 상품이 저장되어 있을때
                 if(!productIdList.contains(productId.toString())){
-                    productIdList = new ObjectMapper().readValue(getProductId, new TypeReference<List<String>>() {});
                     productIdList.add(String.valueOf(productId));
                     redisTemplate.opsForHash().put(cartKey, "productId", new ObjectMapper().writeValueAsString(productIdList));
                 }
 
             }else {
+                getProductId = (String) redisTemplate.opsForHash().get(cartKey, "productId");
                 productIdList.add(productId.toString());
 
                 redisTemplate.opsForHash().put(cartKey, "productId", new ObjectMapper().writeValueAsString(productIdList));
@@ -227,84 +228,97 @@ public class RedisCartServiceImpl implements RedisCartService{
         String cartKey = "cart:"+email;
 
         String productIdList = (String) redisTemplate.opsForHash().get(cartKey, "productId");
-        List<String> productInfoList = new ObjectMapper().readValue(productIdList, new TypeReference<List<String>>() {});
-        log.info("productInfoList: {}", productInfoList);
 
-        List<CartProductResponse> responses = new ArrayList<>();
-        for (String productInfo : productInfoList) {
-            String productKey = "productId:"+productInfo;
-            log.info("productKey: {}", productKey);
+        System.out.println("======");
+        System.out.println(productIdList);
+        System.out.println("======");
+        if (productIdList != null) {
+            List<String> productInfoList = new ObjectMapper().readValue(productIdList, new TypeReference<List<String>>() {
+            });
+            log.info("productInfoList: {}", productInfoList);
 
-            String redisOptionSize = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".optionSize");
+            List<CartProductResponse> responses = new ArrayList<>();
+            for (String productInfo : productInfoList) {
+                String productKey = "productId:" + productInfo;
+                log.info("productKey: {}", productKey);
 
-            Integer optionSize = Integer.parseInt(redisOptionSize); // redis에 있는 옵션 개수
+                String redisOptionSize = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".optionSize");
 
-            log.info("redusIotuibSize: {}", redisOptionSize);
+                System.out.println("redisOptionSize: " + redisOptionSize);
 
-            String getOption;
-            List<List<Integer>> optionList = new ArrayList<>();
-            List<Integer> optionCountList = new ArrayList<>();
-            float totalPrice = 0;
-            for (int i = 0; i < optionSize; i++) {
-                String option = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".option" + i);
-                List<Integer> s = new ObjectMapper().readValue(option, new TypeReference<List<Integer>>() {
-                });
-                optionList.add(s);
+                Integer optionSize = Integer.parseInt(redisOptionSize); // redis에 있는 옵션 개수
 
-                String optionCount = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".optionCount" + i);
-                optionCountList.add(new ObjectMapper().readValue(optionCount, new TypeReference<Integer>() {}));
-            }
+                log.info("redusIotuibSize: {}", redisOptionSize);
 
+                String getOption;
+                List<List<Integer>> optionList = new ArrayList<>();
+                List<Integer> optionCountList = new ArrayList<>();
+                float totalPrice = 0;
+                for (int i = 0; i < optionSize; i++) {
+                    String option = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".option" + i);
+                    List<Integer> s = new ObjectMapper().readValue(option, new TypeReference<List<Integer>>() {
+                    });
+                    optionList.add(s);
 
-            String getOptionTotalPrice = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".optionTotalPrice");
-            List<Float> getOptionTotalPriceList = new ObjectMapper().readValue(getOptionTotalPrice, new TypeReference<List<Float>>() {});
-
-            for (Float s : getOptionTotalPriceList) {
-                totalPrice += s;
-            }
-
-            String getStoreName = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".storeName");
-            String getProductName = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".productName");
-            String getProductImg = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".productImg");
-            String getDeliveryPrice = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".deliveryPrice");
-            String getProductPrice = (String) redisTemplate.opsForHash().get(cartKey, productKey+".productPrice");
-
-            float productPrice = Float.parseFloat(getProductPrice);
-            float deliverPrice = Float.parseFloat(getDeliveryPrice);
-
-            String getDeliveryFreePrice = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".deliveryFreePrice");
-            float deliverFreePrice = Float.parseFloat(getDeliveryFreePrice);
-
-            float totalPricePlusDelivery = totalPrice;
-            if(totalPrice < Float.parseFloat(getDeliveryFreePrice)){
-                totalPricePlusDelivery += Float.parseFloat(getDeliveryPrice);
-            }
-
-
-
-            String getProductStockQuantity = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".productStockQuantity");
-
-            String getOptionStr = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".optionStr");
-            List<String> strOption = new ObjectMapper().readValue(getOptionStr, new TypeReference<List<String>>() {});
-
-            List<List<String>> optionStrs = new ArrayList<>();
-
-            for (int i = 0; i < strOption.size(); i++) {
-                StringTokenizer stringTokenizer = new StringTokenizer(strOption.get(i), "#");
-                List<String> str = new ArrayList<>();
-                while (stringTokenizer.hasMoreTokens()){
-                    String token = stringTokenizer.nextToken();
-                    str.add(token);
+                    String optionCount = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".optionCount" + i);
+                    optionCountList.add(new ObjectMapper().readValue(optionCount, new TypeReference<Integer>() {
+                    }));
                 }
-                optionStrs.add(str);
+
+
+                String getOptionTotalPrice = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".optionTotalPrice");
+                List<Float> getOptionTotalPriceList = new ObjectMapper().readValue(getOptionTotalPrice, new TypeReference<List<Float>>() {
+                });
+
+                for (Float s : getOptionTotalPriceList) {
+                    totalPrice += s;
+                }
+
+                String getStoreName = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".storeName");
+                String getProductName = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".productName");
+                String getProductImg = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".productImg");
+                String getDeliveryPrice = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".deliveryPrice");
+                String getProductPrice = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".productPrice");
+
+                float productPrice = Float.parseFloat(getProductPrice);
+                float deliverPrice = Float.parseFloat(getDeliveryPrice);
+
+                String getDeliveryFreePrice = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".deliveryFreePrice");
+                float deliverFreePrice = Float.parseFloat(getDeliveryFreePrice);
+
+                float totalPricePlusDelivery = totalPrice;
+                if (totalPrice < Float.parseFloat(getDeliveryFreePrice)) {
+                    totalPricePlusDelivery += Float.parseFloat(getDeliveryPrice);
+                }
+
+
+                String getProductStockQuantity = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".productStockQuantity");
+
+                String getOptionStr = (String) redisTemplate.opsForHash().get(cartKey, productKey + ".optionStr");
+                List<String> strOption = new ObjectMapper().readValue(getOptionStr, new TypeReference<List<String>>() {
+                });
+
+                List<List<String>> optionStrs = new ArrayList<>();
+
+                for (int i = 0; i < strOption.size(); i++) {
+                    StringTokenizer stringTokenizer = new StringTokenizer(strOption.get(i), "#");
+                    List<String> str = new ArrayList<>();
+                    while (stringTokenizer.hasMoreTokens()) {
+                        String token = stringTokenizer.nextToken();
+                        str.add(token);
+                    }
+                    optionStrs.add(str);
+                }
+
+                //String storeName, String productName, List<Float> optionTotalPrice, String productImg, List<List<Integer>> option, List<Integer> optionCount, List<List<String>> optionStr, Float deliveryCharge, Float freeDeliverTotalCharge, Float totalPrice, String stockQuantity
+                CartProductResponse cartProductResponse = new CartProductResponse(productInfo, getStoreName, getProductName, getOptionTotalPriceList, getProductImg, optionList, optionCountList, optionStrs, deliverPrice, deliverFreePrice, totalPrice, totalPricePlusDelivery, getProductStockQuantity, productPrice);
+                responses.add(cartProductResponse);
             }
 
-            //String storeName, String productName, List<Float> optionTotalPrice, String productImg, List<List<Integer>> option, List<Integer> optionCount, List<List<String>> optionStr, Float deliveryCharge, Float freeDeliverTotalCharge, Float totalPrice, String stockQuantity
-            CartProductResponse cartProductResponse = new CartProductResponse(productInfo, getStoreName, getProductName, getOptionTotalPriceList, getProductImg, optionList, optionCountList, optionStrs, deliverPrice, deliverFreePrice, totalPrice, totalPricePlusDelivery, getProductStockQuantity, productPrice);
-            responses.add(cartProductResponse);
+            return responses;
+        }else {
+            return null;
         }
-
-        return responses;
     }
 // 장바구니에 보여야하는 정보들
     // 수량
