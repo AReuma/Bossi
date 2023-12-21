@@ -52,7 +52,7 @@
             <v-btn @click="newBtn" style="width: 50%; border-top: 2px solid #626262; border-top-left-radius: 0; border-top-right-radius: 0" height="50" depressed color="rgba(236, 235, 235, 0.15)">신규 입력</v-btn>
           </div>
 
-          <div v-if="existDelivery" style="margin-top: 10px; font-size: 15px; padding: 5px">
+          <div v-if="!existDelivery" style="margin-top: 10px; font-size: 15px; padding: 5px">
             <div v-if="!purchaseInfo.deliveryCheck" style="height: 100px; text-align: center; display: flex; justify-content: center; align-items: center">
               배송지가 없습니다.<br/>
               ' 신규 입력 '을 눌러 배송지를 추가해주세요.
@@ -79,14 +79,14 @@
               <tr style="height: 55px; width: 100%; vertical-align: middle;">
                 <td style="width: 25%">수령인 <span style="color: red">*</span></td>
                 <td style="width: 80%">
-                  <v-text-field v-model="receiver" dense outlined style="margin-left: 5%; height: 35px; font-size: 12px">
+                  <v-text-field v-model="receiver" density="compact" variant="outlined" style="margin-left: 5%; height: 35px; font-size: 12px">
                   </v-text-field>
                 </td>
               </tr>
               <tr style="height: 100%; vertical-align: middle;">
                 <td>주소 <span style="color: red">*</span></td>
                 <td>
-                  <v-text-field v-model="addrZipcode" readonly prepend-inner-icon="mdi-magnify" dense outlined style="margin-left: 5%; width: 95%; height: 35px; font-size: 12px" @click="addAddr">
+                  <v-text-field v-model="addrZipcode" readonly="" density="compact" variant="outlined" prepend-inner-icon="mdi-magnify" style="margin-left: 5%; width: 95%; height: 35px; font-size: 12px" @click="addAddr">
                   </v-text-field>
 
                   <div ref="embed" style="height: auto; margin-left: 5%; margin-top: 10px">
@@ -97,7 +97,7 @@
               <tr style="height: 45px; vertical-align: middle;">
                 <td>상세주소</td>
                 <td>
-                  <v-text-field v-model="detailAddr" dense outlined style="margin-left: 5%; width: 95%; height: 35px; font-size: 12px">
+                  <v-text-field v-model="detailAddr" density="compact" variant="outlined" style="margin-left: 5%; width: 95%; height: 35px; font-size: 12px">
                   </v-text-field>
                 </td>
               </tr>
@@ -105,7 +105,7 @@
               <tr style="height: 55px; vertical-align: middle;">
                 <td>휴대폰 <span style="color: red">*</span></td>
                 <td>
-                  <v-text-field v-model="phoneNum" @input="formatPhoneNumber" dense outlined style="margin-left: 5%; width: 95%; height: 35px; font-size: 12px">
+                  <v-text-field v-model="phoneNum" @input="formatPhoneNumber" density="compact" variant="outlined" style="margin-left: 5%; width: 95%; height: 35px; font-size: 12px">
                   </v-text-field>
                 </td>
               </tr>
@@ -120,7 +120,7 @@
               <tr style="height: 45px; vertical-align: middle;">
                 <td>배송지명 <span style="color: red">*</span></td>
                 <td>
-                  <v-text-field dense outlined style="margin-left: 5%; width: 95%; height: 35px; font-size: 12px" v-model="deliveryName" :readonly="selectedChip !== null">
+                  <v-text-field density="compact" variant="outlined" style="margin-left: 5%; width: 95%; height: 35px; font-size: 12px" v-model="deliveryName" :disabled="selectedChip !== null">
                   </v-text-field>
                 </td>
               </tr>
@@ -128,14 +128,9 @@
                <tr style="height: 45px; width: 100%; vertical-align: middle;">
                  <td></td>
                  <td style="padding-left: 5%; width: 80%">
-                  <v-chip-group active-class="text--pink lighten-5 DEEP_PINK--text" v-model="selectedChip" @change="handleChipChange">
-                    <v-chip value="집" small>집</v-chip>
-                    <v-chip value="회사" small>회사</v-chip>
-                    <v-chip value="가족" small>가족</v-chip>
-                    <v-chip value="친구" small>친구</v-chip>
-                    <v-chip value="학교" small>학교</v-chip>
+                  <v-chip-group selected-class="text-DEEP_PINK" v-model="selectedChip" @update:model-value="handleChipChange">
+                    <v-chip v-for="(chip, index) in saveOrderName" :key="index" small :value="chip">{{chip}}</v-chip>
                   </v-chip-group>
-
                 </td>
               </tr>
             </table>
@@ -190,7 +185,7 @@
                         <span style="font-size: 15px">•</span> {{option}}
                       </div>
                     </div>
-                    <div style="width: 30%; text-align: end">{{purchaseInfo.optionPrice[index].toLocaleString()}}원</div>
+                    <div style="width: 30%; text-align: end">{{ numberWithCommas(purchaseInfo.optionPrice[index])}}원</div>
                   </div>
                   <div> <span style="font-size: 15px">•</span> 수량 : {{purchaseInfo.orderCount[index]}} 개</div>
                 </div>
@@ -206,7 +201,7 @@
             <hr/>
             <div style="display: flex; font-size: 14px; padding: 15px">
               <div style="width: 70%">배송비</div>
-              <div style="width: 30%; text-align: end">{{purchaseInfo.deliveryPrice.toLocaleString()}}원</div>
+              <div style="width: 30%; text-align: end">{{ numberWithCommas(purchaseInfo.deliveryPrice)}}원</div>
             </div>
           </div>
 
@@ -253,18 +248,18 @@
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td>작품 금액</td>
-              <td class="text-right">{{purchaseInfo.totalProductPrice.toLocaleString()}}원</td>
+              <td class="text-right">{{ numberWithCommas(purchaseInfo.totalProductPrice)}}원</td>
             </tr>
 
             <tr>
               <td>배송비</td>
-              <td class="text-right">{{purchaseInfo.deliveryPrice.toLocaleString()}}원</td>
+              <td class="text-right">{{ numberWithCommas(purchaseInfo.deliveryPrice)}}원</td>
             </tr>
 
             <tr>
               <td>적립금</td>
               <td class="text-right" v-if="!usePointCheck">0원</td>
-              <td class="text-right" v-else>{{usePoint.toLocaleString()}}원</td>
+              <td class="text-right" v-else>{{ numberWithCommas(usePoint)}}원</td>
             </tr>
 
             <tr style="height: 50px; vertical-align: top">
@@ -274,7 +269,7 @@
 
             <tr style="border-top: 1px solid rgba(128,127,127,0.64); vertical-align: middle">
               <td style="font-size: 18px; font-weight: bold;">최종 결제 금액</td>
-              <td class="text-right" style="height: 60px; font-size: 18px; font-weight: bold;">{{totalPrice.toLocaleString()}}원</td>
+              <td class="text-right" style="height: 60px; font-size: 18px; font-weight: bold;">{{ numberWithCommas(totalPrice)}}원</td>
             </tr>
           </table>
         </div>
@@ -294,7 +289,7 @@
         <div style="margin-top: 40px">
           <v-btn @click="payment" color="DEEP_PINK" depressed height="80" width="100%" style="font-size: 18px; color: white; font-family: GmarketSansBold,sans-serif">
             <div>
-              <div>{{totalPrice.toLocaleString()}}원 결제하기</div>
+              <div>{{ numberWithCommas(totalPrice)}}원 결제하기</div>
             <div style="font-family: GmarketSansMedium,sans-serif; margin-top: 8px; font-size: 14px">예상적금: {{purchaseInfo.expectPoint}}p</div>
             </div>
           </v-btn>
@@ -309,6 +304,7 @@ import {defineComponent} from 'vue'
 import axios from "axios";
 import {API_BASE_URL} from "@/constant/basic";
 import {useCookies} from "vue3-cookies";
+import {numberWithCommas} from "@/constant/util";
 export default defineComponent({
   name: "PurchaseDeliveryView",
   props: ['purchaseInfo'],
@@ -329,7 +325,8 @@ export default defineComponent({
       phoneNum: '',
       phoneNumPatternCheck: false,
       deliveryName: '',
-      selectedChip: null,
+      selectedChip: '',
+      saveOrderName: ['집', '회사', '가족', '친구', '학교'],
       phoneNumberError: '',
       orderMsg: useCookies().cookies.get('orderMsg'),
       productId: useCookies().cookies.get('productId'),
@@ -345,6 +342,7 @@ export default defineComponent({
     };
   },
   methods: {
+    numberWithCommas,
     expandBox() {
       this.isActive = !this.isActive;
       if(this.isActive){

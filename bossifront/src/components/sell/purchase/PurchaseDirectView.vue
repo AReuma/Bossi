@@ -67,17 +67,17 @@
         <table style="width: 100%; border-collapse: collapse; ">
           <tr style="height: 60px; border-bottom: 1px solid black; border-top: 1px solid black;">
             <td class="table-padding">작품 가격</td>
-            <td class="table-padding" style="font-weight: bold; text-align: end">{{ optionTotalPrice.toLocaleString() }}원</td>
+            <td class="table-padding" style="font-weight: bold; text-align: end">{{ numberWithCommas(optionTotalPrice) }}원</td>
           </tr>
 
           <tr>
             <td v-if="directOrderList.freeDeliverTotalCharge !== -1" class="table-padding" rowspan="2" style="height: 80px;">배송비</td>
             <td v-else class="table-padding" style="height: 60px;">배송비</td>
-            <td class="table-padding" style="font-weight: bold; text-align: end; ">{{ directOrderList.deliveryCharge.toLocaleString() }}원</td>
+            <td class="table-padding" style="font-weight: bold; text-align: end; ">{{ numberWithCommas(directOrderList.deliveryCharge) }}원</td>
           </tr>
 
           <tr v-if="directOrderList.freeDeliverTotalCharge !== -1">
-            <td class="table-padding" style="font-size: 12px; text-align: end"> {{directOrderList.freeDeliverTotalCharge.toLocaleString()}}원 이상 무료배송</td>
+            <td class="table-padding" style="font-size: 12px; text-align: end"> {{ numberWithCommas(directOrderList.freeDeliverTotalCharge)}}원 이상 무료배송</td>
           </tr>
         </table>
       </div>
@@ -97,11 +97,11 @@
               <td>결제 예정 금액</td>
             </tr>
             <tr>
-              <td class="table-border">{{ optionTotalPrice.toLocaleString() }} 원</td>
+              <td class="table-border">{{ numberWithCommas(optionTotalPrice) }} 원</td>
               <td class="table-border">+</td>
-              <td class="table-border">{{ directOrderList.deliveryCharge.toLocaleString() }} 원</td>
+              <td class="table-border">{{ numberWithCommas(directOrderList.deliveryCharge) }} 원</td>
               <td class="table-border">=</td>
-              <td class="table-border">{{ (optionTotalPrice + directOrderList.deliveryCharge).toLocaleString() }} 원</td>
+              <td class="table-border">{{ numberWithCommas((optionTotalPrice + directOrderList.deliveryCharge)) }} 원</td>
             </tr>
           </table>
         </div>
@@ -188,6 +188,7 @@
 import {defineComponent} from 'vue'
 import index, {mapActions} from "vuex";
 import {useCookies} from "vue3-cookies";
+import {numberWithCommas} from "../../../constant/util";
 
 export default defineComponent({
   name: "PurchaseDirectView",
@@ -217,6 +218,7 @@ export default defineComponent({
     }
   },
   methods: {
+    numberWithCommas,
     checkTextLength() {
       this.showSave = this.orderMsg.length > 0;
       this.showWarning = true;

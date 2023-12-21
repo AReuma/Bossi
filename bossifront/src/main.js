@@ -4,11 +4,14 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import {router} from './routes'
 import { loadFonts } from './plugins/webfontloader'
+import { numberWithCommas } from './constant/util';
 
 loadFonts()
 
-createApp(App)
-    .use(store)
-    .use(vuetify)
-    .use(router)
-.mount('#app')
+const app = createApp(App)
+
+app.use(store);
+app.use(vuetify);
+app.use(router);
+app.config.globalProperties.$numberWithCommas = numberWithCommas;
+app.mount('#app')
