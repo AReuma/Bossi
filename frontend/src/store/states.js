@@ -10,4 +10,7 @@ export default {
     directOptionPrice: [],
     purchaseInfo: [],
     cartCount: 0,
+    myCartInfo: [],
+    multiOrderProduct: [],
+    orderCompleteInfo: []
 }
