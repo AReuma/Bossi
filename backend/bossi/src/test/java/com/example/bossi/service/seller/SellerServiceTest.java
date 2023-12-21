@@ -5,7 +5,6 @@ import com.example.bossi.entity.*;
 import com.example.bossi.exception.AppException;
 import com.example.bossi.repository.user.UserRepository;
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;

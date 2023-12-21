@@ -3,7 +3,7 @@
     <home-header></home-header>
     <div class="content-wrapper">
       <product-detail-content class="left-component" :productImg="productContent.productImg"></product-detail-content>
-      <product-detail-info class="right-component" :productContent="productContent"></product-detail-info>
+      <product-detail-info class="right-component" :productContent="productContent" @addCart="addCart"></product-detail-info>
     </div>
   </div>
 </template>
@@ -14,12 +14,26 @@ import HomeHeader from "@/components/home/HomeHeader.vue";
 import ProductDetailInfo from "@/components/sell/detail/ProductDetailInfo.vue";
 import ProductDetailContent from "@/components/sell/detail/ProductDetailContent.vue";
 import {mapActions, mapState} from "vuex";
+import axios from "axios";
+import {API_BASE_URL} from "@/constant/basic";
 
 export default defineComponent({
   name: "ProductDetailPage",
   components: {ProductDetailContent, ProductDetailInfo, HomeHeader},
   methods: {
-    ...mapActions(['fetchProductContent', 'updateImgStyleData'])
+    ...mapActions(['fetchProductContent', 'updateImgStyleData']),
+    addCart(payload){
+      const {email, productId, options, optionCount} = payload;
+      console.log(email)
+
+      axios.post(API_BASE_URL+"/api/v1/cart/addCart", {email, productId, options, optionCount})
+          .then((res) => {
+            console.log(res)
+          })
+          .catch((res) => {
+            console.log(res)
+          })
+    }
   },
   computed: {
     ...mapState(["productContent"])

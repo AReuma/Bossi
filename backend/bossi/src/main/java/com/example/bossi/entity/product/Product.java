@@ -2,6 +2,8 @@ package com.example.bossi.entity.product;
 
 import com.example.bossi.entity.BaseEntity;
 import com.example.bossi.entity.Seller;
+import com.example.bossi.exception.AppException;
+import com.example.bossi.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -118,5 +120,20 @@ public class Product extends BaseEntity {
     public void addProductContentImg(ProductContentImg productContentImg) {
         productContentImgList.add(productContentImg);
         productContentImg.setProduct(this);
+    }
+
+    public void removeStock(int quantity){
+        System.out.println("========");
+        System.out.println(this.stockQuantity);
+        System.out.println("========");
+        if(this.stockQuantity != -1) {
+            int resetStock = this.stockQuantity - quantity;
+
+            if (resetStock < 0) {
+                throw new AppException(ErrorCode.NOT_ENOUGH_STOCK, "수량 부족");
+            }
+
+            this.stockQuantity = resetStock;
+        }
     }
 }

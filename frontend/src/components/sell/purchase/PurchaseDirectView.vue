@@ -186,7 +186,7 @@
 
 <script>
 import {defineComponent} from 'vue'
-import index from "vuex";
+import index, {mapActions} from "vuex";
 import {useCookies} from "vue3-cookies";
 
 export default defineComponent({
@@ -339,12 +339,14 @@ export default defineComponent({
         this.saveOrderBtn = false;
       }
     },
+    ...mapActions(['fetchTest']),
     order(){
       // 주문
       // 옵션, 옵션별 개수, 주문 요청 사항
       /*const {orderMsg} = this;
 
       this.$emit('order', {orderMsg});*/
+
       this.$router.push({name: 'PurchaseDeliveryPage'})
     }
   },

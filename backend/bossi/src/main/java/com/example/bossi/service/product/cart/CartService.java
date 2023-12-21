@@ -1,6 +1,8 @@
 package com.example.bossi.service.product.cart;
 
+import com.example.bossi.dto.product.cart.OrderProductInfoRequest;
 import com.example.bossi.response.product.cart.DirectButOrderItemInfo;
+import com.example.bossi.response.product.cart.OrderMultiProductInfo;
 import com.example.bossi.response.product.cart.OrderProductInfo;
 import org.springframework.http.ResponseEntity;
 
@@ -12,4 +14,6 @@ public interface CartService {
     ResponseEntity<String> modifyDirectOption(List<String> options);
 
     ResponseEntity<OrderProductInfo> orderProduct(Long productId, String options, String optionCount, String email);
+
+    ResponseEntity<OrderMultiProductInfo> multiOrderProduct(String email, List<OrderProductInfoRequest> orderData);
 }

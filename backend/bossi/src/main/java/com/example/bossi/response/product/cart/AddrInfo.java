@@ -22,6 +22,6 @@ public class AddrInfo {
     private String recipient;
 
     @Schema(description = "수령인 전화번호")
-    private String poneNum;
+    private String phoneNum;
 
 }

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Schema(description = "장바구니 상품")
 public class AddToCartRequest {
 
-    //String userId, Long productId, String options, String optionCount
+    //String email, Long productId, String options, String optionCount
     private String email;
     private Long productId;
     private String options;
