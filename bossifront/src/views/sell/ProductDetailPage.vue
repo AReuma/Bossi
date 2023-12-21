@@ -2,6 +2,7 @@
   <div>
     <home-header></home-header>
     <div class="content-wrapper">
+      {{userData}}
       <product-detail-content class="left-component" :productImg="productContent.productImg"></product-detail-content>
       <product-detail-info class="right-component" :productContent="productContent" @addCart="addCart"></product-detail-info>
     </div>

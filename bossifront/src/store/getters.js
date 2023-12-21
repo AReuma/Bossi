@@ -5,8 +5,9 @@ export default {
     isLogin (){
         return useCookies().cookies.get("access_token") !== null;
     },
-    getImgData() {
-        return states.imgData;
+    getImgData(state) {
+        //console.log(states.imgData)
+        return state.imgData;
     },
     getOptionCount() {
         return states.directOptionCount;

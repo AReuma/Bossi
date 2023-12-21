@@ -2,7 +2,7 @@
   <div style="height: 100%; max-width: 50%; padding: 10px;">
     <v-card height="auto" width="100%" style="padding: 10px; border: 1px solid rgba(234,234,234,0.2)" elevation="2">
       <div style="display: flex; align-items: center;">
-        <img style="border-radius: 80%; border: 1px solid rgba(187,187,187,0.43); margin-right: 10px" src="../../../assets/logo/Bossi_logo_1.png" height="50" width="50"/>
+        <v-img style="border-radius: 80%; border: 1px solid rgba(187,187,187,0.43); margin-right: 10px" src="../../../assets/logo/Bossi_logo_1.png" max-height="50" max-width="50" height="50" width="50"/>
         <div style="font-family: GmarketSansBold, sans-serif">{{productContent.storeName}}</div>
       </div>
 
@@ -12,9 +12,9 @@
 
       <div style="margin-top: 5px; display: flex;">
         <div style="width: 80%; display: flex; align-items: end">
-          <div class="boldText" style="color: red" v-if="productContent.rating !== 0">{{productContent.rating.toLocaleString()}}%</div>
-          <div class="boldText" style="">{{productContent.ratingPrice.toLocaleString()}}원</div>
-          <div style="font-size: 15px; padding-bottom: 5px; color: #bbbbbb"  v-if="productContent.rating !== 0"><del>{{productContent.price.toLocaleString()}}원</del></div>
+          <div class="boldText" style="color: red" v-if="productContent.rating !== 0">{{numberWithCommas(productContent.rating)}}%</div>
+          <div class="boldText" style="">{{numberWithCommas(productContent.ratingPrice)}}원</div>
+          <div style="font-size: 15px; padding-bottom: 5px; color: #bbbbbb"  v-if="productContent.rating !== 0"><del>{{numberWithCommas(productContent.price)}}원</del></div>
         </div>
         <div style="width: 20%; display: flex; justify-content: end; padding-right: 5px">
           <v-icon size="32">mdi-heart</v-icon>
@@ -22,7 +22,7 @@
       </div>
 
       <div style="display: flex; justify-content: end">
-        <span style="font-family: GmarketSansBold, sans-serif">{{productContent.salesQuantity.toLocaleString()}}명</span> 구매
+        <span style="font-family: GmarketSansBold, sans-serif">{{numberWithCommas(productContent.salesQuantity)}}명</span> 구매
       </div>
 
       <div>
@@ -37,17 +37,17 @@
             <td><v-rating readonly color="yellow"></v-rating></td>
           </tr>
 
-          <tr>
+<!--          <tr>
             <td class="table-name" style="vertical-align: top">배송비</td>
-            <td v-if="productContent.freeDeliverTotalCharge !== -1" style="text-align: start">{{ productContent.deliveryCount.toLocaleString()}}원 <br/>
-              <span style="font-size: 13px; color: rgba(106,106,106,0.89)">{{productContent.freeDeliverTotalCharge.toLocaleString()}}원 이상 무료배송</span>
+            <td v-if="productContent.freeDeliverTotalCharge !== -1" style="text-align: start">{{ numberWithCommas(productContent.deliveryCount)}}원 <br/>
+              <span style="font-size: 13px; color: rgba(106,106,106,0.89)">{{pnumberWithCommas(roductContent.freeDeliverTotalCharge)}}원 이상 무료배송</span>
             </td>
-            <td v-else style="text-align: start">{{ productContent.deliveryCount.toLocaleString() }}원 <br/>
+            <td v-else style="text-align: start">{{ numberWithCommas(productContent.deliveryCount) }}원 <br/>
             </td>
           </tr>
           <tr v-if="productContent.freeDeliverTotalCharge === -1">
             <td class="table-name"></td>
-          </tr>
+          </tr>-->
           <tr>
             <td class="table-name">배송 시작</td>
             <td>평균 1일, 최대 7일 이내</td>
@@ -60,7 +60,7 @@
         </table>
       </div>
 
-      <div v-if="!productContent.productOption.every(isEmptyObject)">
+<!--      <div v-if="!productContent.productOption.every(isEmptyObject)">
         <div style="margin: 15px 0 20px 0; height: 60px; padding: 5px 0">
           <v-btn @click="optionDialog = true" text width="100%" height="100%" style=" border: 1px solid rgba(187,187,187,0.67);">
             옵션 선택 <v-spacer></v-spacer><v-icon>mdi-chevron-down</v-icon>
@@ -78,7 +78,7 @@
               </div>
 
               <div style="text-align: end; width: 60%; font-weight: bolder;">
-                {{orderOptionTotalPrice[index].toLocaleString()}} <v-btn icon @click="removeOption(index)"><v-icon>mdi-window-close</v-icon></v-btn>
+                {{numberWithCommas(orderOptionTotalPrice[index])}} <v-btn icon @click="removeOption(index)"><v-icon>mdi-window-close</v-icon></v-btn>
               </div>
             </div>
           </div>
@@ -94,14 +94,14 @@
               <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="noOptionOrderPlus">+</v-btn>
             </div>
             <div v-if="this.orderNoOptionCount === 1" style="text-align: end; width: 60%; font-weight: bolder; display: flex; align-items: center; justify-content: end; height: auto">
-              {{productContent.ratingPrice.toLocaleString()}} 원
+              {{numberWithCommas(productContent.ratingPrice)}} 원
             </div>
             <div v-else style="text-align: end; width: 60%; font-weight: bolder; display: flex; align-items: center; justify-content: end; height: auto">
-              {{this.orderNoOptionPrice.toLocaleString()}} 원
+              {{numberWithCommas(this.orderNoOptionPrice)}} 원
             </div>
           </div>
         </div>
-      </div>
+      </div>-->
 
       <v-dialog v-model="optionDialog" persistent height="auto" width="500px">
         <v-card>
@@ -138,16 +138,18 @@
         </v-card>
       </v-dialog>
 
+<!--
       <div v-if="!productContent.productOption.every(isEmptyObject)" style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
         <div style="width: 20%">총 작품금액</div>
-        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;"> {{this.orderPrice.toLocaleString()}} 원</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;"> {{ numberWithCommas(this.orderPrice)}} 원</div>
       </div>
 
       <div v-else style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
         <div style="width: 20%">총 작품금액</div>
-        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-if="this.orderNoOptionCount === 1"> {{this.productContent.ratingPrice.toLocaleString()}} 원</div>
-        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-else> {{this.orderNoOptionPrice.toLocaleString()}} 원</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-if="this.orderNoOptionCount === 1"> {{numberWithCommas(this.productContent.ratingPrice)}} 원</div>
+        <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;" v-else> {{numberWithCommas(this.orderNoOptionPrice)}} 원</div>
       </div>
+-->
 
       <div style="margin-top: 18px;">
         <v-btn depressed height="50px" text class="buy-button" style="border: 1px solid rgba(187,187,187,0.62)" @click="addCart">장바구니</v-btn>
@@ -379,7 +381,14 @@ export default defineComponent({
     }
   },
   computed: {
-
+    numberWithCommas() {
+      return function(value) {
+        if (value && typeof value.toString === 'function') {
+          return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        return value;
+      };
+    }
   }
 })
 </script>
