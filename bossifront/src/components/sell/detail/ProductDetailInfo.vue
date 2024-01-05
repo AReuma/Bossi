@@ -1,5 +1,6 @@
 <template>
   <div style="height: 100%; max-width: 50%; padding: 10px;">
+    {{productContent.productOption === null}}
     <v-card height="auto" width="100%" style="padding: 10px; border: 1px solid rgba(234,234,234,0.2)" elevation="2">
       <div style="display: flex; align-items: center;">
         <v-img style="border-radius: 80%; border: 1px solid rgba(187,187,187,0.43); margin-right: 10px" src="../../../assets/logo/Bossi_logo_1.png" max-height="50" max-width="50" height="50" width="50"/>
@@ -60,7 +61,7 @@
         </table>
       </div>
 
-      <div v-if="!productContent.productOption.every(isEmptyObject)">
+      <div v-if="productContent.productOption">
         <div style="margin: 15px 0 20px 0; height: 60px; padding: 5px 0">
           <v-btn @click="optionDialog = true" text width="100%" height="100%" style=" border: 1px solid rgba(187,187,187,0.67);">
             옵션 선택 <v-spacer></v-spacer><v-icon>mdi-chevron-down</v-icon>
@@ -110,7 +111,7 @@
           </v-card-title>
 
           <v-card-actions>
-            <div style="height: 200px; width: 100%; display: flex; flex-direction: column">
+            <div v-if="productContent.productOption" style="height: 200px; width: 100%; display: flex; flex-direction: column">
               <div v-for="(items, index) in productContent.productOption" :key="index">
                 <v-select :style="{outline: 'none'}" color="DEEP_PINK" v-model="selectedOptions[index]" :items="getOptionDetails(items)" :item-props="itemProps" variant="outlined"
                          :label="(index+1)+'.  '+items.option" style="padding-bottom: 2px"></v-select>
@@ -138,7 +139,7 @@
         </v-card>
       </v-dialog>
 
-      <div v-if="!productContent.productOption.every(isEmptyObject)" style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
+      <div v-if="productContent.productOption" style="display:flex; width: 100%; margin-top: 5px; padding-right: 10px">
         <div style="width: 20%">총 작품금액</div>
         <div style="display:flex; font-family: GmarketSansBold,sans-serif; justify-content: end; width: 80%;"> {{ numberWithCommas(this.orderPrice)}} 원</div>
       </div>
@@ -333,8 +334,16 @@ export default defineComponent({
         if(this.userEmail !== null){
           let productId = this.productContent.productId;
           const options = this.orderList.join(',');
-          const optionCount = this.orderCount.join(',');
-          console.log(options)
+
+          let optionCount;
+          if (!this.productContent.productOption){
+            alert(this.orderNoOptionCount)
+            optionCount = this.orderNoOptionCount;
+          }else{
+            optionCount = this.orderCount.join(',');
+          }
+
+          console.log(optionCount)
 
           const expires = new Date()
           expires.setMinutes(expires.getMinutes() + 60)

@@ -1,5 +1,6 @@
 <template>
-  <div class="basic" v-if="!cartIsEmpty">
+  <div class="basic">
+    {{directOrderList}}
     <div style="width: 100%; display: flex;">
       <div style="width: 50%; font-size: 28px; font-family: GmarketSansBold, sans-serif">장바구니</div>
       <div style="display: flex; width: 50%; justify-content: end; align-items: center; font-size: 20px">
@@ -10,8 +11,8 @@
     </div>
 
     <div style="border: 1px solid #626262; width: 100%; height: 100%; margin-top: 40px; border-radius: 4px">
-      <div style="padding-left: 2%; display: flex; align-items: center; background-color: rgba(187,187,187,0.15); height: 60px">
-        <v-checkbox readonly v-model="checkProduct" color="DEEP_PINK"></v-checkbox><div style="margin-left: 5px; font-size: 18px">{{directOrderList.storeName}}</div>
+      <div style="padding-left: 2%; display: flex; background-color: rgba(187,187,187,0.15); height: 60px">
+        <v-checkbox :model-value="true" readonly="" color="DEEP_PINK" class="text-black" :label="directOrderList.storeName" style="font-weight: bolder;" density="default"></v-checkbox>
       </div>
 
       <div style="display: flex; padding: 0 2%; height: 100%; flex-direction: column">
@@ -28,24 +29,42 @@
         </div>
 
         <div style="margin-top: 30px; padding: 0 10px 0 155px; height: auto; margin-bottom: 20px">
-          <div v-for="(option, index) in optionStr" :key="index" style="border-bottom: #848484 1px solid; height: 50px; padding: 0 10px; display: flex; align-items: center; font-size: 15px">
-            <div style="max-width: 50%; min-width: 50%">
-              {{option}}
+          <div v-if="directOrderList.option" >
+            <div v-for="(option, index) in optionStr" :key="index" style="border-bottom: #848484 1px solid; height: 50px; padding: 0 10px; display: flex; align-items: center; font-size: 15px">
+              <div style="max-width: 50%; min-width: 50%">
+                {{option}}
+              </div>
+              <div style=" max-width: 25%; min-width: 25%">
+                <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="orderListMin(index)">-</v-btn>
+                <input readonly :style="{outline: 'none'}" v-model="optionCount[index]" type="text" style="width: 40%; text-align: center">
+                <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="orderListPlus(index)">+</v-btn>
+              </div>
+              <div style="display: flex; align-items: center; max-width: 25%; min-width: 25%">
+                {{ optionPrice[index] * optionCount[index]}}
+                <div style="margin-left: 15px;">
+              <!--<v-btn icon @click="settingOption(index)"><v-icon>mdi-cog</v-icon></v-btn>-->
+                  <v-btn icon @click="removeOption(index)"><v-icon>mdi-window-close</v-icon></v-btn>
+                </div>
+              </div>
             </div>
-            <div style=" max-width: 25%; min-width: 25%">
-              <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="orderListMin(index)">-</v-btn>
-              <input readonly :style="{outline: 'none'}" v-model="optionCount[index]" type="text" style="width: 40%; text-align: center">
-              <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="orderListPlus(index)">+</v-btn>
-            </div>
-            <div style="display: flex; align-items: center; max-width: 25%; min-width: 25%">
-              {{ optionPrice[index] * optionCount[index]}}
-              <div style="margin-left: 15px;">
-                <v-btn icon @click="settingOption(index)"><v-icon>mdi-cog</v-icon></v-btn>
-                <v-btn icon @click="removeOption(index)"><v-icon>mdi-window-close</v-icon></v-btn>
+          </div>
+
+          <div v-else style="min-height: 80px; max-height: 80px; overflow-y: auto; margin-top: 20px">
+            <div style="background-color: rgba(229,229,229,0.25); border: 1px solid rgba(149,146,146,0.23); border-radius: 7px; padding: 10px">
+              <div style="display: flex">
+                <div style=" max-width: 25%; min-width: 25%">
+                  <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="noOptionOrderMin">-</v-btn>
+                  <input readonly :style="{outline: 'none'}" type="text" style="width: 40%; text-align: center" v-model="noOptionProductCount">
+                  <v-btn outlined min-width="10px" style="border: 1px solid rgba(106,106,106,0.5)" @click="noOptionOrderPlus">+</v-btn>
+                </div>
+                <div style="text-align: end; width: 60%; font-weight: bolder; display: flex; align-items: center; justify-content: end; height: auto">
+                  {{numberWithCommas(optionTotalPrice)}} 원
+                </div>
               </div>
             </div>
           </div>
         </div>
+
 
         <div>
           <div style="display: flex; height: 170px">
@@ -73,7 +92,7 @@
           <tr>
             <td v-if="directOrderList.freeDeliverTotalCharge !== -1" class="table-padding" rowspan="2" style="height: 80px;">배송비</td>
             <td v-else class="table-padding" style="height: 60px;">배송비</td>
-            <td class="table-padding" style="font-weight: bold; text-align: end; ">{{ numberWithCommas(directOrderList.deliveryCharge) }}원</td>
+            <td class="table-padding" style="font-weight: bold; text-align: end; ">{{ numberWithCommas(deliveryCharge) }}원</td>
           </tr>
 
           <tr v-if="directOrderList.freeDeliverTotalCharge !== -1">
@@ -99,9 +118,9 @@
             <tr>
               <td class="table-border">{{ numberWithCommas(optionTotalPrice) }} 원</td>
               <td class="table-border">+</td>
-              <td class="table-border">{{ numberWithCommas(directOrderList.deliveryCharge) }} 원</td>
+              <td class="table-border">{{ numberWithCommas(deliveryCharge) }} 원</td>
               <td class="table-border">=</td>
-              <td class="table-border">{{ numberWithCommas((optionTotalPrice + directOrderList.deliveryCharge)) }} 원</td>
+              <td class="table-border">{{ numberWithCommas((optionTotalPrice + deliveryCharge)) }} 원</td>
             </tr>
           </table>
         </div>
@@ -112,15 +131,18 @@
       </div>
     </div>
 
-    <v-dialog v-model="optionDialog" persistent height="auto" width="500px">
+<!--    옵션 변경 구현
+    <v-dialog v-model="optionDialog" persistent="" height="auto" width="800px">
       <v-card>
-        <v-card-title style="justify-content: center; border-bottom: 1px solid black">
-          <v-spacer></v-spacer>
-          옵션 수정
-          <v-spacer></v-spacer>
-          <v-btn icon @click="optionDialog = false"><v-icon small>mdi-window-close</v-icon></v-btn>
+        <v-card-title ju style="justify-content: center; border-bottom: 1px solid black">
+          <div style="display: flex">
+            <span class="text-h4">옵션 수정</span>
+            <v-spacer></v-spacer>
+            <v-btn variant="plain" @click="optionDialog = false">
+              <v-icon small>mdi-window-close</v-icon>
+            </v-btn>
+          </div>
         </v-card-title>
-
 
         <v-card-text>
           <div style="padding: 10px">
@@ -128,6 +150,7 @@
               <v-img :src="`https://s3.ap-northeast-2.amazonaws.com/my.example.s3.bucket.bossi/${directOrderList.productImg}`" style="border-radius: 4px; max-width: 90px; height: 90px"/>
               <div style="display: flex; flex-direction: column; margin-left: 12px; ">
                 <div style="font-weight: bolder; font-size: 24px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: black">
+                  {{checkIndex}}
                   {{directOrderList.productName}}
                 </div>
 
@@ -141,17 +164,17 @@
 
             <div style="margin-top: 15px">
               <div style="color: #fc9899">현재 선택한 옵션</div>
-              <div style="height: auto; background-color: rgba(187,187,187,0.15); border-radius: 4px; padding: 15px">
+              <div style="height: auto; background-color: rgba(187,187,187,0.15); border-radius: 4px; padding: 15px" v-if="directOrderList.option">
                 {{directOrderList.optionStr[checkIndex]}}
               </div>
             </div>
 
-            <div style="margin-top: 15px">
+            <div v-if="directOrderList.option" style="margin-top: 15px">
               <div style="">옵션 선택</div>
               <div style="height: 200px; width: 100%; display: flex; flex-direction: column; margin-top: 10px">
                 <div v-for="(item, index) in directOrderList.productOption" :key="index">
-                  <v-select :style="{outline: 'none'}" color="DEEP_PINK" v-model="selectedOptions[index]" :items="getOptionDetails(item)" item-text="label"
-                            item-value="value" :label="(index+1)+'.  '+item.option" style="padding-bottom: 2px"></v-select>
+                  <v-select :style="{outline: 'none'}" color="DEEP_PINK" v-model="selectedOptions[index]" :items="getOptionDetails(item)" :item-props="itemProps"
+                            :label="(index+1)+'.  '+item.option" style="padding-bottom: 2px"></v-select>
                 </div>
               </div>
             </div>
@@ -169,18 +192,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+-->
 
-  </div>
-
-  <div class="basic" style="justify-content: center; align-items: center; height: 500px;" v-else>
-    <div style="width: 100%; text-align: center; font-size: 22px">
-      장바구니가 비었습니다.<br>
-      작가님들의 다양한 작품을 담아보세요.
-    </div>
-
-    <div style="padding: 15px; margin-top: 40px; width: 240px">
-      <v-btn @click="gHome" style="width: 100%; height: 50px; font-size: 18px; color: white" color="DEEP_PINK" depressed>작품 구경하기</v-btn>
-    </div>
   </div>
 </template>
 
@@ -212,9 +225,12 @@ export default defineComponent({
       optionPrice: null,
       checkProduct: true,
       optionTotalPrice: 0,
+      noOptionProductCount: 0,
       orderMsg: '',
       showSave: false,
-      showWarning: false
+      showWarning: false,
+      freeDeliverTotalCharge: 0,
+      deliveryCharge: 0
     }
   },
   methods: {
@@ -230,14 +246,15 @@ export default defineComponent({
     },
     removeOption(index){
       if(this.optionStr.length -1 < 1){
-        this.optionCount = [];
+        /*this.optionCount = [];
         this.optionPrice = [];
         this.optionStr = [];
         this.option = [];
 
         useCookies().cookies.remove('options');
-        useCookies().cookies.remove('productId');
+        useCookies().cookies.remove('productId');*/
 
+        alert("한개 이상 구매해야합니다.")
       }else {
         this.optionCount.splice(index, 1);
         this.optionPrice.splice(index, 1);
@@ -256,17 +273,25 @@ export default defineComponent({
     },
     getOptionDetails(item) {
       let combinedOptions = [];
-
+      //this.combinedOptions = [];
       for (let key in item.price) {
-        //let index = item.option+ ": " +item.optionDetail[key];
+        let index = item.option+ ": " +item.optionDetail[key]+'/(+'+item.price[key]+')';
         let price = item.price[key];
         let optionDetail = item.optionDetail[key];
         combinedOptions.push({
-          label: `${optionDetail} (+ ${price} 원)`,
-          value: `${key}`
+          title: `${optionDetail} (+ ${price} 원)`,
+          props: `${key}#${index}`
         });
       }
+
+      //console.log(combinedOptions)
       return combinedOptions;
+    },
+    itemProps(item){
+      return {
+        title: item.title,
+        value: item.props
+      }
     },
     closeOptionDialog(){
       this.optionDialog = false;
@@ -299,6 +324,18 @@ export default defineComponent({
       useCookies().cookies.set('options', options)
       this.optionDialog = false;
       this.$router.go(0);
+    },
+    noOptionOrderMin(){
+      if(this.noOptionProductCount > 1){
+        this.noOptionProductCount--;
+        this.optionTotalPrice = this.directOrderList.ratingPrice * this.noOptionProductCount;
+      }else {
+        alert('주문수가 1보다 작을 수 없습니다.')
+      }
+    },
+    noOptionOrderPlus(){
+      this.noOptionProductCount++;
+      this.optionTotalPrice = this.directOrderList.ratingPrice * this.noOptionProductCount;
     },
     orderListMin(index){
       if(this.optionCount[index] > 1) {
@@ -355,7 +392,7 @@ export default defineComponent({
   watch: {
     directOrderList: {
       handler(newVal) {
-        if (newVal && newVal.optionCount) {
+        if (newVal && newVal.optionCount && newVal.option) {
           this.optionCount = [...newVal.optionCount];
           this.optionPrice = [...newVal.optionPrice];
           this.optionStr = [...newVal.optionStr];
@@ -364,18 +401,28 @@ export default defineComponent({
           for (let i = 0; i < newVal.optionPrice.length; i++) {
             this.optionTotalPrice += (this.optionPrice[i] * this.optionCount[i])
           }
+        }else {
+          this.optionTotalPrice = newVal.ratingPrice;
+          this.noOptionProductCount = newVal.optionCount[0];
         }
+
+        this.freeDeliverTotalCharge = newVal.freeDeliverTotalCharge;
+        this.deliveryCharge = newVal.deliveryCharge;
       },
       deep: true,
+    },
+    optionTotalPrice() {
+      if(this.freeDeliverTotalCharge !== -1){
+        if(this.optionTotalPrice >= this.freeDeliverTotalCharge){
+            this.deliveryCharge = 0;
+        }else {
+          this.deliveryCharge = this.directOrderList.deliveryCharge
+        }
+      }
     },
     orderMsg(){
 
     }
-  },
-  mounted() {
-    console.log(this.optionCount)
-    //this.optionCount = [...this.directOrderList.optionCount];
-    //this.optionPrice = [...this.directOrderList.optionPrice];
   },
 })
 </script>

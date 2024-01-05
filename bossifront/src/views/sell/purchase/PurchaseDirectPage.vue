@@ -37,12 +37,7 @@ export default defineComponent({
     }
   },
   mounted() {
-    if(this.options !== null) {
-      this.cartIsEmpty = false
-      this.fetchDirectOrderList({productId: this.productId, options: this.options, optionCount: this.optionCount})
-    } else {
-      this.cartIsEmpty = true;
-    }
+    this.fetchDirectOrderList({productId: this.productId, options: this.options, optionCount: this.optionCount})
   },
   computed: {
     ...mapState(["directOrderList"])

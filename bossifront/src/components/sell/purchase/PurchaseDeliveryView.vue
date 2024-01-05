@@ -52,7 +52,7 @@
             <v-btn @click="newBtn" style="width: 50%; border-top: 2px solid #626262; border-top-left-radius: 0; border-top-right-radius: 0" height="50" depressed color="rgba(236, 235, 235, 0.15)">신규 입력</v-btn>
           </div>
 
-          <div v-if="!existDelivery" style="margin-top: 10px; font-size: 15px; padding: 5px">
+          <div v-if="existDelivery" style="margin-top: 10px; font-size: 15px; padding: 5px">
             <div v-if="!purchaseInfo.deliveryCheck" style="height: 100px; text-align: center; display: flex; justify-content: center; align-items: center">
               배송지가 없습니다.<br/>
               ' 신규 입력 '을 눌러 배송지를 추가해주세요.
@@ -239,7 +239,16 @@
 
         <div class="div-deco" style="margin-top: 20px; height: auto">
           <div style="width: 50%; font-weight: bold;">결제 수단</div>
+
+          <div style="height: 120px;" class="py-2">
+            <v-radio-group v-model="selectPayment">
+              <v-radio class="pay-radio text-black" density="comfortable" color="DEEP_PINK" label="카드 결제" value="html5_inicis"></v-radio>
+              <v-radio class="pay-radio text-black" density="comfortable" color="DEEP_PINK" label="카카오 결제" value="kakaopay"></v-radio>
+              <v-radio class="pay-radio text-black" density="comfortable" color="DEEP_PINK" label="토스 결제" value="tosspay"></v-radio>
+            </v-radio-group>
+          </div>
         </div>
+
       </div>
 
       <div class="div-deco" style="flex: 0.8; height: 450px; margin-left: 25px; padding-top: 20px">
@@ -273,14 +282,6 @@
             </tr>
           </table>
         </div>
-
-        <router-link
-            :to="{ name: 'PurchaseCompletePage', query: {orderNum: orderNum} }"
-        >
-          Query 선언적 방식
-        </router-link>
-
-        <v-btn @click="move">dd</v-btn>
 
         <div>
           결제 시 개인정보 제공에 동의합니다.
@@ -339,6 +340,7 @@ export default defineComponent({
       isSave: true,
       isBasic: true,
       orderNum: "ORD16973799120143309",
+      selectPayment: "html5_inicis",
     };
   },
   methods: {
@@ -440,6 +442,7 @@ export default defineComponent({
         let orderPhoneNum = this.purchaseInfo.phoneNum;
         let deliveryPrice = this.purchaseInfo.deliveryPrice;
         let existDelivery = this.existDelivery
+        let pg = this.selectPayment;
 
         let orderNum = this.createOrderNum();
 
@@ -447,16 +450,16 @@ export default defineComponent({
 
         IMP.request_pay(
             {
-              pg: "kakaopay",
+              pg: pg,
               pay_method: "card",
               merchant_uid: orderNum,// 주문번호
               name: this.purchaseInfo.productTitle,
               amount: this.totalPrice,
-              //buyer_email: "gildong@gmail.com",
               buyer_name: this.purchaseInfo.name,
-              //buyer_tel: "010-4242-4242",
-              //buyer_addr: "서울특별시 강남구 신사동",
-              //buyer_postcode: "01181"
+              buyer_tel: phoneNum,
+              buyer_addr: address+" "+detailAddr,
+              buyer_postcode: zipcode,
+              m_redirect_url: "https://www.naver.com"
             },
             (rsp) => {
               //rsp.imp_uid 값으로 결제 단건조회 API를 호출하여 결제결과를 판단합니다.
@@ -623,5 +626,9 @@ textarea {
 
 textarea:focus {
   outline: none;
+}
+
+.pay-radio{
+  font-size: 12px;
 }
 </style>

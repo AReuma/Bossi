@@ -4,7 +4,7 @@
     <div class="content-wrapper">
       {{userData}}
       <product-detail-content class="left-component" :productImg="productContent.productImg"></product-detail-content>
-      <product-detail-info v-if="productContent && productContent.productOption && !isEmptyObject(productContent.productOption)" class="right-component" :productContent="productContent" @addCart="addCart"></product-detail-info>
+      <product-detail-info v-if="productContent" class="right-component" :productContent="productContent" @addCart="addCart"></product-detail-info>
     </div>
   </div>
 </template>
