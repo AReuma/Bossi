@@ -66,17 +66,30 @@ export default {
     },
     fetchDirectOrderList({commit}, {productId, options, optionCount}){
         console.log(productId +"id:"+"options"+options)
-        return axios.post(API_BASE_URL+'/api/v1/cart/directBuy', {productId, options, optionCount})
+        return axios.post(API_BASE_URL+'/api/v1/product/directBuy', {productId, options, optionCount})
             .then((res) => {
                 commit(FETCH_DIRECT_ORDER_LIST, res.data)
             })
     },
+    /*fetchDirectOrderList({commit}, {productId, options, optionCount}){
+        console.log(productId +"id:"+"options"+options)
+        return axios.post(API_BASE_URL+'/api/v1/cart/directBuy', {productId, options, optionCount})
+            .then((res) => {
+                commit(FETCH_DIRECT_ORDER_LIST, res.data)
+            })
+    },*/
     fetchPurchaseInfo({commit}, {productId, options, optionCount, email}){
-        return axios.post(API_BASE_URL+'/api/v1/cart/order', {productId, options, optionCount, email})
+        return axios.post(API_BASE_URL+'/api/v1/product/order', {productId, options, optionCount, email})
             .then((res) => {
                 commit(FETCH_PURCHASE_INFO, res.data)
             })
     },
+    /*fetchPurchaseInfo({commit}, {productId, options, optionCount, email}){
+        return axios.post(API_BASE_URL+'/api/v1/cart/order', {productId, options, optionCount, email})
+            .then((res) => {
+                commit(FETCH_PURCHASE_INFO, res.data)
+            })
+    },*/
     fetchCartCount({commit}, email){
         return axios.post(API_BASE_URL+"/api/v1/cart/cartCount", {email})
             .then((res) => {
